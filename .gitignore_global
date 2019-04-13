@@ -1,0 +1,5 @@
+# module files created by IntelliJ and alike
+*.iml
+
+# Mac folder attributes files
+.DS_Store

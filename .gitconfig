@@ -1,0 +1,5 @@
+# user is set either at the system git config or the local (per repo) git config
+[push]
+        default = current # Allows pushing a branch to remote with giving a name (uses the current branch name)
+[core]
+	excludesfile = .gitignore_global
