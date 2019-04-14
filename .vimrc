@@ -1,6 +1,7 @@
 " Enable syntax highlighting
 syntax on
 
+" What does this do, is it needed?
 hi Search term=reverse cterm=NONE ctermfg=231 ctermbg=24 gui=NONE guifg=#f8f8f2 guibg=#204a87
 
 " Use the monokai colorscheme (https://github.com/crusoexia/vim-monokai)
