@@ -20,7 +20,7 @@ bash-it enable completion bash-it brew defaults git makefile system tmux
 ```
 7. Restart the terminal again.
 8. Run `myconfig config --local status.showUntrackedFiles no` to not show untracked files. Otherwise all files in your home directory will report when running `git status`. You will need to manually add new files to commit them to the repo.
-  - Verify by running `myconfig status` and it doesn't report a ton of files.
+    - Verify by running `myconfig status` and it doesn't report a ton of files.
 
 # Liscense
 This project uses the https://unlicense.org liscense. Basically no copywrite, you can copy, modify, use, sell etc any code here without giving me credit (though if this is helpful to you, I'd love a shout out!). I give no warranty of any kind on this code.
