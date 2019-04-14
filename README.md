@@ -5,7 +5,7 @@ There are my dotfiles. You are welcome to use them as a whole, or just take any 
 I'm using the setup from https://www.atlassian.com/git/tutorials/dotfiles which allows cloning this repo into $HOME to automatically sync all files. I've included how to do this below (and to help me remember without having to re-read the article).
 
 1. [combinedBash.bash](https://github.com/convergedtarkus/dotfiles/blob/master/bash/combinedBash.bash) defines the alias to interact with the repo. It is also here for setup ease `alias myconfig="/usr/bin/git --git-dir=$HOME/.myconfig/ --work-tree=$HOME"`. This assumes you clone into `$HOME/.myconfig`.
-2. `git clone --bare https://github.com/convergedtarkus/dotfiles.git $HOME/.myconfig'
+2. `git clone --bare https://github.com/convergedtarkus/dotfiles.git $HOME/.myconfig`
 3. `myconfig checkout`
     - This will warn you about overwritting any files in this repo that are in your home directory. You should manually back these up.
     - `myconfig checkout -f` will overwrite everything.
