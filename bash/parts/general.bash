@@ -32,7 +32,7 @@ alias findNotHidden="find . -not -path '*/\.*'"
 
 # Touch all time at a directory. Good for getting build tools to pick up changes.
 function touchFiles() {
-	find $1 -type f -exec touch {} +
+	find "$1" -type f -exec touch {} +
 }
 
 # Takes piped in input and echos to stdout and copies to clipboard
