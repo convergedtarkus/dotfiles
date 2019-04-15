@@ -37,7 +37,14 @@ function touchFiles() {
 
 # Takes piped in input and echos to stdout and copies to clipboard
 function copyEcho() {
-	read value
-	echo "$value" | pbcopy
-	echo "$value"
+	allLines=""
+	while read -r line; do
+		if [[ -z "$allLines" ]]; then
+			allLines=$(printf "%s" "$line")
+		else
+			allLines=$(printf "%s\n%s" "$allLines" "$line")
+		fi
+		echo "$line"
+	done
+	echo "$allLines" | pbcopy
 }
