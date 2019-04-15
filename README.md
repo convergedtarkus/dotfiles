@@ -25,5 +25,5 @@ bash-it enable completion bash-it brew defaults git makefile system tmux
 # Working with
 Edit a tracked file and then use the `myconfig` alias to commit and push. If you need to integrate remote changes, you'll need to reclone unfortunately (if you've have a better solution I would love to hear it!).
 
-# Liscense
-This project uses the https://unlicense.org liscense. Basically no copywrite, you can copy, modify, use, sell etc any code here without giving me credit (though if this is helpful to you, I'd love a shout out!). I give no warranty of any kind on this code.
+# License
+This project uses the https://unlicense.org license. Basically no copyright, you can copy, modify, use, sell etc any code here without giving me credit (though if this is helpful to you, I'd love a shout out!). I give no warranty of any kind on this code.

@@ -15,7 +15,7 @@ filetype plugin on
 filetype plugin indent on
 
 " Always show line numbers (git files override line numbers to be off
-" becuase it kills performance)
+" because it kills performance)
 set number
 
 " Show line numbers releative to current position

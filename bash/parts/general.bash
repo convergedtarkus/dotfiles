@@ -19,7 +19,7 @@ alias ll='ls -al' # show hidden and list in long form
 alias grep='grep --color=auto'
 export GREP_COLOR='1;33'
 
-# Quick naviagtion helpers.
+# Quick navigation helpers.
 alias ..='cd ..'         # Go up one directory
 alias ...='cd ../..'     # Go up two directories
 alias ....='cd ../../..' # Go up three directories

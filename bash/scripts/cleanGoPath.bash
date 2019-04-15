@@ -1,5 +1,5 @@
 # Produces a string to remove any packages in your $GOPATH
-# The varaibles `cleanGoPathDomainProtected` and `cleanGoPathGithubUserProtected` can be
+# The variables `cleanGoPathDomainProtected` and `cleanGoPathGithubUserProtected` can be
 # populated with inputs to a find command to ignore certain paths for deletion.
 
 # Usage
@@ -11,7 +11,7 @@
 
 # TODOs
 # Better ignore handling
-#   Have only one varaible and parse it to ignore any paths
+#   Have only one variable and parse it to ignore any paths
 #   Make it not need to care about the underlying command used
 # Walk the whole $GOPATH better
 #   Current setup is too specific to my current setup, make it more generic

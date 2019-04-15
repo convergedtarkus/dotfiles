@@ -192,7 +192,7 @@ if [ -d "$localDependencyPath/vendor" ]; then
 	else
 		echo "Moving the nested vendor directory to 'vendor_bak', use \`mv "$localDependencyPath/vendor_bak" "$localDependencyPath/vendor"\` to reverse"
 		mv "$localDependencyPath/vendor" "$localDependencyPath/vendor_bak"
-		echo "Moved the nested vendor directory successfuly! Your build should work correctly!"
+		echo "Moved the nested vendor directory successfully! Your build should work correctly!"
 	fi
 
 else

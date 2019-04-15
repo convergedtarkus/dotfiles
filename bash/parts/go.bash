@@ -8,7 +8,7 @@ alias goClearTestCache='go clean -testcache'
 # run all go tests
 goTestAll() { go test ./...; }
 
-# install go simple, becuase it keeps uninstalling somehow
+# install go simple, because it keeps uninstalling somehow
 installGoSimple() { go get honnef.co/go/tools/cmd/gosimple; }
 
 # remove/install gopherJS, because of caching issues with serve
