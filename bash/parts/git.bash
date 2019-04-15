@@ -83,20 +83,11 @@ alias gsta='git stash apply'
 alias gstp='git stash pop'
 alias gsts='git stash save'
 
-# git tag
-alias gt="git tag"
-alias gta="git tag -a"
-alias gtd="git tag -d"
-alias gtl="git tag -l"
-
 # git command shortcuts
 alias gcp='git cherry-pick'
 alias gm="git merge"
-alias gmv='git mv'
 alias gp='git push'
-alias gr='git remote'
 alias gus='git reset'
-alias grm='git rm'
 alias gs='git status'
 
 # git grep and helpers
