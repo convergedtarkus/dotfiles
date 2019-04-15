@@ -34,10 +34,8 @@ source "$scriptDir/parts/go.bash"
 # shellcheck source=/dev/null
 source "$scriptDir/parts/osSpecific/osx.bash"
 
-# This can be used to load a custom file in addition to these. Good for
-# sensative things that should not be in a public repo. Set in your
-# system bash profile (normally /etc/profile).
-if [[ -n "$ADDITIONAL_BASH_PART" ]]; then
-	# shellcheck source=/dev/null
-	source "$ADDITIONAL_BASH_PART"
-fi
+# Find any custom files under ./custom (other than .keep) and source them
+customFiles=$(find "$scriptDir/../custom" ! -type d ! -name "*.keep")
+while read -r customFile; do
+	source "$customFile"
+done <<< "$customFiles"
