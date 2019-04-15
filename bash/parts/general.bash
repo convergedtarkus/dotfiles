@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Replace this with the path to the bashrc repo, used for finding scripts
 export MYDEVPROFILE=~/myProjects/bashrc
 

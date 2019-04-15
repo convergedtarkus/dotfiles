@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Desktop Programs
 alias preview="open -a 'preview'"
 alias chrome="open -a google\ chrome"

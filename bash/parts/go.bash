@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # The GOCACHE makes tests a lot faster, but it can also hide random failures.
 enableGoTestCache() { unset GOCACHE; }
 disableGoTestCache() { export GOCACHE=off; }
