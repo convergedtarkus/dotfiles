@@ -10,8 +10,11 @@ alias goClearTestCache='go clean -testcache'
 # run all go tests
 goTestAll() { go test ./...; }
 
-# install go simple, because it keeps uninstalling somehow
-installGoSimple() { go get honnef.co/go/tools/cmd/gosimple; }
+# install go-tools staticcheck (https://github.com/dominikh/go-tools)
+installStaticcheck() {
+	go get -d honnef.co/go/tools/cmd/staticcheck
+	cd $$GOPATH/src/honnef.co/go/tools && git checkout 2019.1.1 && go get ./... && cd ./staticcheck && go install .
+}
 
 # remove/install gopherJS, because of caching issues with serve
 removeGopherJS() { rm -rf $GOPATH/src/github.com/gopherjs; }
@@ -72,26 +75,26 @@ smartGoLint() { _smartGoRunner goLint; }
 # Identies all directories with changed go files and runs goCheck (`goFormat` + `goLint`) in all those directories
 smartGoCheck() { _smartGoRunner goCheck; }
 
-# Identies all directories with changed go files and runs `gosimple` in all those directories
-smartGoSimple() { _smartGoRunner gosimple; }
+# Identies all directories with changed go files and runs `staticcheck` in all those directories
+smartGoStatic() { _smartGoRunner staticcheck; }
 
 # Identies all directories with changed go files and runs `go test` in all those directories
 smartGoTest() { _smartGoRunner 'go test'; }
 
 # Identies all directories with changed go files the whole suite of go checks
-# This includes, `goFormat`, `goLint`, `gosimple` and `go test`
+# This includes, `goFormat`, `goLint`, `staticcheck` and `go test`
 smartGoAll() {
 	smartGoCheck
-	smartGoSimple
+	smartGoStatic
 	smartGoTest
 }
 
 # Identies all directories with changed go files the whole suite of go checks minus go lint
 # Good for cleaner output in code that is very messy according to the linter
-# This includes, `goFormat`, `gosimple` and `go test`
+# This includes, `goFormat`, `staticcheck` and `go test`
 smartGoAllNoLint() {
 	smartGoFormat
-	smartGoSimple
+	smartGoStatic
 	smartGoTest
 }
 
