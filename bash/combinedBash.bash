@@ -4,7 +4,7 @@
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 # This allows working with the bare clone of this repo under .myconfig. See Readme for more.
-alias myconfig='/usr/bin/git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
+alias myconfig='git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
 
 # Bash modifications
 # shellcheck source=/dev/null
