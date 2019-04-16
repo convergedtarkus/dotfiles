@@ -42,7 +42,7 @@ alias gbD='git branch -D'
 # git checkout
 alias gco='git checkout'
 alias gcom='git checkout master'
-gcomup() { git checkout master $1 && git pull; } # $1 allows passing -f to dump current changes
+gcomup() { git checkout master ${1:+"$1"} && git pull; } # $1 allows passing -f to dump current changes
 alias gcob='git checkout -b'
 
 # git commit
