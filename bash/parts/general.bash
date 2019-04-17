@@ -31,12 +31,12 @@ alias -- -='cd -'        # Go back
 alias findNotHidden="find . -not -path '*/\.*'"
 
 # Touch all time at a directory. Good for getting build tools to pick up changes.
-function touchFiles() {
+touchFiles() {
 	find "$1" -type f -exec touch {} +
 }
 
 # Takes piped in input and echos to stdout and copies to clipboard
-function copyEcho() {
+copyEcho() {
 	allLines=""
 	while read -r line; do
 		if [[ -z "$allLines" ]]; then
@@ -47,4 +47,13 @@ function copyEcho() {
 		echo "$line"
 	done
 	echo "$allLines" | pbcopy
+}
+
+# Runs a given command in bash with the x flag for debug output.
+# This does not work if the command is a script (or calls one). Use
+# bash -x path/to/script in that case.
+debugBash() {
+	set -x
+	eval "$@"
+	set +x
 }
