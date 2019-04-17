@@ -4,6 +4,7 @@ There are my dotfiles. You are welcome to use them as a whole, or just take any 
 # Bash
 `.bash_profile` source `.bashrc` so `.bashrc` loads for all interactive shells.
 This will load bash-it and in turn source `./bash/combinedBash.bash` which then sources everything under parts. In addition, any files (other than .keep) under `./custom` will be sourced as well allowing sourcing custom files.
+
 `MYDOTFILES` is exported from .bashrc as the root of the project (when the .bashrc is), this is used to find other files.
 
 # How to setup
