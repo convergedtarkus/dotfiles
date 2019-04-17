@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Replace this with the path to the bashrc repo, used for finding scripts
-export MYDEVPROFILE=~/myProjects/bashrc
-
 # Many of these were copied or inspired from bash-it general.aliases.bash and base.plugin.bash
 # reload everything
 alias reload="source ~/.bash_profile"
