@@ -176,7 +176,7 @@ addRemote() {
 
 # Echos true if the file or directory is tracked or false otherwise.
 isGitTracked() {
-	if git ls-files $1 --error-unmatch &>/dev/null; then
+	if git ls-files "$1" --error-unmatch &>/dev/null; then
 		echo true
 		return 0
 	fi
@@ -188,8 +188,8 @@ isGitTracked() {
 # allows passing extra arguments to the final `git log` command
 # E.X. logAgainstMaster -n 1
 logAgainstMaster() {
-	git fetch $(getOriginRemote) master &>/dev/null # fetch origin so origin/master is up to date
-	git log $(getOriginRemote)/master..HEAD --first-parent
+	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	git log "$(getOriginRemote)/master"..HEAD --first-parent ${1:+"$1"}
 }
 
 # produces the commit log of commits in this branch that are not in master
@@ -197,9 +197,9 @@ logAgainstMaster() {
 # allows passing extra arguments to the final `git log` command
 # E.X. logAgainstMaster -n 1
 logAgainstBase() {
-	git fetch $(getOriginRemote) master &>/dev/null # fetch origin so origin/master is up to date
-	baseCommit=$(git merge-base $(getOriginRemote)/master HEAD)
-	git log $baseCommit..HEAD --first-parent $1
+	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	baseCommit=$(git merge-base "$(getOriginRemote)"/master HEAD)
+	git log "$baseCommit"..HEAD --first-parent ${1:+"$1"}
 }
 
 # produces a diff of code in this branch that is not in master
@@ -208,8 +208,8 @@ logAgainstBase() {
 # allows passing extra arguments to the final `git diff` command
 # E.X. diffAgainstMaster --stat
 diffAgainstMaster() {
-	git fetch $(getOriginRemote) master &>/dev/null # fetch origin so origin/master is up to date
-	git diff $(getOriginRemote)/master..HEAD $1
+	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	git diff "$(getOriginRemote)/master"..HEAD ${1:+"$1"}
 }
 
 # produces a diff of code changed in this branch
@@ -217,15 +217,15 @@ diffAgainstMaster() {
 # allows passing extra arguments to the final `git diff` command
 # E.X. diffAgainstBase --stat
 diffAgainstBase() {
-	git fetch $(getOriginRemote) master &>/dev/null # fetch origin so origin/master is up to date
-	baseCommit=$(git merge-base $(getOriginRemote)/master HEAD)
-	git diff $baseCommit..HEAD $1
+	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	baseCommit=$(git merge-base "$(getOriginRemote)"/master HEAD)
+	git diff "$baseCommit"..HEAD ${1:+"$1"}
 }
 
 # shows new parent commits in master that are not in this branch
 # allows passing extra arguments to the final `git log` command
 # E.X. previewMasterMerge -n 1
 previewMasterMerge() {
-	git fetch $(getOriginRemote) master &>/dev/null # fetch origin so origin/master is up to date
-	git log HEAD..$(getOriginRemote)/master --first-parent
+	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	git log HEAD.."$(getOriginRemote)/master" --first-parent
 }
