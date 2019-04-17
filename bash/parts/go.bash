@@ -129,17 +129,13 @@ export cleanGoPathDomainProtected=""                            # E.X '! -name g
 export cleanGoPathGithubUserProtected="! -name convergedtarkus" # Of course I protect my repos, they are just too awesome to delete
 
 cleanGoPath() {
-	# Get current script directory to make a path to the scripts
-	scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 	# the "$@" passes all arguments to the symlink script
-	"$scriptDir"/../scripts/cleanGoPath.bash "$@"
+	eval "$MYDOTFILES/bash/scripts/cleanGoPath.bash $@"
 }
 
 symlinkVendorPackage() {
-	# Get current script directory to make a path to the scripts
-	scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 	# the "$@" passes all arguments to the symlink script
-	"$scriptDir"/../scripts/symlinkPackageIntoVendor.bash "$@"
+	eval "$MYDOTFILES/bash/scripts/symlinkPackageIntoVendor.bash $@"
 }
 
 # Helper to easily move the vendor directory. Pairs with the symlinkVendorPackage function.
