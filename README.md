@@ -1,6 +1,10 @@
 # Dotfiles
 There are my dotfiles. You are welcome to use them as a whole, or just take any parts that are helpful to you.
 
+# Bash
+`.bash_profile` source `.bashrc` so `.bashrc` loads for all interactive shells.
+This will load bash-it and in turn source `./bash/combinedBash.bash` which then sources everything under parts. In addition, any files (other than .keep) under `./custom` will be sourced as well allowing sourcing custom files.
+
 # How to setup
 I'm using the setup from https://www.atlassian.com/git/tutorials/dotfiles which allows cloning this repo into $HOME to automatically sync all files. I've included how to do this below (and to help me remember without having to re-read the article).
 
