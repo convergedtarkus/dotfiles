@@ -87,11 +87,14 @@ alias gsta='git stash apply'
 alias gstp='git stash pop'
 alias gsts='git stash save'
 
+# git reset
+alias gus='git reset'
+alias undoLastCommit='git reset --soft HEAD~ && git reset' # Will basically undo the last commit, putting all the changes back in the working tree.
+
 # git command shortcuts
 alias gcp='git cherry-pick'
 alias gm="git merge"
 alias gp='git push'
-alias gus='git reset'
 alias gs='git status'
 
 # git grep and helpers
