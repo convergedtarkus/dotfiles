@@ -24,5 +24,6 @@ if [ -d "$HOME/.bash-it" ]; then
 	source "$BASH_IT"/bash_it.sh
 else
 	# Just use my base bash info
+	# shellcheck source=/dev/null
 	source "$MYDOTFILES/bash/combinedBash.bash"
 fi

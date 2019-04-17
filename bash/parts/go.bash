@@ -130,12 +130,12 @@ export cleanGoPathGithubUserProtected="! -name convergedtarkus" # Of course I pr
 
 cleanGoPath() {
 	# the "$@" passes all arguments to the symlink script
-	eval "$MYDOTFILES/bash/scripts/cleanGoPath.bash $@"
+	eval "$MYDOTFILES/bash/scripts/cleanGoPath.bash $*"
 }
 
 symlinkVendorPackage() {
 	# the "$@" passes all arguments to the symlink script
-	eval "$MYDOTFILES/bash/scripts/symlinkPackageIntoVendor.bash $@"
+	eval "$MYDOTFILES/bash/scripts/symlinkPackageIntoVendor.bash $*"
 }
 
 # Helper to easily move the vendor directory. Pairs with the symlinkVendorPackage function.
