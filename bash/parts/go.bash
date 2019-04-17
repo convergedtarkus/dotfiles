@@ -100,8 +100,8 @@ smartGoAllNoLint() {
 
 # runs `goFormat` and `goLint` in the given directory. If no input, assume the current ('.') directory
 goCheck() {
-	goFormat $1
-	goLint $1
+	goFormat ${1:+"$1"}
+	goLint ${1:+"$1"}
 }
 
 # runs `gofmt -w` in the given directory. If no input, assume the current ('.') directory
