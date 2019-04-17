@@ -4,10 +4,10 @@
 alias dd='pub run dart_dev'
 
 # Quick aliases for various dart_dev tasks
-alias ddAnalyze='dd analyze'
-alias ddTest='dd test'
-alias ddFormat='dd format'
-alias ddGenTestRunner='dd gen-test-runner'
+alias ddAnalyze='pub run dart_dev analyze'
+alias ddTest='pub run dart_dev test'
+alias ddFormat='pub run dart_dev format'
+alias ddGenTestRunner='pub run dart_dev gen-test-runner'
 
 # TODO Add a way to run custom dd analyze based on repo
 # Runs a full dart check, formats files, runs analysis, runs all tests
@@ -16,18 +16,18 @@ fullDartCheck() {
 	echo "### Running ddev format ###"
 	echo "###"
 
-	dd format || return
+	pub run dart_dev format || return
 
 	echo "###"
 	echo "### Running normal ddev analyze ###"
 	echo "###"
-	dd analyze || return
+	pub run dart_dev analyze || return
 
 	echo "###"
 	echo "### Running ddev test ###"
 	echo "###"
 
-	dd test
+	pub run dart_dev test
 }
 
 # Runs a dart_dev analyze that removes deprecated warnings.
