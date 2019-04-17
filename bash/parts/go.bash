@@ -17,7 +17,7 @@ installStaticcheck() {
 }
 
 # remove/install gopherJS, because of caching issues with serve
-removeGopherJS() { rm -rf $GOPATH/src/github.com/gopherjs; }
+removeGopherJS() { rm -rf "$GOPATH/src/github.com/gopherjs"; }
 installGopherJS() { go get -u github.com/gopherjs/gopherjs; }
 reinstallGopherJS() { removeGopherJS && installGopherJS; }
 
@@ -60,7 +60,7 @@ _smartGoRunner() {
 		echo "#### running $commandToRun in '$line'"
 		echo "####"
 
-		eval $commandToRun $line
+		eval "$commandToRun" "$line"
 		echo ""
 	done <<<"$uniqueDirs"
 }
@@ -104,14 +104,14 @@ goCheck() {
 	goLint $1
 }
 
-# runs `goimports -w` in the given directory. If no input, assume the current ('.') directory
+# runs `gofmt -w` in the given directory. If no input, assume the current ('.') directory
 goFormat() {
 	input=$1
 	if [[ $input == "" ]]; then
 		input="."
 	fi
 
-	goimports -w $input # does everything gofmt does plus organizes imports, also see goreturns
+	gofmt -w $input
 }
 
 # runs `golint` in the given directory. If no input, assume the current ('.') directory
