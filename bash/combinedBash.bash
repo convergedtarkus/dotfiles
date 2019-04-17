@@ -38,4 +38,4 @@ source "$scriptDir/parts/osSpecific/osx.bash"
 customFiles=$(find "$scriptDir/../custom" ! -type d ! -name "*.keep")
 while read -r customFile; do
 	source "$customFile"
-done <<< "$customFiles"
+done <<<"$customFiles"
