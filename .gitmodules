@@ -10,3 +10,6 @@
 [submodule ".vim/pack/convergedtarkus/start/vim-go"]
 	path = .vim/pack/convergedtarkus/start/vim-go
 	url = git@github.com:fatih/vim-go.git
+[submodule ".vim/pack/convergedtarkus/start/dart-vim-plugin"]
+	path = .vim/pack/convergedtarkus/start/dart-vim-plugin
+	url = https://github.com/dart-lang/dart-vim-plugin.git
