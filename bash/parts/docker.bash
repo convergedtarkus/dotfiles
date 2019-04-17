@@ -9,4 +9,4 @@ restartDocker() { killDocker && startDocker; }
 alias killAllDockerContainers='docker rm -f $(docker ps -aq) >/dev/null 2>&1 || true'
 
 # Removes all docker containers. This does not use the force flag, so some images may require manual deletion.
-removeAllDockerContainers() { docker image rm $(docker image ls | awk '{print $3}'); }
+removeAllDockerContainers() { docker image rm "$(docker image ls | awk '{print $3}')"; }
