@@ -55,27 +55,29 @@ alias gcAmend="git commit --amend -C HEAD" # like gcaa, but only add staged chan
 
 # git diff
 alias gd='git diff'
-alias gdv='git diff -w "$@" | vim -R -' # git diff, ignore whitespace, in vim
+gdv() { git diff -w "$@" | vim -R -; } # git diff, ignore whitespace, in vim
 
 # git fetch
 alias gf='git fetch --all --prune'
 alias gft='git fetch --all --prune --tags'
+# TODO I don't think this is true, try using single quotes
 # gfm must be a function. If its an alias, the $(getOriginRemote) is evaluated right away, defeating the purpose of the _getOriginRemotePreHook
-gfm() { git fetch $(getOriginRemote) master; } # fetch remote master
+gfm() { git fetch "$(getOriginRemote)" master; } # fetch remote master
 # gfc fetches just the current branch.
 gfc() {
-	fetchTarget=$(git rev-parse --symbolic-full-name --abbrev-ref @{upstream} | sed 's|/| |')
+	fetchTarget=$(git rev-parse --symbolic-full-name --abbrev-ref "@{upstream}" | sed 's|/| |')
+	echo "Fetch target is '$fetchTarget'"
 	if [[ -z "$fetchTarget" ]]; then
 		echo "Cannot parse upstream"
 		return 1
 	fi
-	git fetch $fetchTarget
+	eval git fetch "$fetchTarget"
 }
 
 # git pull
 alias gl='git pull'
 # glum must be a function. If its an alias, the $(getOriginRemote) is evaluated right away, defeating the purpose of the _getOriginRemotePreHook
-glum() { git pull $(getOriginRemote) master --no-edit $1; } # pull in upstream master, $1 allows passing extra args to the pull (like -r)
+glum() { git pull "$(getOriginRemote)" master --no-edit ${1:+"$1"}; } # pull in upstream master, $1 allows passing extra args to the pull (like -r)
 
 # git stash
 alias gst='git stash'
@@ -96,7 +98,7 @@ alias gs='git status'
 alias gitGrep="git grep -I -n --break" # skip binary files, add line numbers and a break between files
 
 # helpers for use with gitGrep
-ggNoVendor=':!/vendor' # gitGrep "blah" -- $ggNoVendor to ignore matches in ./vendor (for go projects)
+export ggNoVendor=':!/vendor' # gitGrep "blah" -- $ggNoVendor to ignore matches in ./vendor (for go projects)
 
 # Show commits since last pull
 alias gnew="git log HEAD@{1}..HEAD@{0}"
@@ -115,30 +117,31 @@ alias gpristine='git reset --hard && safeClean' # safeClean + reset to HEAD
 
 # Get the base commit between the current branch and master.
 masterBase() {
-	git fetch $(getOriginRemote) master &>/dev/null # fetch origin so origin/master is up to date
-	git merge-base $(getOriginRemote)/master HEAD
+	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	git merge-base "$(getOriginRemote)/master" HEAD
 }
 
 # Rebase the current branch based on its base against master. Good for cleaning/re-organizing commits
 gRebaseBase() {
-	git rebase -i $(masterBase)
+	git rebase -i "$(masterBase)"
 }
 
 # List all tags. Use tags pulled down, consider running a fetch with tags before hand.
+# A numeric value can be passed in to limit the number of returned tags to the number.
 listTags() {
 	if [[ "$1" == "" ]]; then
 		git tag -l --sort=-v:refname
 		return 0
 	fi
 
-	git tag -l --sort=-v:refname | head -n $1
+	git tag -l --sort=-v:refname | head -n "$1"
 }
 
 # Merges master and produces a string to say when the merge was done. Produce the same format of string if up to date with master.
 qaMasterMerge() {
 	startingHeadHash=$(git rev-parse HEAD)
 
-	git pull $(getOriginRemote) master &>/dev/null
+	git pull "$(getOriginRemote)" master &>/dev/null
 
 	endingHeadHash=$(git rev-parse HEAD)
 
@@ -149,7 +152,7 @@ qaMasterMerge() {
 		logString="Up to date with master as of '$(date '+%c %z')'"
 	fi
 
-	git fetch $(getOriginRemote) master &>/dev/null # fetch origin so origin/master is up to date
+	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
 
 	echo "$logString, master commit: $(masterBase), head commit: $(git rev-parse HEAD)"
 }
@@ -157,7 +160,7 @@ qaMasterMerge() {
 # Add a remote to the current repo. `addRemote someone`. Fetches after to ensure everything is up to date.
 addRemote() {
 	remoteName=$1
-	reproName=$(basename $(git rev-parse --show-toplevel))
+	reproName=$(basename "$(git rev-parse --show-toplevel)")
 
 	if [[ "$remoteName" == "" ]]; then
 		echo "Must supply a remote name"
@@ -166,15 +169,14 @@ addRemote() {
 
 	echo "Adding remote $remoteName"
 
-	git remote add $remoteName git@github.com:$remoteName/$reproName.git
+	git remote add "$remoteName" "git@github.com:$remoteName/$reproName.git"
 
-	git fetch $remoteName --tags # fetch the new remote
+	git fetch "$remoteName" --tags # fetch the new remote
 }
 
 # Echos true if the file or directory is tracked or false otherwise.
 isGitTracked() {
-	git ls-files $1 --error-unmatch &>/dev/null
-	if [ $? -eq 0 ]; then
+	if git ls-files $1 --error-unmatch &>/dev/null; then
 		echo true
 		return 0
 	fi
