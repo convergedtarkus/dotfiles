@@ -71,6 +71,14 @@ pubCleanAndGet() { pubClean && libAndAppGet; }
 # Kills any dart processes. Sometimes they get stuck.
 killDart() { killall -KILL dart; }
 
+# Quickly checkout, reset or add pubspec changes
+alias gcoPubspecs='git checkout "*pubspec.lock" "*pubspec.yaml"'
+alias gusPubspecs='git reset "*pubspec.lock" "*pubspec.yaml"'
+alias gaPubspecs='git add "*pubspec.lock" "*pubspec.yaml"'
+
+# quickly add all dart files
+alias gaDart='git add "*.dart"'
+
 # Needed to keep Dartium and Content-Shell working in Dart 1
 export DARTIUM_EXPIRATION_TIME=1577836800
 
@@ -79,7 +87,7 @@ export DARTIUM_EXPIRATION_TIME=1577836800
 alias dartium="DART_FLAGS='--checked --load_deferred_eagerly' open /Applications/Chromium.app"
 
 # Switch to using dart 1.24.3
-d1() {
+switchDart1() {
 	brew unlink dart
 	brew unlink dart@1
 	brew switch dart@1 1.24.3
@@ -88,7 +96,7 @@ d1() {
 }
 
 # Switch to using dart 2.2.0
-d2() {
+switchDart2() {
 	brew unlink dart
 	brew unlink dart@1
 	brew switch dart 2.2.0
