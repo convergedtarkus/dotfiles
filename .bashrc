@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-if [ -d "$HOME/.bash-it" ]; then
-	# Get the scripts directory (https://stackoverflow.com/questions/59895/get-the-source-directory-of-a-bash-script-from-within-the-script-itself)
-	# This is use by the bash-it submodule to load the bash/combinedBash.bash
-	scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-	export MY_DOT_FILES="$scriptDir"
+# Get the scripts directory (https://stackoverflow.com/questions/59895/get-the-source-directory-of-a-bash-script-from-within-the-script-itself)
+# This is use by the bash-it submodule to load the bash/combinedBash.bash
+scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+export MYDOTFILES="$scriptDir"
 
+if [ -d "$HOME/.bash-it" ]; then
 	# Path to the bash it configuration
 	export BASH_IT="$HOME/.bash-it"
 
@@ -24,5 +24,5 @@ if [ -d "$HOME/.bash-it" ]; then
 	source "$BASH_IT"/bash_it.sh
 else
 	# Just use my base bash info
-	source ./bash/combinedBash.bash
+	source "$MYDOTFILES/bash/combinedBash.bash"
 fi
