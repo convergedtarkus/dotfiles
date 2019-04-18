@@ -8,6 +8,9 @@ colorscheme monokai
 set splitright
 set splitbelow
 
+" Apply the indentation of the current line to the next line added
+set autoindent
+
 " Allow loading file based options and mappings for opened files based on filetype plugins.
 filetype plugin on
 
@@ -32,6 +35,7 @@ set showcmd
 " https://stackoverflow.com/questions/3534028/mac-terminal-vim-will-only-use-backspace-when-at-the-end-of-a-line 
 set backspace=indent,eol,start
 
+" Setup directories for backfiles and swap file
 set backupdir=~/.vim/.backup// " put all backup files in the .vim folder
 set directory=~/.vim/.swp// " put all swap files in the .vim folder
 
