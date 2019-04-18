@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This allows working with the bare clone of this repo under .myconfig. See Readme for more.
 alias myconfig='git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'

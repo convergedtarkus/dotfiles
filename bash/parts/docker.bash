@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Commands to kill, start and restart (kill + start) docker. Helps clean up memory.
 killDocker() { killall Docker; }

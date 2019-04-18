@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Many of these were copied or inspired from bash-it general.aliases.bash and base.plugin.bash
 # reload everything

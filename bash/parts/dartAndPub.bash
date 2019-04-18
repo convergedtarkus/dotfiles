@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Simple alias for running dart_dev
 alias dd='pub run dart_dev'

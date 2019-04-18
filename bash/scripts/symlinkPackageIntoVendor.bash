@@ -17,7 +17,7 @@
 
 ### Argbash code starts here, jump to 'ACTUAL SCRIPT STARTS HERE' to skip
 
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # This is a rather minimal example Argbash potential
 # Example taken from http://argbash.readthedocs.io/en/stable/example.html

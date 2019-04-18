@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Better bash completion for environment variables
 # https://askubuntu.com/questions/41891/bash-auto-complete-for-environment-variables

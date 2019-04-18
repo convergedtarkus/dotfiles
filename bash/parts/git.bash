@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Function to define the "upstream" repo alias name. Needs to be first for use below
 # Uses the first matching remote in git config upstream > origin

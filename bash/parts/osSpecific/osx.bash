@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Desktop Programs
 alias preview="open -a 'preview'"

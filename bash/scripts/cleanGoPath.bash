@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Produces a string to remove any packages in your $GOPATH
 # The variables `cleanGoPathDomainProtected` and `cleanGoPathGithubUserProtected` can be
 # populated with inputs to a find command to ignore certain paths for deletion.
@@ -18,7 +20,6 @@
 # Handle copy on Linux (and non-Mac in general)
 
 ### Arg bash stuff starts here
-#!/bin/bash
 #
 # This is a rather minimal example Argbash potential
 # Example taken from http://argbash.readthedocs.io/en/stable/example.html
