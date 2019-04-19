@@ -81,7 +81,7 @@ smartGoLint() { _smartGoRunner goLint; }
 smartGoCheck() { _smartGoRunner goCheck; }
 
 # Identies all directories with changed go files and runs `staticcheck` in all those directories
-smartGoStatic() { _smartGoRunner staticcheck; }
+smartGoStatic() { _smartGoRunner goStatic; }
 
 # Identies all directories with changed go files and runs `go test` in all those directories
 smartGoTest() { _smartGoRunner 'go test'; }
@@ -107,6 +107,13 @@ smartGoAllNoLint() {
 goCheck() {
 	goFormat ${1:+"$1"}
 	goLint ${1:+"$1"}
+}
+
+# runs 'staticcheck' in the given directory. If not input, assume the current ('.') directory.
+# Removes the checks for using deprecations and missing package comments.
+# TODO Have a nice way to call this (and the all runner) without those checks removed.
+goStatic() {
+	staticcheck -checks all,-SA1019,-ST1000 ${1:+"$1"}
 }
 
 # runs `goimports -w` in the given directory. If no input, assume the current ('.') directory
