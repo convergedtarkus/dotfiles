@@ -16,6 +16,11 @@ installStaticcheck() {
 	cd $$GOPATH/src/honnef.co/go/tools && git checkout 2019.1.1 && go get ./... && cd ./staticcheck && go install .
 }
 
+# install goimports which is like gofmt, but does a lot more.
+installGoimports() {
+	go get -u golang.org/x/tools/cmd/goimports
+}
+
 # remove/install gopherJS, because of caching issues with serve
 removeGopherJS() { rm -rf "$GOPATH/src/github.com/gopherjs"; }
 installGopherJS() { go get -u github.com/gopherjs/gopherjs; }
@@ -104,14 +109,14 @@ goCheck() {
 	goLint ${1:+"$1"}
 }
 
-# runs `gofmt -w` in the given directory. If no input, assume the current ('.') directory
+# runs `goimports -w` in the given directory. If no input, assume the current ('.') directory
 goFormat() {
 	input=$1
 	if [[ $input == "" ]]; then
 		input="."
 	fi
 
-	gofmt -w $input
+	goimports -w $input
 }
 
 # runs `golint` in the given directory. If no input, assume the current ('.') directory
