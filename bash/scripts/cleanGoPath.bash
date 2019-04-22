@@ -140,9 +140,9 @@ _prettyPrintGoPackagePath() {
 	echo "$1" | sed "s|$GOPATH/src/||g"
 }
 
-domainFoldersToRemove=$(find "$GOPATH/src" -type d -mindepth 1 -maxdepth 1 $cleanGoPathDomainProtected)
+domainFoldersToRemove=$(eval "find $GOPATH/src -type d -mindepth 1 -maxdepth 1 $cleanGoPathDomainProtected")
 
-githubUsersToRemove=$(find "$GOPATH/src/github.com" -type d -mindepth 1 -maxdepth 1 $cleanGoPathGithubUserProtected)
+githubUsersToRemove=$(eval "find $GOPATH/src/github.com -type d -mindepth 1 -maxdepth 1 $cleanGoPathGithubUserProtected")
 
 removalString=""
 if [[ "$domainFoldersToRemove" != "" ]]; then
