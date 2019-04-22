@@ -9,30 +9,46 @@ alias ddTest='pub run dart_dev test'
 alias ddFormat='pub run dart_dev format'
 alias ddGenTestRunner='pub run dart_dev gen-test-runner'
 
-# TODO Add a way to run custom dd analyze based on repo
-# Runs a full dart check, formats files, runs analysis, runs all tests
+# Runs dart_dev formar, analyze and test
+# Normally removes deprecated member use hints from analyze output, use "-a" to include these hints.
 fullDartCheck() {
 	echo "###"
-	echo "### Running ddev format ###"
+	echo "### Running dart_dev format ###"
 	echo "###"
 
-	pub run dart_dev format || return
+	dd format || return
+
+	if [[ "$1" == "-a" ]]; then
+		echo "###"
+		echo "### Running normal dart_dev analyze ###"
+		echo "###"
+		dd analyze || return
+	else
+		echo "###"
+		echo "### Running dart_dev analayze (no deprecated) ###"
+		echo "###"
+		analyzeNoDeprecated || return
+	fi
 
 	echo "###"
-	echo "### Running normal ddev analyze ###"
-	echo "###"
-	pub run dart_dev analyze || return
-
-	echo "###"
-	echo "### Running ddev test ###"
+	echo "### Running dart_dev test ###"
 	echo "###"
 
-	pub run dart_dev test
+	dd test
 }
 
-# Runs a dart_dev analyze that removes deprecated warnings.
-noDeprecatedAnalyze() {
-	command pub run dart_dev analyze | perl -pe 's/(\s+?hint.+?deprecated_member_use\s)//g'
+# Runs a dart_dev analyze, but strips out deprecated member use hints.
+analyzeNoDeprecated() {
+	# Solution for getting the error code from https://stackoverflow.com/questions/43736021/get-exit-code-of-process-substitution-with-pipe-into-while-loop
+	while read -r analyzeLine || { analyzeErrorCode=$analyzeLine && break; }; do # the or case is hit once the analyze is done and captures the exit code
+		echo "$analyzeLine" | perl -pe 's/\s*?hint.+?deprecated_member_use\s*//g'
+	done < <(
+		dd analyze 2>&1
+		printf "%s" "$?"
+	) # the print will print the commands exit code
+
+	# Return the captured error code from analyze
+	return "$analyzeErrorCode"
 }
 
 # Runs a safe clean and full pub get. Good for getting up and going.
