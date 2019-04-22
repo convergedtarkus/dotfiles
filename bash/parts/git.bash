@@ -60,9 +60,7 @@ gdv() { git diff -w "$@" | vim -R -; } # git diff, ignore whitespace, in vim
 # git fetch
 alias gf='git fetch --all --prune'
 alias gft='git fetch --all --prune --tags'
-# TODO I don't think this is true, try using single quotes
-# gfm must be a function. If its an alias, the $(getOriginRemote) is evaluated right away, defeating the purpose of the _getOriginRemotePreHook
-gfm() { git fetch "$(getOriginRemote)" master; } # fetch remote master
+alias gfm='git fetch "$(getOriginRemote)" master' # fetch remote master
 # gfc fetches just the current branch.
 gfc() {
 	fetchTarget=$(git rev-parse --symbolic-full-name --abbrev-ref "@{upstream}" | sed 's|/| |')
