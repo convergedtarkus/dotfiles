@@ -49,9 +49,9 @@ alias gcob='git checkout -b'
 alias gc='git commit -v'
 alias gca='git commit -v -a' # commit all
 alias gcm='git commit -v -m'
-alias gcam="git commit -v -am"
-alias gcaa="git commit -a --amend -C HEAD" # Add uncommitted and unstaged changes to the last commit
-alias gcAmend="git commit --amend -C HEAD" # like gcaa, but only add staged changes
+alias gcam='git commit -v -am'
+alias gcaa='git commit -a --amend -C HEAD' # Add uncommitted and unstaged changes to the last commit
+alias gcAmend='git commit --amend -C HEAD' # like gcaa, but only add staged changes
 
 # git diff
 alias gd='git diff'
@@ -79,8 +79,8 @@ glum() { git pull "$(getOriginRemote)" master --no-edit ${1:+"$1"}; } # pull in 
 
 # git stash
 alias gst='git stash'
-alias gstd="git stash drop"
-alias gstl="git stash list"
+alias gstd='git stash drop'
+alias gstl='git stash list'
 alias gsta='git stash apply'
 alias gstp='git stash pop'
 alias gsts='git stash save'
@@ -91,25 +91,25 @@ alias undoLastCommit='git reset --soft HEAD~ && git reset' # Will basically undo
 
 # git command shortcuts
 alias gcp='git cherry-pick'
-alias gm="git merge"
+alias gm='git merge'
 alias gp='git push'
 alias gs='git status'
 
 # git grep and helpers
-alias gitGrep="git grep -I -n --break" # skip binary files, add line numbers and a break between files
+alias gitGrep='git grep -I -n --break' # skip binary files, add line numbers and a break between files
 
 # helpers for use with gitGrep
 export ggNoVendor=':!/vendor' # gitGrep "blah" -- $ggNoVendor to ignore matches in ./vendor (for go projects)
 
 # Show commits since last pull
-alias gnew="git log HEAD@{1}..HEAD@{0}"
+alias gnew='git log HEAD@{1}..HEAD@{0}'
 
 # Quick ways to get the head commit.
-alias gHead="git log -1"
-alias gHeadHash="git rev-parse HEAD"
+alias gHead='git log -1'
+alias gHeadHash='git rev-parse HEAD'
 
 # Quick way to get the current branch
-alias gBranch="git rev-parse --abbrev-ref HEAD"
+alias gBranch='git rev-parse --abbrev-ref HEAD'
 
 # Clean commands
 safeClean() { git clean -xdf -e .idea -e "*.iml"; } # will remove ignored files and untracked files (git add anything you want to keep)

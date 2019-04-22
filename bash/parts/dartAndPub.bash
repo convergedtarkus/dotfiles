@@ -84,7 +84,7 @@ export DARTIUM_EXPIRATION_TIME=1577836800
 
 # This is using a custom installed version of Dartium, not the Dartium from Dart, keep the Chromium.app updated.
 # https://webdev.dartlang.org/tools/dartium#getting-dartium
-alias dartium="DART_FLAGS='--checked --load_deferred_eagerly' open /Applications/Chromium.app"
+alias dartium='DART_FLAGS="--checked --load_deferred_eagerly" open /Applications/Chromium.app'
 
 # Switch to using dart 1.24.3
 switchDart1() {

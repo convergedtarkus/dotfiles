@@ -2,7 +2,7 @@
 
 # Many of these were copied or inspired from bash-it general.aliases.bash and base.plugin.bash
 # reload everything
-alias reload="source ~/.bash_profile"
+alias reload='source ~/.bash_profile'
 
 # Clear terminal lines.
 alias c='clear'
@@ -25,7 +25,7 @@ alias ....='cd ../../..' # Go up three directories
 alias -- -='cd -'        # Go back
 
 # Helper to find files that are not hidden.
-alias findNotHidden="find . -not -path '*/\.*'"
+alias findNotHidden='find . -not -path "*/\.*"'
 
 # Touch all time at a directory. Good for getting build tools to pick up changes.
 touchFiles() {
