@@ -131,7 +131,8 @@ goStatic() {
 # Runs 'golangci-lint' using my global config file.
 # Passes arguments to the command so `goCiLint -n` or `goCiLint ./path` etc work.
 goCiLint() {
-	golangci-lint run -c "$MYDOTFILES/.golangci.yml" "$*"
+	# $@ will keep each passed in parameter quotes vs $* that will not
+	golangci-lint run -c "$MYDOTFILES/.golangci.yml" "$@"
 }
 
 # runs `goimports -w` in the given directory. If no input, assume the current ('.') directory
