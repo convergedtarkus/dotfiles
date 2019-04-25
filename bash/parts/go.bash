@@ -13,7 +13,16 @@ goTestAll() { go test ./...; }
 # install go-tools staticcheck (https://github.com/dominikh/go-tools)
 installStaticcheck() {
 	go get -d honnef.co/go/tools/cmd/staticcheck
-	cd $$GOPATH/src/honnef.co/go/tools && git checkout 2019.1.1 && go get ./... && cd ./staticcheck && go install .
+	# Most recent release (3/15/19)
+	(cd "$GOPATH/src/honnef.co/go/tools" && git checkout 2019.1.1 && go get ./... && cd ./staticcheck && go install .)
+}
+
+# install golangci-lint (https://github.com/golangci/golangci-lint)
+installGolangCiLint() {
+	go get -d github.com/golangci/golangci-lint
+	# Most recent release (3/31/19)
+	(cd "$GOPATH/src/github.com/golangci/golangci-lint" && git checkout "v1.16.0" && cd "cmd/golangci-lint" &&
+		go install -ldflags "-X 'main.version=$(git describe --tags)' -X 'main.commit=$(git rev-parse --short HEAD)' -X 'main.date=$(date)'")
 }
 
 # install goimports which is like gofmt, but does a lot more.
@@ -83,6 +92,9 @@ smartGoCheck() { _smartGoRunner goCheck; }
 # Identies all directories with changed go files and runs `staticcheck` in all those directories
 smartGoStatic() { _smartGoRunner goStatic; }
 
+# Identies all directories with changed go files and runs `goCiLint` in all those directories
+smartGoCiLint() { _smartGoRunner goCiLint; }
+
 # Identies all directories with changed go files and runs `go test` in all those directories
 smartGoTest() { _smartGoRunner 'go test'; }
 
@@ -116,6 +128,12 @@ goStatic() {
 	staticcheck -checks all,-SA1019,-ST1000 ${1:+"$1"}
 }
 
+# Runs 'golangci-lint' using my global config file.
+# Passes arguments to the command so `goCiLint -n` or `goCiLint ./path` etc work.
+goCiLint() {
+	golangci-lint run -c "$MYDOTFILES/.golangci.yml" "$*"
+}
+
 # runs `goimports -w` in the given directory. If no input, assume the current ('.') directory
 goFormat() {
 	input=$1
@@ -141,12 +159,12 @@ export cleanGoPathDomainProtected=""                            # E.X '! -name g
 export cleanGoPathGithubUserProtected="! -name convergedtarkus" # Of course I protect my repos, they are just too awesome to delete
 
 cleanGoPath() {
-	# the "$@" passes all arguments to the symlink script
+	# the "$*" passes all arguments to the symlink script
 	eval "$MYDOTFILES/bash/scripts/cleanGoPath.bash $*"
 }
 
 symlinkVendorPackage() {
-	# the "$@" passes all arguments to the symlink script
+	# the "$*" passes all arguments to the symlink script
 	eval "$MYDOTFILES/bash/scripts/symlinkPackageIntoVendor.bash $*"
 }
 

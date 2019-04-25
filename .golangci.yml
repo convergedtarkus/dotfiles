@@ -1,0 +1,50 @@
+# Setting for https://github.com/golangci/golangci-lint
+run:
+  # include test files or not, default is true
+  tests: true
+
+# output configuration options
+output:
+  # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
+  format: colored-line-number
+
+  # print lines of code with issue, default is true
+  print-issued-lines: true
+
+  # print linter name in the end of issue text, default is true
+  print-linter-name: true
+
+
+# all available settings of specific linters
+linters-settings:
+  govet:
+    # report about shadowed variables
+    check-shadowing: true
+    # TODO Look into go vet settings
+  gofmt:
+    # simplify code: gofmt with `-s` option, true by default
+    simplify: true
+
+
+linters:
+  enable:
+    - misspell
+    - gofmt
+    - golint
+    - goimports
+    - unparam
+
+
+issues:
+  # Excluding configuration per-path, per-linter, per-text and per-source
+  exclude-rules:
+    # Removes the checks for using deprecations and missing package comments.
+    - linters:
+        - staticcheck
+      text: "SA1019:"
+
+  # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
+  max-same-issues: 0
