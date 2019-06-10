@@ -123,8 +123,10 @@ switchDart2() {
 # Path to Dart 2 executables
 export DART_2_PATH=/usr/local/opt/dart/bin/
 
-# The Dart SDK version you wish to solve under
-export CURRENT_DART_VERSION=1.24.3
+# Use regex to get the currently-activated Dart version.
+function get_current_dart_version() {
+	dart --version 2>&1 | perl -n -e'/version: ([^ ]+)/ && print $1'
+}
 
 # Runs `pub get` in Dart 2 using the current Dart version as SDK constraints,
 # and then runs `pub get` in Dart 1 to get the lock file in a good state.
@@ -134,10 +136,12 @@ export CURRENT_DART_VERSION=1.24.3
 #
 # Unlike an alias (in Bash), this function also passes any
 # additional arguments along to `pub`.
-pub2get() {
-	_PUB_TEST_SDK_VERSION="$CURRENT_DART_VERSION" "$DART_2_PATH/pub" get --no-precompile "$@" && pub get --offline "$@"
+function pub2get() {
+	echo "Using Dart 2 solver under Dart $(get_current_dart_version)"
+	_PUB_TEST_SDK_VERSION="$(get_current_dart_version)" "$DART_2_PATH/pub" get --no-precompile "$@" && pub get --offline "$@"
 }
 
-pub2upgrade() {
-	_PUB_TEST_SDK_VERSION="$CURRENT_DART_VERSION" "$DART_2_PATH/pub" upgrade --no-precompile "$@" && pub get --offline "$@"
+function pub2upgrade() {
+	echo "Using Dart 2 solver under Dart $(get_current_dart_version)"
+	_PUB_TEST_SDK_VERSION="$(get_current_dart_version)" "$DART_2_PATH/pub" upgrade --no-precompile "$@" && pub get --offline "$@"
 }

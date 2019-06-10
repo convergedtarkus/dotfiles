@@ -82,6 +82,9 @@ _smartGoRunner() {
 # Identies all directories with changed go files and runs `goFormat` in all those directories
 smartGoFormat() { _smartGoRunner goFormat; }
 
+# Identies all directories with changed go files and runs `goImports` in all those directories
+smartGoImports() { _smartGoRunner goImports; }
+
 # TODO "superSmartGoLint" highlights lints on lines that were changed
 # Identies all directories with changed go files and runs `goLint` in all those directories
 smartGoLint() { _smartGoRunner goLint; }
@@ -138,8 +141,18 @@ goCiLint() {
 	golangci-lint run -c "$MYDOTFILES/.golangci.yml" "$@"
 }
 
-# runs `goimports -w` in the given directory. If no input, assume the current ('.') directory
+# runs `gofmt -w` in the given directory. If no input, assume the current ('.') directory
 goFormat() {
+	input=$1
+	if [[ $input == "" ]]; then
+		input="."
+	fi
+
+	gofmt -w $input
+}
+
+# runs `goimports -w` in the given directory. If no input, assume the current ('.') directory
+goImports() {
 	input=$1
 	if [[ $input == "" ]]; then
 		input="."
