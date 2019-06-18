@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Do not run homebrew clean up automatically. This will prevent old versions from being uninstalled.
+export HOMEBREW_NO_INSTALL_CLEANUP=1
+
 # Many of these were copied or inspired from bash-it general.aliases.bash and base.plugin.bash
 # reload everything
 alias reload='source ~/.bash_profile'
