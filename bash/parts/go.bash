@@ -8,7 +8,7 @@ disableGoTestCache() { export GOCACHE=off; }
 alias goClearTestCache='go clean -testcache'
 
 # run all go tests
-goTestAll() { go test ./...; }
+alias goTestAll='go test ./...'
 
 # install go-tools staticcheck (https://github.com/dominikh/go-tools)
 installStaticcheck() {
