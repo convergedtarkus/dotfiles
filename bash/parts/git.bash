@@ -230,3 +230,10 @@ previewMasterMerge() {
 	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
 	git log HEAD.."$(getOriginRemote)/master" --first-parent
 }
+
+# Takes piped in input and will highlight any changed files in the input.
+highlightChangedFiles() {
+	changedFiles=$(git diff --name-only | tr '\n' '|')
+	# From https://stackoverflow.com/questions/981601/colorized-grep-viewing-the-entire-file-with-highlighted-matches
+	grep --color -E "$changedFiles$" # grep --color -E 'blah|blah|$'
+}
