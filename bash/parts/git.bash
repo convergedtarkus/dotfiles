@@ -92,8 +92,11 @@ alias gUndoLastCommit='git reset --soft HEAD~ && git reset' # Will basically und
 # git command shortcuts
 alias gcp='git cherry-pick'
 alias gm='git merge'
-alias gp='git push'
 alias gs='git status'
+
+# git push
+alias gp='git push'
+gpu() { git push -u "$(getOriginRemote)" ${1:+"$1"}; } # push (and track) to upstream
 
 # git grep and helpers
 alias gitGrep='git grep -I -n --break' # skip binary files, add line numbers and a break between files
