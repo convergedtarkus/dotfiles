@@ -88,6 +88,7 @@ alias gsts='git stash save'
 # git reset
 alias gus='git reset'
 alias gUndoLastCommit='git reset --soft HEAD~ && git reset' # Will basically undo the last commit, putting all the changes back in the working tree.
+alias gusr='gfc && git reset --hard @{u}'                   # Fetches this branch and then resets to the head of the remote.
 
 # git command shortcuts
 alias gcp='git cherry-pick'
