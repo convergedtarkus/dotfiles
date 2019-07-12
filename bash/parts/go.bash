@@ -10,6 +10,9 @@ alias goClearTestCache='go clean -testcache'
 # run all go tests
 alias goTestAll='go test ./...'
 
+# run go test with verbose flag and count=1 (which bypasses all test caching)
+alias gotest='go test -v -count=1'
+
 # install go-tools staticcheck (https://github.com/dominikh/go-tools)
 installStaticcheck() {
 	go get -d honnef.co/go/tools/cmd/staticcheck
