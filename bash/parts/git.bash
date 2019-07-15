@@ -116,9 +116,9 @@ alias gHeadHash='git rev-parse HEAD'
 alias gBranch='git rev-parse --abbrev-ref HEAD'
 
 # Clean commands
-safeClean() { git clean -xdf -e .idea -e "*.iml"; } # will remove ignored files and untracked files (git add anything you want to keep)
-testSafeClean() { git clean -xdfn -e .idea -e "*.iml"; }
-alias gpristine='git reset --hard && safeClean' # safeClean + reset to HEAD
+safeClean() { git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode; }      # will remove ignored files and untracked files (git add anything you want to keep). Keeps IDE files/settings.
+testSafeClean() { git clean -xdfn -e .idea -e "*.iml" -e .atom -e .vscode; } # safeClean but only list what would be removed
+alias gpristine='git reset --hard && safeClean'                              # safeClean + reset to HEAD
 
 # Get the base commit between the current branch and master.
 masterBase() {
