@@ -76,6 +76,7 @@ parse_commandline() {
 			_arg_autorun="on"
 			_next="${_key##-a}"
 			if test -n "$_next" -a "$_next" != "$_key"; then
+				# shellcheck disable=SC2015
 				begins_with_short_option "$_next" && shift && set -- "-a" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 			fi
 			;;
@@ -87,6 +88,7 @@ parse_commandline() {
 			_arg_copy="on"
 			_next="${_key##-c}"
 			if test -n "$_next" -a "$_next" != "$_key"; then
+				# shellcheck disable=SC2015
 				begins_with_short_option "$_next" && shift && set -- "-c" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 			fi
 			;;
@@ -98,6 +100,7 @@ parse_commandline() {
 			_arg_force="on"
 			_next="${_key##-f}"
 			if test -n "$_next" -a "$_next" != "$_key"; then
+				# shellcheck disable=SC2015
 				begins_with_short_option "$_next" && shift && set -- "-f" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 			fi
 			;;
@@ -125,7 +128,7 @@ parse_commandline "$@"
 
 _allPackagesProto() {
 	protected="github.com/convergedtarkus github.com/Workiva github.com/gopherjs"
-	protected="${protected// /$'\n'}" 	
+	protected="${protected// /$'\n'}"
 
 	pathsToRemove=$(eval "find $GOPATH/src -type d -mindepth 3 -maxdepth 3 ! -path '*/\.*'")
 
@@ -138,7 +141,6 @@ _allPackagesProto() {
 	echo "$pathsToRemove"
 	echo
 }
-
 
 # Takes an input of newline separated paths and echos them out one by one indented once each.
 _logToRemove() {

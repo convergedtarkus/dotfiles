@@ -60,6 +60,7 @@ while test $# -gt 0; do
 		_arg_delete="on"
 		_next="${_key##-d}"
 		if test -n "$_next" -a "$_next" != "$_key"; then
+			# shellcheck disable=SC2015
 			begins_with_short_option "$_next" && shift && set -- "-d" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 		fi
 		test "${1:0:5}" = "--no-" && _arg_delete="off"
@@ -68,6 +69,7 @@ while test $# -gt 0; do
 		_arg_branches="on"
 		_next="${_key##-b}"
 		if test -n "$_next" -a "$_next" != "$_key"; then
+			# shellcheck disable=SC2015
 			begins_with_short_option "$_next" && shift && set -- "-b" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 		fi
 		test "${1:0:5}" = "--no-" && _arg_branches="off"
@@ -76,6 +78,7 @@ while test $# -gt 0; do
 		_arg_tags="on"
 		_next="${_key##-t}"
 		if test -n "$_next" -a "$_next" != "$_key"; then
+			# shellcheck disable=SC2015
 			begins_with_short_option "$_next" && shift && set -- "-t" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 		fi
 		test "${1:0:5}" = "--no-" && _arg_tags="off"
@@ -84,6 +87,7 @@ while test $# -gt 0; do
 		_arg_printonly="on"
 		_next="${_key##-p}"
 		if test -n "$_next" -a "$_next" != "$_key"; then
+			# shellcheck disable=SC2015
 			begins_with_short_option "$_next" && shift && set -- "-p" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 		fi
 		test "${1:0:5}" = "--no-" && _arg_printonly="off"

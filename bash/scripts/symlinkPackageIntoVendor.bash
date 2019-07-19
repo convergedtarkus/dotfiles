@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Finds a dependency inside the vendor folder by the repro name, removes it vendor and symlinks to to a local copy of that dependency
 # If the dependency doesn't exit in vendor, has multiple possible options or a copy doesn't exist in the $GOPATH then nothing will happen
 # Note that the search string is case sensitive
@@ -17,7 +19,6 @@
 
 ### Argbash code starts here, jump to 'ACTUAL SCRIPT STARTS HERE' to skip
 
-#!/usr/bin/env bash
 #
 # This is a rather minimal example Argbash potential
 # Example taken from http://argbash.readthedocs.io/en/stable/example.html
@@ -79,6 +80,7 @@ parse_commandline() {
 			_arg_version="on"
 			_next="${_key##-v}"
 			if test -n "$_next" -a "$_next" != "$_key"; then
+				# shellcheck disable=SC2015
 				begins_with_short_option "$_next" && shift && set -- "-v" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 			fi
 			;;
