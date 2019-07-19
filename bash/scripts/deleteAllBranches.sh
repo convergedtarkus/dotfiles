@@ -228,13 +228,17 @@ echo ""
 echo "Will delete all the following remote refs"
 echo "$refNamesOnly"
 
-echo "You have 10 seconds to cancel if the above refs look wrong"
 echo ""
+echo "Please confirm the remote refs look correct:"
 
-sleep 10 # Waits 10 seconds.
-
-echo "Deleting all requested remote refs"
-echo ""
+read input_variable
+if [ "$input_variable" != "y" ] && [ "$input_variable" != "Y" ]; then
+	echo "Aborting"
+	exit 0
+else
+	echo "Deleting all requested remote refs"
+	echo ""
+fi
 
 # Put all the refs into a single line so one command can be run
 commandRefs=$(echo "$refNamesOnly" | tr '\n' ' ')
