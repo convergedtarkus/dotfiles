@@ -19,5 +19,5 @@ fi
 branchName=$(git rev-parse --abbrev-ref HEAD)
 parseResult=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$branchName")
 if [[ -n "$parseResult" ]]; then
-	printf "\n%s%s" "$parseResult" "$(cat "$COMMIT_MSG_FILE")" > "$COMMIT_MSG_FILE"
+	printf "\n%s%s" "$parseResult" "$(cat "$COMMIT_MSG_FILE")" >"$COMMIT_MSG_FILE"
 fi
