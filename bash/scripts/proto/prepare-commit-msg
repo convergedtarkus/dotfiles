@@ -9,8 +9,15 @@
 #
 
 COMMIT_MSG_FILE=$1
-#COMMIT_SOURCE=$2
+COMMIT_SOURCE=$2
 #SHA1=$3
+
+# A source of message means -m was used, do not append ticket info.
+#   Plus, in this case the -m content is already here so it would need
+#   fancy logic to correctly append the ticket info.
+if [[ "$COMMIT_SOURCE" == "message" ]]; then
+	exit 0
+fi
 
 if [[ ! -f "$MYDOTFILES/bash/scripts/parseTicket.bash" ]]; then
 	exit 0
@@ -21,3 +28,4 @@ parseResult=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$branchName")
 if [[ -n "$parseResult" ]]; then
 	printf "\n%s%s" "$parseResult" "$(cat "$COMMIT_MSG_FILE")" >"$COMMIT_MSG_FILE"
 fi
+printf "\nSource: '%s'%s" "$COMMIT_SOURCE" "$(cat "$COMMIT_MSG_FILE")" >"$COMMIT_MSG_FILE"
