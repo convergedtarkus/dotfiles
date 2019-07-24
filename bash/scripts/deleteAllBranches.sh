@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # ARG_HELP([The general script's help msg])
 # ARG_POSITIONAL_SINGLE([remote],[Remote, defaults to remove local branches],[local])
