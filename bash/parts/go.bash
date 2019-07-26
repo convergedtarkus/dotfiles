@@ -99,10 +99,8 @@ smartGoCheck() { _smartGoRunner goCheck; }
 smartGoStatic() { _smartGoRunner goStatic; }
 
 # Identies all directories with changed go files and runs `goCiLint` in all those directories
-smartGoCiLint() { _smartGoRunner goCiLint; }
-
-# Same as smartGoCiLint (above) but only show new issues.
-smartGoCiLintNew() { _smartGoRunner 'goCiLint -n'; }
+# Passes all arguments along, use -n for only new issues.
+smartGoCiLint() { _smartGoRunner "goCiLint $*"; }
 
 # Identies all directories with changed go files and runs `go test` in all those directories
 smartGoTest() { _smartGoRunner 'go test'; }
