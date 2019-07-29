@@ -1,6 +1,11 @@
 " Enable syntax highlighting
 syntax on
 
+" Increase pattern memory limit
+" This fixes syntax highlighting for git commits while rebasing
+" See https://github.com/vim/vim/issues/2049 for discussion.
+set mmp=5000
+
 " Use the monokai colorscheme (https://github.com/crusoexia/vim-monokai)
 colorscheme monokai
 
