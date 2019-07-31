@@ -10,12 +10,12 @@
 
 COMMIT_MSG_FILE=$1
 COMMIT_SOURCE=$2
-#SHA1=$3
+SHA1=$3
 
-# Do not do anything for -m commits, merges or squashes.
+# Do not do anything for -m commits, merges or squashes or appends (SHA1 != "")
 #   Plus, in this case the content is already here so it would need
 #   fancy logic to correctly append the ticket info after it.
-if [[ "$COMMIT_SOURCE" == "message" || "$COMMIT_SOURCE" == "merge" || "$COMMIT_SOURCE" == "squash" ]]; then
+if [[ -n "$SHA1" || "$COMMIT_SOURCE" == "message" || "$COMMIT_SOURCE" == "merge" || "$COMMIT_SOURCE" == "squash" ]]; then
 	exit 0
 fi
 
