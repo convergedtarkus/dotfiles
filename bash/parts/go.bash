@@ -82,6 +82,43 @@ _smartGoRunner() {
 	done <<<"$uniqueDirs"
 }
 
+_smartGoRunner2() {
+	# Throw an alert if not at the repo root just so no mistakes are made
+	if [[ $(git rev-parse --show-toplevel) != $(pwd) ]]; then
+		echo "FYI: Not running at repo root, not all files may be processed"
+		echo
+	fi
+
+	# Print changed files, no deleted files, .go files only regardless of index or working tree.
+	# The --relative flag returns paths relative to the current path, allowing running in sub-directories.
+	# Use grep to remove any entries from the vendor directory as these should never be touched.
+	changedFiles=$(git diff HEAD --relative --name-only --diff-filter=d -- '*.go' | grep -v '^vendor/')
+	if [[ "$changedFiles" == "" ]]; then
+		echo "No changed files found, aborting"
+		return 0
+	fi
+
+	commandToRun=$1
+
+	# https://unix.stackexchange.com/questions/217628/cut-string-on-last-delimiter
+	# echo, reverse it, get 2nd and beyond fields, reverse again
+	# using `dirname` might be better, but that requires looping over lines
+	endingsRemoved=$(echo "$changedFiles" | rev | cut -d'/' -f2- | rev)
+
+	uniqueDirs=$(echo "$endingsRemoved" | sort | uniq)
+
+	# Add './' to the start of each line as go test (and others) require it.
+	# shellcheck disable=SC2001
+	# As far as I know, bash cannot handle this correctly, so use sed.
+	uniqueDirs=$(echo "$uniqueDirs" | sed 's|^|./|')
+
+	# Put all the directories on a single line (separated by a space).
+	commandInput=$(echo "$uniqueDirs" | tr '\n' ' ')
+
+	echo "$commandToRun $commandInput"
+	eval "$commandToRun" "$commandInput"
+}
+
 # Identies all directories with changed go files and runs `goFormat` in all those directories
 smartGoFormat() { _smartGoRunner goFormat; }
 
