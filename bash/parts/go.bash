@@ -39,50 +39,12 @@ installGopherJS() { go get -u github.com/gopherjs/gopherjs; }
 reinstallGopherJS() { removeGopherJS && installGopherJS; }
 
 # Identies all directories with changed go files and runs the given command ($1) in all those directories
-# passed in command must be able to run with a single in the form `command $directory`
+# passed in command must be able to run with a single in the form `command $directory $anotherDirectroy $etc`
 # Note, if this is run from non-repo root, it will only touch things at this directory and below
 # E.X. `_smartGoRunner goFormat` would run `goFormat` in all directories with changed go files
 # Generally should use one of the public (not `_`) smartGoBLANK style functions
 _smartGoRunner() {
-	# Throw an alert if not at the repo root just so no mistakes are made
-	if [[ $(git rev-parse --show-toplevel) != $(pwd) ]]; then
-		echo "FYI: Not running at repo root, not all files may be processed"
-		echo
-	fi
-
-	# Print changed files, no deleted files, .go files only regardless of index or working tree.
-	# The --relative flag returns paths relative to the current path, allowing running in sub-directories.
-	# Use grep to remove any entries from the vendor directory as these should never be touched.
-	changedFiles=$(git diff HEAD --relative --name-only --diff-filter=d -- '*.go' | grep -v '^vendor/')
-	if [[ "$changedFiles" == "" ]]; then
-		echo "No changed files found, aborting"
-		return 0
-	fi
-
-	commandToRun=$1
-
-	# https://unix.stackexchange.com/questions/217628/cut-string-on-last-delimiter
-	# echo, reverse it, get 2nd and beyond fields, reverse again
-	# using `dirname` might be better, but that requires looping over lines
-	endingsRemoved=$(echo "$changedFiles" | rev | cut -d'/' -f2- | rev)
-
-	uniqueDirs=$(echo "$endingsRemoved" | sort | uniq)
-
-	while read -r line; do
-		# go test requires the './' at the start of a path
-		# `go test ./common/stuff` = good
-		# `go test common/stuff` = bad
-		line="./$line"
-		echo "####"
-		echo "#### running $commandToRun in '$line'"
-		echo "####"
-
-		eval "$commandToRun" "$line"
-		echo ""
-	done <<<"$uniqueDirs"
-}
-
-_smartGoRunner2() {
+	# TODO Need to look into this, not sure it always works.
 	# Throw an alert if not at the repo root just so no mistakes are made
 	if [[ $(git rev-parse --show-toplevel) != $(pwd) ]]; then
 		echo "FYI: Not running at repo root, not all files may be processed"
@@ -115,7 +77,9 @@ _smartGoRunner2() {
 	# Put all the directories on a single line (separated by a space).
 	commandInput=$(echo "$uniqueDirs" | tr '\n' ' ')
 
-	echo "$commandToRun $commandInput"
+	echo "####"
+	echo "#### Running $commandToRun $commandInput"
+	echo "####"
 	eval "$commandToRun" "$commandInput"
 }
 
@@ -124,16 +88,6 @@ smartGoFormat() { _smartGoRunner goFormat; }
 
 # Identies all directories with changed go files and runs `goImports` in all those directories
 smartGoImports() { _smartGoRunner goImports; }
-
-# TODO "superSmartGoLint" highlights lints on lines that were changed
-# Identies all directories with changed go files and runs `goLint` in all those directories
-smartGoLint() { _smartGoRunner goLint; }
-
-# Identies all directories with changed go files and runs goCheck (`goFormat` + `goLint`) in all those directories
-smartGoCheck() { _smartGoRunner goCheck; }
-
-# Identies all directories with changed go files and runs `staticcheck` in all those directories
-smartGoStatic() { _smartGoRunner goStatic; }
 
 # Identies all directories with changed go files and runs `goCiLint` in all those directories
 # Passes all arguments along, use -n for only new issues.
@@ -145,31 +99,15 @@ smartGoTest() { _smartGoRunner 'go test'; }
 # Identies all directories with changed go files the whole suite of go checks
 # This includes, `goFormat`, `goLint`, `staticcheck` and `go test`
 smartGoAll() {
-	smartGoCheck
-	smartGoStatic
+	smartGoImports
+	smartGoCiLint -n
 	smartGoTest
-}
-
-# Identies all directories with changed go files the whole suite of go checks minus go lint
-# Good for cleaner output in code that is very messy according to the linter
-# This includes, `goFormat`, `staticcheck` and `go test`
-smartGoAllNoLint() {
-	smartGoFormat
-	smartGoStatic
-	smartGoTest
-}
-
-# runs `goFormat` and `goLint` in the given directory. If no input, assume the current ('.') directory
-goCheck() {
-	goFormat ${1:+"$1"}
-	goLint ${1:+"$1"}
 }
 
 # runs 'staticcheck' in the given directory. If not input, assume the current ('.') directory.
 # Removes the checks for using deprecations and missing package comments.
-# TODO Have a nice way to call this (and the all runner) without those checks removed.
 goStatic() {
-	staticcheck -checks all,-SA1019,-ST1000 ${1:+"$1"}
+	staticcheck -checks all,-SA1019,-ST1000 ${@:+"$@"}
 }
 
 # Runs 'golangci-lint' using my global config file.
@@ -181,8 +119,8 @@ goCiLint() {
 
 # runs `gofmt -w` in the given directory. If no input, assume the current ('.') directory
 goFormat() {
-	input=$1
-	if [[ $input == "" ]]; then
+	input=$*
+	if [[ -z "$input" ]]; then
 		input="."
 	fi
 
@@ -191,8 +129,8 @@ goFormat() {
 
 # runs `goimports -w` in the given directory. If no input, assume the current ('.') directory
 goImports() {
-	input=$1
-	if [[ $input == "" ]]; then
+	input=$*
+	if [[ -z "$input" ]]; then
 		input="."
 	fi
 
@@ -201,7 +139,7 @@ goImports() {
 
 # runs `golint` in the given directory. If no input, assume the current ('.') directory
 goLint() {
-	input=$1
+	input=$*
 	if [[ $input == "" ]]; then
 		input="."
 	fi
