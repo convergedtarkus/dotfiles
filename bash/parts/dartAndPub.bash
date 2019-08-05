@@ -87,6 +87,10 @@ pubCleanAndGet() { pubClean && libAndAppGet; }
 # Kills any dart processes. Sometimes they get stuck.
 killDart() { killall -KILL dart; }
 
+# Kills any Dartium/Chromium instances that failed to die.
+# Normally happens after running tests or something.
+killRogueDartium() { pgrep -f "Chromium --user-data" | xargs kill; }
+
 # Quickly checkout, reset or add pubspec changes
 alias gcoPubspecs='git checkout "*pubspec.lock" "*pubspec.yaml"'
 alias gusPubspecs='git reset "*pubspec.lock" "*pubspec.yaml"'
