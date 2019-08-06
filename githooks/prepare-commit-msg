@@ -12,10 +12,8 @@ COMMIT_MSG_FILE=$1
 COMMIT_SOURCE=$2
 SHA1=$3
 
-# Do not do anything for -m commits, merges or squashes or appends (SHA1 != "")
-#   Plus, in this case the content is already here so it would need
-#   fancy logic to correctly append the ticket info after it.
-if [[ -n "$SHA1" || "$COMMIT_SOURCE" == "message" || "$COMMIT_SOURCE" == "merge" || "$COMMIT_SOURCE" == "squash" ]]; then
+# Do not do anything for merges or squashes or appends (SHA1 != "")
+if [[ -n "$SHA1" || "$COMMIT_SOURCE" == "merge" || "$COMMIT_SOURCE" == "squash" ]]; then
 	exit 0
 fi
 
@@ -24,7 +22,13 @@ if [[ ! -f "$MYDOTFILES/bash/scripts/parseTicket.bash" ]]; then
 fi
 
 branchName=$(git rev-parse --abbrev-ref HEAD)
-parseResult=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$branchName")
-if [[ -n "$parseResult" ]]; then
-	printf "\n%s%s" "$parseResult" "$(cat "$COMMIT_MSG_FILE")" >"$COMMIT_MSG_FILE"
+parsedTicket=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$branchName")
+if [[ -n "$parsedTicket" ]]; then
+	if [[ "$COMMIT_SOURCE" == "message" ]]; then
+		# Append parsed ticket after the -m message.
+		printf "%s\n%s" "$(cat "$COMMIT_MSG_FILE")" "$parsedTicket" >"$COMMIT_MSG_FILE"
+	else
+		# Leave a blank line at the start and the parsed ticket on the next line.
+		printf "\n%s%s" "$parsedTicket" "$(cat "$COMMIT_MSG_FILE")" >"$COMMIT_MSG_FILE"
+	fi
 fi
