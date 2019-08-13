@@ -157,10 +157,10 @@ localDependencyPath=$(find "$GOPATH/src" -maxdepth 3 -d -path "*$_arg_symlink_pa
 
 numResults=$(_countLines "$localDependencyPath")
 
-if (($numResults == 0)); then
+if ((numResults == 0)); then
 	echo "FAILURE: Package '$_arg_symlink_package' does not exist in GOPATH, aborting"
 	exit 1
-elif (($numResults != 1)); then
+elif ((numResults != 1)); then
 	echo "FAILURE: Found $numResults possible dependency hits in GOPATH, aborting"
 	echo "Possible dependencies:"
 	echo "$localDependencyPath"
