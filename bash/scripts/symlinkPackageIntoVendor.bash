@@ -183,30 +183,23 @@ else
 fi
 
 echo "Preparing to symlink '$_arg_symlink_package' into vendor from GOPATH"
-
-if [ -d "$localDependencyPath/vendor" ]; then
-	echo
-	echo "ATTENTION!! Package '$_arg_symlink_package' in GOPATH has a vendor directory, if left this way, your build will almost certainly break."
-
-	if [ $_arg_ignore_vendor == "on" ]; then
-		echo "NOT MOVING NESTED VENDOR DIRECTORY DUE TO --ignore-vendor parameter!!!"
-		echo "THIS WILL MOST LIKELY BREAK YOUR BUILD, BUT YOU TOLD ME TO DO IT!!!"
-	else
-		echo "Moving the nested vendor directory to 'vendor_bak', use \`mv "$localDependencyPath/vendor_bak" "$localDependencyPath/vendor"\` to reverse"
-		mv "$localDependencyPath/vendor" "$localDependencyPath/vendor_bak"
-		echo "Moved the nested vendor directory successfully! Your build should work correctly!"
-	fi
-
-else
-	echo
-	echo "No need to move vendor directory from '$_arg_symlink_package' as it does not have a vendor directory. Your build should be fine!"
-fi
+echo "ATTENTION: If you add or remove a file/directory at the root level of the package being symlinked in, you will need to re-run the symlink script!"
 
 if [ -d $expectedVendorPath ]; then
 	rm -rf $expectedVendorPath
+	mkdir $expectedVendorPath
 fi
 
-ln -s $localDependencyPath ${expectedVendorPath%/$_arg_symlink_package}
+# Loop over all files/directories under the root of the package and symlink them one by one (minus vendor).
+# This solves the problem of nested vendor directories and also does not require deleting/renaming the vendor
+# directory of the package being symlinked in.
+for filename in "$localDependencyPath/"*; do
+	# Skip not-existing files and the vendor directory.
+	if [[ ! -e "$filename" || "$filename" == *vendor ]]; then
+		continue
+	fi
+	ln -s $filename ${expectedVendorPath%/$_arg_symlink_package/}
+done
 
 # touch all files in the symlinked package to ensure gopherJS and other tools see the changes correctly
 find "./vendor/$vendorDependencyPath" -type f -name "*.go" -exec touch {} +
