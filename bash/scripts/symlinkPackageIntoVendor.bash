@@ -153,7 +153,7 @@ fi
 
 # look for the dependency in GOPATH first, this supports adding a new dependency into vendor if its not already in vendor
 # the maxdepth is since go packages should follow the pattern '$GOPATH/src/domain/user/repo' so only search down three directories to limit results
-localDependencyPath=$(find $GOPATH/src -maxdepth 3 -d -path "*$_arg_symlink_package" | grep -v /vendor/)
+localDependencyPath=$(find "$GOPATH/src" -maxdepth 3 -d -path "*$_arg_symlink_package" | grep -v /vendor/)
 
 numResults=$(_countLines "$localDependencyPath")
 
@@ -161,7 +161,7 @@ if (($numResults == 0)); then
 	echo "FAILURE: Package '$_arg_symlink_package' does not exist in GOPATH, aborting"
 	exit 1
 elif (($numResults != 1)); then
-	echo "FAILURE: Found "$numResults" possible dependency hits in GOPATH, aborting"
+	echo "FAILURE: Found $numResults possible dependency hits in GOPATH, aborting"
 	echo "Possible dependencies:"
 	echo "$localDependencyPath"
 	exit 1
@@ -172,7 +172,7 @@ echo "Found package '$_arg_symlink_package' inside GOPATH at '$localDependencyPa
 expectedVendorPath="./vendor"${localDependencyPath#$GOPATH/src}
 
 # path matches against the whole path name
-if [ ! -d $expectedVendorPath ]; then
+if [ ! -d "$expectedVendorPath" ]; then
 	echo "Package '$_arg_symlink_package' does not currently exist in vendor, will symlink using path $expectedVendorPath"
 else
 	if [[ -L $expectedVendorPath ]]; then
@@ -185,9 +185,9 @@ fi
 echo "Preparing to symlink '$_arg_symlink_package' into vendor from GOPATH"
 echo "ATTENTION: If you add or remove a file/directory at the root level of the package being symlinked in, you will need to re-run the symlink script!"
 
-if [ -d $expectedVendorPath ]; then
-	rm -rf $expectedVendorPath
-	mkdir $expectedVendorPath
+if [ -d "$expectedVendorPath" ]; then
+	rm -rf "$expectedVendorPath"
+	mkdir "$expectedVendorPath"
 fi
 
 # Loop over all files/directories under the root of the package and symlink them one by one (minus vendor).
@@ -198,7 +198,7 @@ for filename in "$localDependencyPath/"*; do
 	if [[ ! -e "$filename" || "$filename" == *vendor ]]; then
 		continue
 	fi
-	ln -s $filename ${expectedVendorPath%/$_arg_symlink_package/}
+	ln -s "$filename" "${expectedVendorPath%/$_arg_symlink_package/}"
 done
 
 # touch all files in the symlinked package to ensure gopherJS and other tools see the changes correctly
