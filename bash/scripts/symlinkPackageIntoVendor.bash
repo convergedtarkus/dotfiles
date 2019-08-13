@@ -196,7 +196,8 @@ for filename in "$localDependencyPath/"*; do
 done
 
 # touch all files in the symlinked package to ensure gopherJS and other tools see the changes correctly
-find "./vendor/$vendorDependencyPath" -type f -name "*.go" -exec touch {} +
+touch "$expectedVendorPath"
+find "$expectedVendorPath" -exec touch {} +
 
 echo
 echo "Success! Package '$_arg_symlink_package' was symlinked into vendor from GOPATH correctly!"
