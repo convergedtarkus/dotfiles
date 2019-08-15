@@ -94,7 +94,7 @@ smartGoImports() { _smartGoRunner goImports; }
 smartGoCiLint() { _smartGoRunner "goCiLint $*"; }
 
 # Identies all directories with changed go files and runs `go test` in all those directories
-smartGoTest() { _smartGoRunner 'go test'; }
+smartGoTest() { _smartGoRunner "go test $*"; }
 
 # Identies all directories with changed go files the whole suite of go checks
 # This includes, `goFormat`, `goLint`, `staticcheck` and `go test`
