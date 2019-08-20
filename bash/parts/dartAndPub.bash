@@ -119,7 +119,7 @@ switchDart1() {
 switchDart2() {
 	brew unlink dart
 	brew unlink dart@1
-	brew switch dart 2.4.0
+	brew switch dart 2.4.1
 	brew link dart
 	dart --version
 }
