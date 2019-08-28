@@ -37,16 +37,7 @@ touchFiles() {
 
 # Takes piped in input and echos to stdout and copies to clipboard
 copyEcho() {
-	allLines=""
-	while read -r line; do
-		if [[ -z "$allLines" ]]; then
-			allLines=$(printf "%s" "$line")
-		else
-			allLines=$(printf "%s\n%s" "$allLines" "$line")
-		fi
-		echo "$line"
-	done
-	echo "$allLines" | pbcopy
+	tee /dev/tty | pbcopy
 }
 
 # Runs a given command in bash with the x flag for debug output.
