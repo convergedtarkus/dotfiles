@@ -7,11 +7,12 @@ disableGoTestCache() { export GOCACHE=off; }
 # clear go test cache
 alias goClearTestCache='go clean -testcache'
 
+# run go test with count=1 (which bypasses all test caching)
+alias goTestQuiet='go test -count=1'
+# run go test with verbose flag and count=1 (which bypasses all test caching)
+alias goTest='goTestQuiet -v'
 # run all go tests
 alias goTestAll='go test ./...'
-
-# run go test with verbose flag and count=1 (which bypasses all test caching)
-alias gotest='go test -v -count=1'
 
 # install go-tools staticcheck (https://github.com/dominikh/go-tools)
 installStaticcheck() {
@@ -92,6 +93,50 @@ smartGoImports() { _smartGoRunner goImports; }
 # Identies all directories with changed go files and runs `goCiLint` in all those directories
 # Passes all arguments along, use -n for only new issues.
 smartGoCiLint() { _smartGoRunner "goCiLint $*"; }
+
+smartGoCiLintFiles() {
+	echo "#### Limiting results to changed files only."
+	rawChangedFiles=$(git diff HEAD --name-only)
+
+	# Turn the changed files into one big or regex.
+	changedFiles=""
+	while read -r line; do
+		changedFiles+="$line:|"
+	done <<<"$rawChangedFiles"
+	# Trim off the last '|' to make the regex valid.
+	changedFiles="${changedFiles::-1}"
+
+	# 0 = no match yet
+	# 1 = found a match
+	matchState="0"
+
+	while read -r outputLine; do
+		# _smartGoRunner uses this pattern for comments and logging, so don't filter it out.
+		if [[ "$outputLine" == '####'* ]]; then
+			echo "$outputLine"
+			continue
+		fi
+
+		if [[ "$matchState" -eq "1" ]]; then
+			# Look for a line starting with a control character and [1m which matches the
+			# color formatting golangci-lint uses when printing a lint match.
+			if echo "$outputLine" | grep -q '^[[:cntrl:]]\[1m'; then
+				matchState="0"
+			else
+				# Otherwise echo the line as it relates to a changed file (or is sometype
+				# of important log/error).
+				echo "$outputLine"
+				continue
+			fi
+		fi
+
+		# Match a line that contains any of the currently changed files.
+		if echo "$outputLine" | grep -qE "$changedFiles"; then
+			echo "$outputLine"
+			matchState="1"
+		fi
+	done <<<$(_smartGoRunner "goCiLint --color=always $*")
+}
 
 # Identies all directories with changed go files and runs `go test` in all those directories
 smartGoTest() { _smartGoRunner "go test $*"; }
