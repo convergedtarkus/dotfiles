@@ -146,7 +146,8 @@ smartGoTest() { _smartGoRunner "go test $*"; }
 smartGoAll() {
 	smartGoImports
 	smartGoCiLint -n
-	smartGoTest
+	# Use count=1 so no tests run with the test cache.
+	smartGoTest -count=1
 }
 
 # runs 'staticcheck' in the given directory. If not input, assume the current ('.') directory.
