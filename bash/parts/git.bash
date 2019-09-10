@@ -45,6 +45,7 @@ alias gco='git checkout'
 alias gcom='git checkout master'
 gcomup() { git checkout master ${1:+"$1"} && git pull; } # $1 allows passing -f to dump current changes
 alias gcob='git checkout -b'
+gcoClean() { git checkout ${1:+"$1"} && git clean -fd ${1:+"$1"}; }
 
 # git commit
 alias gc='git commit -v'
