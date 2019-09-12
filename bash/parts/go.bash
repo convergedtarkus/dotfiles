@@ -10,7 +10,7 @@ alias goClearTestCache='go clean -testcache'
 # run go test with count=1 (which bypasses all test caching)
 alias goTestQuiet='go test -count=1'
 # run go test with verbose flag and count=1 (which bypasses all test caching)
-alias goTest='goTestQuiet -v'
+alias goTest='go test -count=1 -v'
 # run all go tests
 alias goTestAll='go test ./...'
 
