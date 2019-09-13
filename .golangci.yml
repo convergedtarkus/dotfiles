@@ -48,7 +48,7 @@ linters:
     - scopelint
     #- staticcheck (enabled by default)
     #- structcheck (enabled by default)
-    #- stylecheck (TODO look into using)
+    - stylecheck
     #- typecheck (enabled by default)
     #- unused (enabled by default)
     #- varcheck (enabled by default)
