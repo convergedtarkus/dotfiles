@@ -20,7 +20,6 @@ linters-settings:
   govet:
     # report about shadowed variables
     check-shadowing: true
-    # TODO Look into go vet settings
   gofmt:
     # simplify code: gofmt with `-s` option, true by default
     simplify: true
@@ -28,10 +27,10 @@ linters-settings:
 
 linters:
   enable:
-    - misspell
     - gofmt
     - golint
     - goimports
+    - misspell
     - unparam
 
 
