@@ -72,6 +72,9 @@ issues:
     - linters:
         - staticcheck
       text: "SA1019:"
+    - path: _test\.go
+      linters:
+        - scopelint # Lots of false positives for table tests, see https://github.com/kyoh86/scopelint
 
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
