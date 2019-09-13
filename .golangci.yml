@@ -17,6 +17,14 @@ output:
 
 # all available settings of specific linters
 linters-settings:
+  errcheck:
+    # report about not checking of errors in type assetions: `a := b.(MyStruct)`;
+    # default is false: such cases aren't reported by default.
+    check-type-assertions: false
+
+    # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
+    # default is false: such cases aren't reported by default.
+    check-blank: false
   govet:
     # report about shadowed variables
     check-shadowing: true
@@ -27,10 +35,24 @@ linters-settings:
 
 linters:
   enable:
+    #- deadcode (enabled by default)
+    #- errcheck (enabled by default)
     - gofmt
     - golint
     - goimports
+    #- gosimple (enabled by default)
+    #- govet (enabled by default)
+    #- ineffassign (enabled by default)
     - misspell
+    - prealloc
+    - scopelint
+    #- staticcheck (enabled by default)
+    #- structcheck (enabled by default)
+    #- stylecheck (TODO look into using)
+    #- typecheck (enabled by default)
+    #- unused (enabled by default)
+    #- varcheck (enabled by default)
+    - unconvert
     - unparam
 
 
