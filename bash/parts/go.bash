@@ -202,6 +202,27 @@ cleanGoPath() {
 	eval "$MYDOTFILES/bash/scripts/cleanGoPath.bash $*"
 }
 
+# Resets a lot of go environment files to fix build issues.
+# gopherjs is often an issue so delete it as well.
+goResetEnv() {
+	if command -v git >/dev/null; then
+		# TODO Check for any local changes as this will blow those away.
+		echo "Running git reset and clean"
+		git reset --hard && git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode
+	fi
+
+	echo "Removing gopherjs from go bin"
+	rm -rf "$GOPATH/bin/gopherjs"
+
+	echo "Removing gopherjs from src"
+	rm -rf "$GOPATH/src/github.com/gopherjs/"
+
+	echo "Removing go pkg directory, if this errors, run 'sudo rm -rf $GOPATH/pkg/'"
+	rm -rf "$GOPATH/pkg/" # If you get errors, you may need to sudo this command
+
+	echo "Done resetting go environment!"
+}
+
 symlinkVendorPackage() {
 	# the "$*" passes all arguments to the symlink script
 	eval "$MYDOTFILES/bash/scripts/symlinkPackageIntoVendor.bash $*"
