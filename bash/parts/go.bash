@@ -207,6 +207,7 @@ cleanGoPath() {
 goResetEnv() {
 	if command -v git >/dev/null; then
 		# TODO Check for any local changes as this will blow those away.
+		# TODO Also check if this is a git repo.
 		echo "Running git reset and clean"
 		git reset --hard && git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode
 	fi
