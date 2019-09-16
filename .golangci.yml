@@ -35,23 +35,38 @@ linters-settings:
 
 linters:
   enable:
-    #- deadcode (enabled by default)
-    #- errcheck (enabled by default)
+    #- bodyclose # don't use http much
+    #- deadcode # enabled by default
+    #- depguard # varies too much to help
+    #- dupl # TODO Worth a try, noisy?
+    #- errcheck # enabled by default
+    #- funlen # TODO Worth trying, noisy?
+    #- gochecknoglobals # Pretty common, noisy
+    #- gochecknoinits # TODO Try? Safety is nice
+    #- goconst # TODO Worth a shot, noisy?
+    #- gocritic # TODO Would like to try. Need to config a lot I fear
+    #- gocyclo # TODO Existing code will get flagged, maybe try?
+    #- godox # Not always an issue
     - gofmt
     - golint
     - goimports
-    #- gosimple (enabled by default)
-    #- govet (enabled by default)
-    #- ineffassign (enabled by default)
+    #- gosec # This is covered in other ways
+    #- gosimple # enabled by default
+    #- govet # enabled by default
+    #- ineffassign # enabled by default
+    #- interfacer # Generally done for a reason
+    #- lll # Going to be noisy
+    #- maligned # Too noisy and unique setup invalidates
     - misspell
+    #- nakedret # Generally don't use naked returns anyway
     - prealloc
     - scopelint
-    #- staticcheck (enabled by default)
-    #- structcheck (enabled by default)
+    #- staticcheck # enabled by default
+    #- structcheck # enabled by default
     - stylecheck
-    #- typecheck (enabled by default)
-    #- unused (enabled by default)
-    #- varcheck (enabled by default)
+    #- typecheck # enabled by default
+    #- unused # enabled by default
+    #- varcheck # enabled by default
     - unconvert
     - unparam
 
