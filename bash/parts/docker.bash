@@ -11,10 +11,20 @@ alias killAllDockerContainers='docker rm -f $(docker ps -aq) >/dev/null 2>&1 || 
 # Removes all docker containers. This does not use the force flag, so some images may require manual deletion.
 removeAllDockerContainers() { docker image rm "$(docker image ls | awk '{print $3}')"; }
 
-nukeDocker() {
-	echo
+dockerStop() {
 	echo "Stop all containers"
-	docker stop "$(docker ps -a -q)"
+	docker stop $(docker ps -a -q)
+	echo "All containers stopped"
+}
+
+dockerKill() {
+	echo "Killing all stuck containers"
+	docker rm -f $(docker ps -aq) >/dev/null 2>&1 || true
+	echo "All containers dead"
+}
+
+nukeDocker() {
+	dockerStop
 
 	echo
 	echo "Pruning system"
@@ -22,11 +32,11 @@ nukeDocker() {
 
 	echo
 	echo "Delete all containers"
-	docker rm -f "$(docker ps -a -q)" >/dev/null 2>&1 || true
+	docker rm -f $(docker ps -a -q) >/dev/null 2>&1 || true
 
 	echo
 	echo "Delete all images"
-	docker rmi "$(docker images -q)"
+	docker rmi $(docker images -q)
 
 	echo
 	echo "Delete all volumes"
@@ -44,16 +54,4 @@ nukeDocker() {
 	echo
 	echo
 	echo "Finished nuking"
-}
-
-dockerStop() {
-	echo "Stop all containers"
-	docker stop "$(docker ps -a -q)"
-	echo "All containers stopped"
-}
-
-dockerKill() {
-	echo "Killing all stuck containers"
-	docker rm -f "$(docker ps -aq)" >/dev/null 2>&1 || true
-	echo "All containers dead"
 }
