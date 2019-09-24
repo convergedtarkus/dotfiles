@@ -25,7 +25,7 @@ installStaticcheck() {
 installGolangCiLint() {
 	go get -d github.com/golangci/golangci-lint
 	# Most recent release (9/10/19)
-	(cd "$(go env GOPATH)"/src/github.com/golangci/golangci-lint/ && git checkout "v1.18.0" && cd cmd/golangci-lint &&
+	(cd "$(go env GOPATH)"/src/github.com/golangci/golangci-lint/ && git checkout "v1.19.0" && cd cmd/golangci-lint &&
 		go install -ldflags "-X 'main.version=$(git describe --tags)' -X 'main.commit=$(git rev-parse --short HEAD)' -X 'main.date=$(date)'")
 }
 
