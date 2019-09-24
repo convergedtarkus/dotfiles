@@ -99,6 +99,7 @@ alias gs='git status'
 
 # git push
 alias gp='git push'
+alias gpf='git push -f'
 gpu() { git push -u "$(getOriginRemote)" ${1:+"$1"}; } # push (and track) to upstream
 
 # git grep and helpers
@@ -243,3 +244,25 @@ highlightChangedFiles() {
 	# From https://stackoverflow.com/questions/981601/colorized-grep-viewing-the-entire-file-with-highlighted-matches
 	grep --color -E "$changedFiles$" # grep --color -E 'blah|blah|$'
 }
+
+# returns the remote host for the repo as a url.
+getHostUrl() {
+	remoteHost=$(g remote get-url "$(getOriginRemote)")
+	if [[ -z "$remoteHost" ]]; then
+		echo "No remote found"
+		return 1
+	fi
+
+	echo "Raw remoteHost is '$remoteHost'"
+	if [[ "$remoteHost" = $https* ]]; then
+		echo "remoteHost is web address"
+	fi
+
+	remoteHost=${remoteHost%.git}
+	echo "$remoteHost"
+}
+
+# ssh HOST -G | grep "^hostname"| sed 's/hostname //'
+alias trackingBranch='git rev-parse --abbrev-ref --symbolic-full-name @{u}'
+alias hostCommit='open "$(getHostUrl)/commit/$(gHeadHash)"'
+alias hostBranchTag='open "$(getHostUrl)/tree/$(gBranch)"'
