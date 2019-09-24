@@ -47,3 +47,4 @@ set directory=~/.vim/.swp// " put all swap files in the .vim folder
 " Setting for vim-go
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
+let g:go_mod_fmt_autosave = 0 " Do not auto-format go.mod files
