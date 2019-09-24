@@ -1,0 +1,2 @@
+# This file prevents the 'Last login' message from showing up when opening a new terminal.
+# See http://osxdaily.com/2010/06/22/remove-the-last-login-message-from-the-terminal/
