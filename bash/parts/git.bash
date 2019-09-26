@@ -43,7 +43,8 @@ alias gbDPrev='git branch -D @{-1}' # Delete the previous branch you were on.
 # git checkout
 alias gco='git checkout'
 alias gcom='git checkout master'
-gcomup() { git checkout master ${1:+"$1"} && git pull; } # $1 allows passing -f to dump current changes
+alias gcomb='git fetch $(getOriginRemote) master && git checkout $(getOriginRemote)/master -b' # Creates a new branch based on upstream/master (not your local master).
+gcomup() { git checkout master ${1:+"$1"} && git pull; }                                       # $1 allows passing -f to dump current changes
 alias gcob='git checkout -b'
 gcoClean() { git checkout ${1:+"$1"} && git clean -fd ${1:+"$1"}; }
 
