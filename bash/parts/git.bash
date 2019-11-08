@@ -246,6 +246,28 @@ highlightChangedFiles() {
 	grep --color -E "$changedFiles$" # grep --color -E 'blah|blah|$'
 }
 
+# Clone a repo using my personal ssh key setup.
+# How to setup (from https://gist.github.com/jexchan/2351996/)
+#  1. Make a new ssh key `ssh-keygen -t rsa -b 4096 -C <EMAIL>`
+#     - Save it to ~/.ssh/id_rsa_personal
+#  2. Add it to github (or other host) `pbcopy < ~/.ssh/id_rsa_personal.pub`
+#  3. Add this to ~/.ssh/config
+#     # Personal account
+#     Host github.com-personal
+#	HostName github.com
+#	User git
+#	IdentityFile ~/.ssh/id_rsa_personal
+#       IdentitiesOnly yes
+#  4. Clone repos using this command to clone with personal credentials.
+# Takes in a single parameter, the repo to clone `user/repo`.
+clonePersonalRepo() {
+	git clone "git@github.com-personal:$1.git"
+	path=${1##*/}
+	cd "$path" || exit
+	git config user.name "convergedtarkus"
+	git config user.email "38326544+convergedtarkus@users.noreply.github.com"
+}
+
 # returns the remote host for the repo as a url.
 getHostUrl() {
 	remoteHost=$(g remote get-url "$(getOriginRemote)")
@@ -255,7 +277,7 @@ getHostUrl() {
 	fi
 
 	echo "Raw remoteHost is '$remoteHost'"
-	if [[ "$remoteHost" = $https* ]]; then
+	if [[ "$remoteHost" == $https* ]]; then
 		echo "remoteHost is web address"
 	fi
 
