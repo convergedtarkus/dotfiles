@@ -33,9 +33,10 @@ source "$MYDOTFILES/bash/parts/osSpecific/osx.bash"
 
 # Find any custom files under ./custom (other than .keep) and source them
 if [[ -d "$MYDOTFILES/custom" ]]; then
-	customFiles=$(find "$MYDOTFILES/custom" ! -type d ! -name "*.keep")
-	while read -r customFile; do
-		# shellcheck source=/dev/null
-		source "$customFile"
-	done <<<"$customFiles"
+	for file in "$MYDOTFILES"/custom/*; do
+		if [[ -e "$file" ]]; then
+			# shellcheck source=/dev/null
+			source "$file"
+		fi
+	done
 fi
