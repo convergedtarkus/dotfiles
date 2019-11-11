@@ -263,9 +263,10 @@ highlightChangedFiles() {
 clonePersonalRepo() {
 	git clone "git@github.com-personal:$1.git"
 	path=${1##*/}
-	cd "$path" || exit
+	cd "$path" || return
 	git config user.name "convergedtarkus"
 	git config user.email "38326544+convergedtarkus@users.noreply.github.com"
+	installGitHooks
 }
 
 installGitHooks() {
