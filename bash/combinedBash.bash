@@ -32,8 +32,10 @@ source "$MYDOTFILES/bash/parts/go.bash"
 source "$MYDOTFILES/bash/parts/osSpecific/osx.bash"
 
 # Find any custom files under ./custom (other than .keep) and source them
-customFiles=$(find "$MYDOTFILES/custom" ! -type d ! -name "*.keep")
-while read -r customFile; do
-	# shellcheck source=/dev/null
-	source "$customFile"
-done <<<"$customFiles"
+if [[ -d "$MYDOTFILES/custom" ]]; then
+	customFiles=$(find "$MYDOTFILES/custom" ! -type d ! -name "*.keep")
+	while read -r customFile; do
+		# shellcheck source=/dev/null
+		source "$customFile"
+	done <<<"$customFiles"
+fi
