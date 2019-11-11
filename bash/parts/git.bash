@@ -268,6 +268,20 @@ clonePersonalRepo() {
 	git config user.email "38326544+convergedtarkus@users.noreply.github.com"
 }
 
+installGitHooks() {
+	if [[ ! -d ./.git/hooks ]]; then
+		echo "No .git/hooks under current location, aborting."
+		return
+	fi
+
+	for file in "$MYDOTFILES"/githooks/*; do
+		if [[ -e "$file" ]]; then
+			echo "Copying '$file' to git hooks"
+			cp "$file" ./.git/hooks
+		fi
+	done
+}
+
 # returns the remote host for the repo as a url.
 getHostUrl() {
 	remoteHost=$(g remote get-url "$(getOriginRemote)")
