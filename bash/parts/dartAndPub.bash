@@ -6,6 +6,7 @@ alias dd='pub run dart_dev'
 # Quick aliases for various dart_dev tasks
 alias ddAnalyze='pub run dart_dev analyze'
 alias ddTest='pub run dart_dev test'
+alias ddTestHack='pub run dart_dev test --hack-fast-builds'
 alias ddFormat='pub run dart_dev format'
 alias ddGenTestRunner='pub run dart_dev gen-test-runner'
 
