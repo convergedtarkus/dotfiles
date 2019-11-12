@@ -13,6 +13,8 @@ alias goTestQuiet='go test -count=1'
 alias goTest='go test -count=1 -v'
 # run all go tests
 alias goTestAll='go test ./...'
+# run all go tests without any caching.
+alias goTestAllNoCache='go test ./... -count=1'
 
 # install go-tools staticcheck (https://github.com/dominikh/go-tools)
 installStaticcheck() {
