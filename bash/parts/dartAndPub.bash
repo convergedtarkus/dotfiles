@@ -42,7 +42,7 @@ fullDartCheck() {
 analyzeNoDeprecated() {
 	# Solution for getting the error code from https://stackoverflow.com/questions/43736021/get-exit-code-of-process-substitution-with-pipe-into-while-loop
 	while read -r analyzeLine || { analyzeErrorCode=$analyzeLine && break; }; do # the or case is hit once the analyze is done and captures the exit code
-		echo "$analyzeLine" | perl -pe 's/\s*?hint.+?deprecated_member_use\s*//g'
+		echo "$analyzeLine" | perl -pe 's/\s*?hint.+?deprecated_member_use(_from_same_package)?\s*//g'
 	done < <(
 		dd analyze 2>&1
 		printf "%s" "$?"
