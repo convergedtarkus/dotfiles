@@ -93,6 +93,11 @@ alias gus='git reset'
 alias gUndoLastCommit='git reset --soft HEAD~ && git reset' # Will basically undo the last commit, putting all the changes back in the working tree.
 alias gResetToRemote='gfc && git reset --hard @{u}'         # Fetches this branch and then resets to the head of the remote.
 
+# git rebase
+alias gr='git rebase'
+alias gra='git rebase --abort'
+alias grc='git rebase --continue'
+
 # git command shortcuts
 alias gcp='git cherry-pick'
 alias gm='git merge'
