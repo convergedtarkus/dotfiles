@@ -52,3 +52,7 @@ debugBash() {
 	eval "$@"
 	set +x
 }
+
+checkScript() {
+	shfmt -w "$1" && shellcheck "$1"
+}
