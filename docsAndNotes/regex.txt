@@ -1,0 +1,16 @@
+## Shorthand Character Classes
+	\d = Digits
+	\w = Word Character [A-Za-z0-9_]
+	\s = Whitespace character [ \t\r\n\f] (Generally)
+
+	Negate a character class with ^ or capatalize
+		^\d or \D
+
+## Capture groups
+	() to capture the content inside
+		(?:) makes a non-capturing group. Helpful for just grouping or optimization.
+	
+	Reference with \1 \2 etc (Some systems use/support $1 $1 etc)
+
+	Generally used for replace, but can be used in a regex to match and exact characters.
+		`(\w+?) \1` matches 'Dog Dog` but not 'Dog Cat'
