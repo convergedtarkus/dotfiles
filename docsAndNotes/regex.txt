@@ -5,6 +5,7 @@
 
 	Negate a character class with ^ or capatalize
 		^\d or \D
+		The ^ works for characters as well like ^T would match anything but a capital T etc.
 
 ## Capture groups
 	() to capture the content inside
