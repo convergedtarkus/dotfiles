@@ -6,7 +6,6 @@ alias dd='pub run dart_dev'
 # Quick aliases for various dart_dev tasks
 alias ddAnalyze='pub run dart_dev analyze'
 alias ddTest='pub run dart_dev test'
-alias ddTestHack='pub run dart_dev test --hack-fast-builds'
 alias ddFormat='pub run dart_dev format'
 alias ddGenTestRunner='pub run dart_dev gen-test-runner'
 
@@ -88,10 +87,6 @@ pubCleanAndGet() { pubClean && libAndAppGet; }
 # Kills any dart processes. Sometimes they get stuck.
 killDart() { killall -KILL dart; }
 
-# Kills any Dartium/Chromium instances that failed to die.
-# Normally happens after running tests or something.
-killRogueDartium() { pgrep -f "Chromium --user-data" | xargs kill; }
-
 # Quickly checkout, reset or add pubspec changes
 alias gcoPubspecs='git checkout "*pubspec.lock" "*pubspec.yaml"'
 alias gusPubspecs='git reset "*pubspec.lock" "*pubspec.yaml"'
@@ -99,54 +94,3 @@ alias gaPubspecs='git add "*pubspec.lock" "*pubspec.yaml"'
 
 # quickly add all dart files
 alias gaDart='git add "*.dart"'
-
-# Needed to keep Dartium and Content-Shell working in Dart 1
-export DARTIUM_EXPIRATION_TIME=1577836800
-
-# This is using a custom installed version of Dartium, not the Dartium from Dart, keep the Chromium.app updated.
-# https://webdev.dartlang.org/tools/dartium#getting-dartium
-alias dartium='DART_FLAGS="--checked --load_deferred_eagerly" open /Applications/Chromium.app'
-
-# Switch to using dart 1.24.3
-switchDart1() {
-	brew unlink dart
-	brew unlink dart@1
-	brew switch dart@1 1.24.3
-	brew link --force dart@1
-	dart --version
-}
-
-# Switch to using dart 2.2.0
-switchDart2() {
-	brew unlink dart
-	brew unlink dart@1
-	brew switch dart 2.4.1
-	brew link dart
-	dart --version
-}
-
-# Path to Dart 2 executables
-export DART_2_PATH=/usr/local/opt/dart/bin/
-
-# Use regex to get the currently-activated Dart version.
-function get_current_dart_version() {
-	dart --version 2>&1 | perl -n -e'/version: ([^ ]+)/ && print $1'
-}
-
-# Runs `pub get` in Dart 2 using the current Dart version as SDK constraints,
-# and then runs `pub get` in Dart 1 to get the lock file in a good state.
-#
-# `--no-precompile` is important here so that Pub doesn't try
-# and fail to compile Dart 1 executables under Dart 2.
-#
-# Unlike an alias (in Bash), this function also passes any
-# additional arguments along to `pub`.
-function pub2get() {
-	echo "Using Dart 2 solver under Dart $(get_current_dart_version)"
-	_PUB_TEST_SDK_VERSION="$(get_current_dart_version)" "$DART_2_PATH/pub" get --no-precompile "$@" && pub get --offline "$@"
-}
-
-function pub2upgrade() {
-	echo "Using Dart 2 solver under Dart $(get_current_dart_version)"
-	_PUB_TEST_SDK_VERSION="$(get_current_dart_version)" "$DART_2_PATH/pub" upgrade --no-precompile "$@" && pub get --offline "$@"
-}

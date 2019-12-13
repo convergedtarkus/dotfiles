@@ -46,7 +46,6 @@ alias gcom='git checkout master'
 alias gcomb='git fetch $(getOriginRemote) master && git checkout $(getOriginRemote)/master -b' # Creates a new branch based on upstream/master (not your local master).
 gcomup() { git checkout master ${1:+"$1"} && git pull; }                                       # $1 allows passing -f to dump current changes
 alias gcob='git checkout -b'
-gcoClean() { git checkout ${1:+"$1"} && git clean -fd ${1:+"$1"}; }
 
 # git commit
 alias gc='git commit -v'

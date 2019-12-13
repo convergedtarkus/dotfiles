@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-# The GOCACHE makes tests a lot faster, but it can also hide random failures.
-enableGoTestCache() { unset GOCACHE; }
-disableGoTestCache() { export GOCACHE=off; }
-
 # clear go test cache
 alias goClearTestCache='go clean -testcache'
 
@@ -15,13 +11,6 @@ alias goTest='go test -count=1 -v'
 alias goTestAll='go test ./...'
 # run all go tests without any caching.
 alias goTestAllNoCache='go test ./... -count=1'
-
-# install go-tools staticcheck (https://github.com/dominikh/go-tools)
-installStaticcheck() {
-	go get -d honnef.co/go/tools/cmd/staticcheck
-	# Most recent release (3/15/19)
-	(cd "$GOPATH/src/honnef.co/go/tools" && git checkout 2019.1.1 && go get ./... && cd ./staticcheck && go install .)
-}
 
 # install golangci-lint (https://github.com/golangci/golangci-lint)
 installGolangCiLint() {
@@ -152,12 +141,6 @@ smartGoAll() {
 	smartGoTest -count=1
 }
 
-# runs 'staticcheck' in the given directory. If not input, assume the current ('.') directory.
-# Removes the checks for using deprecations and missing package comments.
-goStatic() {
-	staticcheck -checks all,-SA1019,-ST1000 ${@:+"$@"}
-}
-
 # Runs 'golangci-lint' using my global config file.
 # Passes arguments to the command so `goCiLint -n` or `goCiLint ./path` etc work.
 goCiLint() {
@@ -242,7 +225,3 @@ restoreVendorDir() {
 	if [ ! -d ./vendor_bak ]; then return; fi
 	mv ./vendor_bak ./vendor
 }
-
-# dep aliases
-alias depEnsure='dep ensure -v'
-alias depEnsureUp='dep ensure -v -update'
