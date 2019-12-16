@@ -12,46 +12,61 @@ alias killAllDockerContainers='docker rm -f $(docker ps -aq) >/dev/null 2>&1 || 
 removeAllDockerContainers() { docker image rm "$(docker image ls | awk '{print $3}')"; }
 
 dockerStop() {
-	echo "Stop all containers"
-	docker stop $(docker ps -a -q)
-	echo "All containers stopped"
+	if [[ -n "$(docker ps -aq)" ]]; then
+		echo "Stop all containers."
+		docker stop "$(docker ps -a -q)"
+		echo "All containers stopped."
+	else
+		echo "No docker containers running"
+	fi
 }
 
 dockerKill() {
-	echo "Killing all stuck containers"
-	docker rm -f $(docker ps -aq) >/dev/null 2>&1 || true
-	echo "All containers dead"
+	if [[ -n "$(docker ps -aq)" ]]; then
+		echo "Killing all stuck containers."
+		docker rm -f "$(docker ps -aq)" >/dev/null 2>&1 || true
+		echo "All containers dead."
+	else
+		echo "No docker containers to kill."
+	fi
 }
 
 nukeDocker() {
 	dockerStop
 
 	echo
-	echo "Pruning system"
+	echo "Pruning system."
 	docker system prune --all --force --volumes
 
 	echo
-	echo "Delete all containers"
-	docker rm -f $(docker ps -a -q) >/dev/null 2>&1 || true
+	dockerKill
 
 	echo
-	echo "Delete all images"
-	docker rmi $(docker images -q)
+	if [[ -n $(docker images -q) ]]; then
+		echo "Deleting all docker images."
+		docker rmi "$(docker images -q)"
+	else
+		echo "No docker images to delete."
+	fi
 
 	echo
-	echo "Delete all volumes"
+	echo "Deleting all volumes."
 	rm -rf /var/lib/docker/volumes/*
 	rm -rf /var/lib/docker/vfs/dir/*
 
 	echo
 	echo "Kill and restart docker"
-	killall Docker && open /Applications/Docker.app
+	restartDocker
 
 	echo
-	echo "Delete Final Docker Shiz"
-	rm ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2
+	if [[ -d "$HOME/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2" ]]; then
+		echo "Delete Library/Containers/ docker stuff."
+		rm "$HOME/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2"
+	else
+		echo "No docker stuff under Library/Containers/"
+	fi
 
 	echo
 	echo
-	echo "Finished nuking"
+	printf "\033[1;32mFinished nuking!\033[0m\n"
 }
