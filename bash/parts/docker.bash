@@ -3,7 +3,16 @@
 # Commands to kill, start and restart (kill + start) docker. Helps clean up memory.
 killDocker() { killall Docker; }
 startDocker() { open -g -a Docker; } # -g will not focus Docker when it starts.
-restartDocker() { killDocker && startDocker; }
+restartDocker() {
+	if killDocker >/dev/null 2>&1; then
+		echo "Docker was killed"
+	else
+		echo "Docker was not running"
+	fi
+
+	echo "Starting Docker"
+	startDocker
+}
 
 # Kills all running docker containers.
 alias killAllDockerContainers='docker rm -f $(docker ps -aq) >/dev/null 2>&1 || true'
