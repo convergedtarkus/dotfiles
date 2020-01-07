@@ -1,0 +1,8 @@
+## Bash if check commands
+	-d = Directory exists and is a directory
+	-f = File exists and is regular file
+	-h = File exists and is a symbolic link
+	-n = String is not empty
+	-o = Shell option is enabled
+	-s = File exists and has a size of > 0 bytes
+	-z = String is empty
