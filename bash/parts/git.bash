@@ -140,7 +140,7 @@ alias gpristine='git reset --hard && safeClean'                          # safeC
 
 # Get the base commit between the current branch and master.
 masterBase() {
-	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	gfm &>/dev/null # fetch origin so origin/master is up to date
 	git merge-base "$(getOriginRemote)/master" HEAD
 }
 
@@ -175,7 +175,7 @@ qaMasterMerge() {
 		logString="Up to date with master as of '$(date '+%c %z')'"
 	fi
 
-	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	gfm &>/dev/null # fetch origin so origin/master is up to date
 
 	echo "$logString, master commit: $(masterBase), head commit: $(git rev-parse HEAD)"
 }
@@ -211,7 +211,7 @@ isGitTracked() {
 # allows passing extra arguments to the final `git log` command
 # E.X. logAgainstMaster -n 1
 logAgainstMaster() {
-	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	gfm &>/dev/null # fetch origin so origin/master is up to date
 	git log "$(getOriginRemote)/master"..HEAD --first-parent ${1:+"$1"}
 }
 
@@ -220,8 +220,7 @@ logAgainstMaster() {
 # allows passing extra arguments to the final `git log` command
 # E.X. logAgainstMaster -n 1
 logAgainstBase() {
-	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
-	baseCommit=$(git merge-base "$(getOriginRemote)"/master HEAD)
+	baseCommit=$(masterBase)
 	git log "$baseCommit"..HEAD --first-parent ${1:+"$1"}
 }
 
@@ -231,7 +230,7 @@ logAgainstBase() {
 # allows passing extra arguments to the final `git diff` command
 # E.X. diffAgainstMaster --stat
 diffAgainstMaster() {
-	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	gfm &>/dev/null # fetch origin so origin/master is up to date
 	git diff "$(getOriginRemote)/master"..HEAD ${1:+"$1"}
 }
 
@@ -240,9 +239,7 @@ diffAgainstMaster() {
 # allows passing extra arguments to the final `git diff` command
 # E.X. diffAgainstBase --stat
 diffAgainstBase() {
-	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
-	# TODO Use alias or function for this...
-	baseCommit=$(git merge-base "$(getOriginRemote)"/master HEAD)
+	baseCommit=$(masterBase)
 	git diff "$baseCommit"..HEAD ${1:+"$1"}
 }
 
@@ -251,7 +248,7 @@ diffAgainstBase() {
 # allows passing extra arguments to the final `git diff` command
 # E.X. diffAgainstBase --stat
 diffAgainstRemote() {
-	gfc # fetch the remote of this branch
+	gfc &>/dev/null # fetch the remote of this branch
 	remote=$(_fetchTarget)
 	remote=$(echo "$remote" | tr " " "/") # Replace the space between the remote name and branch name with a '/'.
 	git diff "$remote"..HEAD ${1:+"$1"}
@@ -261,7 +258,7 @@ diffAgainstRemote() {
 # allows passing extra arguments to the final `git log` command
 # E.X. previewMasterMerge -n 1
 previewMasterMerge() {
-	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	gfm &>/dev/null # fetch origin so origin/master is up to date
 	git log HEAD.."$(getOriginRemote)/master" --first-parent
 }
 
