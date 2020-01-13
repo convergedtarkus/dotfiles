@@ -63,9 +63,19 @@ gdv() { git diff -w "$@" | vim -R -; } # git diff, ignore whitespace, in vim
 alias gf='git fetch --all --prune'
 alias gft='git fetch --all --prune --tags'
 alias gfm='git fetch "$(getOriginRemote)" master' # fetch remote master
+_fetchTarget() {
+	fetchTarget=$(git rev-parse --symbolic-full-name --abbrev-ref "@{upstream}" | sed 's|/| |')
+	if [[ -z "$fetchTarget" ]]; then
+		echo "Cannot parse upstream"
+		return 1
+	fi
+	echo "$fetchTarget"
+	return 0
+}
+
 # gfc fetches just the current branch.
 gfc() {
-	fetchTarget=$(git rev-parse --symbolic-full-name --abbrev-ref "@{upstream}" | sed 's|/| |')
+	fetchTarget=$(_fetchTarget)
 	echo "Fetch target is '$fetchTarget'"
 	if [[ -z "$fetchTarget" ]]; then
 		echo "Cannot parse upstream"
@@ -231,8 +241,20 @@ diffAgainstMaster() {
 # E.X. diffAgainstBase --stat
 diffAgainstBase() {
 	git fetch "$(getOriginRemote)" master &>/dev/null # fetch origin so origin/master is up to date
+	# TODO Use alias or function for this...
 	baseCommit=$(git merge-base "$(getOriginRemote)"/master HEAD)
 	git diff "$baseCommit"..HEAD ${1:+"$1"}
+}
+
+# produces a diff of code changed in this branch
+# uses 'merge-base' so only changes in this branch should be displayed
+# allows passing extra arguments to the final `git diff` command
+# E.X. diffAgainstBase --stat
+diffAgainstRemote() {
+	gfc # fetch the remote of this branch
+	remote=$(_fetchTarget)
+	remote=$(echo "$remote" | tr " " "/") # Replace the space between the remote name and branch name with a '/'.
+	git diff "$remote"..HEAD ${1:+"$1"}
 }
 
 # shows new parent commits in master that are not in this branch
