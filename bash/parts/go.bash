@@ -203,8 +203,8 @@ goResetEnv() {
 	echo "Removing gopherjs from src"
 	rm -rf "$GOPATH/src/github.com/gopherjs/"
 
-	echo "Removing go pkg directory, if this errors, run 'sudo rm -rf $GOPATH/pkg/'"
-	rm -rf "$GOPATH/pkg/" # If you get errors, you may need to sudo this command
+	echo "Removing go pkg directory (FYI, this is running with sudo)"
+	sudo rm -rf "$GOPATH/pkg/" # If you get errors, you may need to sudo this command
 
 	echo "Done resetting go environment!"
 }
