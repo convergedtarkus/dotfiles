@@ -6,3 +6,8 @@
 	-o = Shell option is enabled
 	-s = File exists and has a size of > 0 bytes
 	-z = String is empty
+
+## Bash Parameter Expansion syntax
+	https://wiki.bash-hackers.org/syntax/pe
+
+	Contains all the fun stuff expansion, substrings, search/replace, length, default values, alternate values etc.
