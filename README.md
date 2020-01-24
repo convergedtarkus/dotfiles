@@ -21,7 +21,7 @@ I'm using the setup from https://www.atlassian.com/git/tutorials/dotfiles which 
 6. If using bash-it, enable the following things
 ```
 bash-it enable alias personal
-bash-it enable plugin alias-completion
+bash-it enable plugin alias-completion man
 bash-it enable completion bash-it brew defaults git makefile system tmux
 ```
 7. Restart the terminal again.
