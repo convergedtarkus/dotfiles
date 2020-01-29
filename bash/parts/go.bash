@@ -191,10 +191,13 @@ cleanGoPath() {
 # gopherjs is often an issue so delete it as well.
 goResetEnv() {
 	if command -v git >/dev/null; then
-		# TODO Check for any local changes as this will blow those away.
-		# TODO Also check if this is a git repo.
-		echo "Running git reset and clean"
-		git reset --hard && git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode
+		# This ensures there are not local changes (and this is a git repo).
+		if git diff-index --quiet HEAD --; then
+			echo "Running git reset and clean"
+			git reset --hard && safeClean
+		else
+			echo "There are local changes in the repo, not running git reset or clean"
+		fi
 	fi
 
 	echo "Removing gopherjs from go bin"
