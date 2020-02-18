@@ -137,7 +137,7 @@ smartGoTest() { _smartGoRunner "go test $*"; }
 smartGoAll() {
 	smartGoImports
 	smartGoCiLint -n
-	# Use count=1 so no tests run with the test cache.
+	# Use count=1 so no tests run without the test cache.
 	smartGoTest -count=1
 }
 
