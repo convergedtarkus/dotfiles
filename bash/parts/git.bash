@@ -213,7 +213,7 @@ isGitTracked() {
 # E.X. logAgainstMaster -n 1
 logAgainstMaster() {
 	gfm &>/dev/null # fetch origin so origin/master is up to date
-	git log "$(getOriginRemote)/master"..HEAD --first-parent ${1:+"$1"}
+	git log "$(getOriginRemote)/master"..HEAD --first-parent ${*:+"$*"}
 }
 
 # produces the commit log of commits in this branch that are not in master
@@ -222,7 +222,7 @@ logAgainstMaster() {
 # E.X. logAgainstMaster -n 1
 logAgainstBase() {
 	baseCommit=$(masterBase)
-	git log "$baseCommit"..HEAD --first-parent ${1:+"$1"}
+	git log "$baseCommit"..HEAD --first-parent ${*:+"$*"}
 }
 
 # produces a diff of code in this branch that is not in master
@@ -232,7 +232,7 @@ logAgainstBase() {
 # E.X. diffAgainstMaster --stat
 diffAgainstMaster() {
 	gfm &>/dev/null # fetch origin so origin/master is up to date
-	git diff "$(getOriginRemote)/master"..HEAD ${1:+"$1"}
+	git diff "$(getOriginRemote)/master"..HEAD ${*:+"$*"}
 }
 
 # produces a diff of code changed in this branch
@@ -241,7 +241,7 @@ diffAgainstMaster() {
 # E.X. diffAgainstBase --stat
 diffAgainstBase() {
 	baseCommit=$(masterBase)
-	git diff "$baseCommit"..HEAD ${1:+"$1"}
+	git diff "$baseCommit"..HEAD ${*:+"$*"}
 }
 
 # produces a diff of code changed in this branch
@@ -252,7 +252,7 @@ diffAgainstRemote() {
 	gfc &>/dev/null # fetch the remote of this branch
 	remote=$(_fetchTarget)
 	remote=$(echo "$remote" | tr " " "/") # Replace the space between the remote name and branch name with a '/'.
-	git diff "$remote"..HEAD ${1:+"$1"}
+	git diff "$remote"..HEAD ${*:+"$*"}
 }
 
 # shows new parent commits in master that are not in this branch
