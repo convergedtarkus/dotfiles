@@ -35,8 +35,11 @@ reinstallGopherJS() { removeGopherJS && installGopherJS; }
 # Note, if this is run from non-repo root, it will only touch things at this directory and below
 # E.X. `_smartGoRunner goFormat` would run `goFormat` in all directories with changed go files
 # Generally should use one of the public (not `_`) smartGoBLANK style functions
+# TODO Handle the fact that gofmt/goimports runs recursively with directories
+#   This is a pain if there is a changed file at the root directory as the whole repo gets formatted....
+#     Also a waste of time to format ./subdirectory and ./subdirectory/subdirectory2 etc
+#     In addition, really messes with the vendor directory as it also gets formatted :|
 _smartGoRunner() {
-	# TODO Need to look into this, not sure it always works.
 	# Throw an alert if not at the repo root just so no mistakes are made
 	if [[ $(git rev-parse --show-toplevel) != $(pwd) ]]; then
 		echo "FYI: Not running at repo root, not all files may be processed"
@@ -52,6 +55,12 @@ _smartGoRunner() {
 		return 0
 	fi
 
+	# Add './' to the start of each line as go test (and others) require it.
+	# This also allows for correct handling of test files at the current directroy level.
+	# shellcheck disable=SC2001
+	# As far as I know, bash cannot handle this correctly, so use sed.
+	changedFiles=$(echo "$changedFiles" | sed 's|^|./|')
+
 	commandToRun=$1
 
 	# https://unix.stackexchange.com/questions/217628/cut-string-on-last-delimiter
@@ -60,11 +69,6 @@ _smartGoRunner() {
 	endingsRemoved=$(echo "$changedFiles" | rev | cut -d'/' -f2- | rev)
 
 	uniqueDirs=$(echo "$endingsRemoved" | sort | uniq)
-
-	# Add './' to the start of each line as go test (and others) require it.
-	# shellcheck disable=SC2001
-	# As far as I know, bash cannot handle this correctly, so use sed.
-	uniqueDirs=$(echo "$uniqueDirs" | sed 's|^|./|')
 
 	# Put all the directories on a single line (separated by a space).
 	commandInput=$(echo "$uniqueDirs" | tr '\n' ' ')
