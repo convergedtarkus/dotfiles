@@ -30,15 +30,20 @@ removeGopherJS() { rm -rf "$GOPATH/src/github.com/gopherjs"; }
 installGopherJS() { go get -u github.com/gopherjs/gopherjs; }
 reinstallGopherJS() { removeGopherJS && installGopherJS; }
 
+# Can be given to _smartGoRunner to run the command on the changes files rather than directories.
+readonly _runOnFiles="--runOnFiles"
+
 # Identies all directories with changed go files and runs the given command ($1) in all those directories
 # passed in command must be able to run with a single in the form `command $directory $anotherDirectroy $etc`
+# In addition, _runOnFiles can be given as the first argument to this function to run the given command (which is
+# the second argument) on all changed files rather than directories.
 # Note, if this is run from non-repo root, it will only touch things at this directory and below
-# E.X. `_smartGoRunner goFormat` would run `goFormat` in all directories with changed go files
+# E.X. `_smartGoRunner "go test"` would run `go test` in all directories with changed go files
+# E.X. `_smartGoRunner "$_runOnFiles" "gofmt -w"` would run `gofmt -w` on all changed go files.
 # Generally should use one of the public (not `_`) smartGoBLANK style functions
-# TODO Handle the fact that gofmt/goimports runs recursively with directories
-#   This is a pain if there is a changed file at the root directory as the whole repo gets formatted....
-#     Also a waste of time to format ./subdirectory and ./subdirectory/subdirectory2 etc
-#     In addition, really messes with the vendor directory as it also gets formatted :|
+# TODO The _runOnFiles approach works, but man is it gross. Probably better to have a different
+#   function for it, but need to finda good way to share logic in base (passing arguments will
+#   be a pain).
 _smartGoRunner() {
 	# Throw an alert if not at the repo root just so no mistakes are made
 	if [[ $(git rev-parse --show-toplevel) != $(pwd) ]]; then
@@ -61,17 +66,27 @@ _smartGoRunner() {
 	# As far as I know, bash cannot handle this correctly, so use sed.
 	changedFiles=$(echo "$changedFiles" | sed 's|^|./|')
 
-	commandToRun=$1
+	commandToRun=""
+	commandInput=""
+	if [[ "$1" == "$_runOnFiles" ]]; then
+		commandToRun=$2
 
-	# https://unix.stackexchange.com/questions/217628/cut-string-on-last-delimiter
-	# echo, reverse it, get 2nd and beyond fields, reverse again
-	# using `dirname` might be better, but that requires looping over lines
-	endingsRemoved=$(echo "$changedFiles" | rev | cut -d'/' -f2- | rev)
+		# Put all the directories on a single line (separated by a space).
+		commandInput="$changedFiles"
+	else
+		commandToRun=$1
 
-	uniqueDirs=$(echo "$endingsRemoved" | sort | uniq)
+		# https://unix.stackexchange.com/questions/217628/cut-string-on-last-delimiter
+		# echo, reverse it, get 2nd and beyond fields, reverse again
+		# using `dirname` might be better, but that requires looping over lines
+		endingsRemoved=$(echo "$changedFiles" | rev | cut -d'/' -f2- | rev)
+
+		# Get a list of all the unique directories to use as the command input.
+		commandInput=$(echo "$endingsRemoved" | sort | uniq)
+	fi
 
 	# Put all the directories on a single line (separated by a space).
-	commandInput=$(echo "$uniqueDirs" | tr '\n' ' ')
+	commandInput=$(echo "$commandInput" | tr '\n' ' ')
 
 	echo "####"
 	echo "#### Running $commandToRun $commandInput"
@@ -80,10 +95,10 @@ _smartGoRunner() {
 }
 
 # Identies all directories with changed go files and runs `goFormat` in all those directories
-smartGoFormat() { _smartGoRunner goFormat; }
+smartGoFormat() { _smartGoRunner "$_runOnFiles" goFormat; }
 
 # Identies all directories with changed go files and runs `goImports` in all those directories
-smartGoImports() { _smartGoRunner goImports; }
+smartGoImports() { _smartGoRunner "$_runOnFiles" goImports; }
 
 # Identies all directories with changed go files and runs `goCiLint` in all those directories
 # Passes all arguments along, use -n for only new issues.
