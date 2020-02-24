@@ -14,9 +14,10 @@ alias goTestAllNoCache='go test ./... -count=1'
 
 # install golangci-lint (https://github.com/golangci/golangci-lint)
 installGolangCiLint() {
+	version="v1.23.6"
 	go get -d github.com/golangci/golangci-lint
-	# Most recent release (9/10/19)
-	(cd "$(go env GOPATH)"/src/github.com/golangci/golangci-lint/ && git checkout "v1.19.1" && cd cmd/golangci-lint &&
+	# Most recent release (2/24/2020)
+	(cd "$(go env GOPATH)"/src/github.com/golangci/golangci-lint/ && git checkout "$version" && cd cmd/golangci-lint &&
 		go install -ldflags "-X 'main.version=$(git describe --tags)' -X 'main.commit=$(git rev-parse --short HEAD)' -X 'main.date=$(date)'")
 }
 
