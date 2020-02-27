@@ -8,9 +8,24 @@ alias goTestQuiet='go test -count=1'
 # run go test with verbose flag and count=1 (which bypasses all test caching)
 alias goTest='go test -count=1 -v'
 # run all go tests
-alias goTestAll='go test ./...'
+alias goTestAll='_goTestAll'
 # run all go tests without any caching.
-alias goTestAllNoCache='go test ./... -count=1'
+alias goTestAllNoCache='_goTestAll -count=1'
+
+# Helper for go test ./... that adds output for test run status.
+_goTestAll() {
+	go test ./... "$@"
+	exitCode="$?"
+	echo
+	if [[ "$exitCode" == 0 ]]; then
+		printf "\033[32mAll tests passed!\033[0m\n"
+	elif [[ "$exitCode" == 1 ]]; then
+		printf "\033[31mSOME TESTS FAILED!\033[0m\n"
+	else
+		printf "\033[34;1mExit code '%s'. There may be build or package structure issues.\033[0m\n" "$exitCode"
+		printf "\033[34;1mThis does not necessarily mean any tests failed though.\033[0m\n"
+	fi
+}
 
 # install golangci-lint (https://github.com/golangci/golangci-lint)
 installGolangCiLint() {
