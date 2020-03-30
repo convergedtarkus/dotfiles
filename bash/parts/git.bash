@@ -88,6 +88,7 @@ gfc() {
 # git pull
 alias gl='git pull'
 # glum must be a function. If its an alias, the $(getOriginRemote) is evaluated right away, defeating the purpose of the _getOriginRemotePreHook
+# shellcheck disable=SC2120 # Disabled since arguments are optional.
 glum() { git pull "$(getOriginRemote)" master --no-edit ${1:+"$1"}; } # pull in upstream master, $1 allows passing extra args to the pull (like -r)
 
 # git stash
@@ -148,6 +149,21 @@ masterBase() {
 # Rebase the current branch based on its base against master. Good for cleaning/re-organizing commits
 gRebaseBase() {
 	git rebase -i "$(masterBase)"
+}
+
+# Merges upstream master into the given branch, pushes it up and deleted the local branch.
+# Good for updating a remote branch with master that you don't need checked-out locally.
+mergeMasterIntoBranch() {
+	if [[ -z "$1" ]]; then
+		echo "Must supply a branch name!"
+		return 1
+	fi
+	gf       # Fetch everything (not tags though)
+	gco "$1" # Checkout the passed in branch
+	glum     # Merge master into the checked-out branch
+	gp       # Push up the merge
+	gco -    # Switch back to the previous branch
+	gbd "$1" # Delete the branch that master was merged into
 }
 
 # List all tags. Use tags pulled down, consider running a fetch with tags before hand.
