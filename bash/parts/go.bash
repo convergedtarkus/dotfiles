@@ -12,6 +12,33 @@ alias goTestAll='_goTestAll'
 # run all go tests without any caching.
 alias goTestAllNoCache='_goTestAll -count=1'
 
+# Allows running all the test in a single go file (given as the first argument to this function)
+# Any additional arguments are passed directly to the go test command (-v --count etc).
+goTestFile() {
+	# The whole path to the file './blah/blah/file.go'
+	filePath="$1"
+
+	if [[ -z "$filePath" ]]; then
+		printf "\033[33mMust provide an input file!\033[0m\n"
+		return 1
+	fi
+
+	# Use perl to get all the tests in the file
+	matchingTests=$(perl -ne '/^func (Test.+?)\(/ && print "$1\n";' "$filePath")
+
+	# Insert a '|' between each test name to for a big regex or statement.
+	testRunRegex=$(echo "$matchingTests" | tr '\n' '|')
+
+	# Remove the trailing '|' (otherwise all tests in the directory will be run)
+	testRunRegex=${testRunRegex%|}
+
+	# Get just the directory path ('./blah/blah')
+	testDir=$(dirname "$filePath")
+
+	# Run the test, any arguments after the first are applied to the test command.
+	go test "$testDir" --run "$testRunRegex" "${@:2}"
+}
+
 # Helper for go test ./... that adds output for test run status.
 _goTestAll() {
 	go test ./... "$@"
