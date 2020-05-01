@@ -323,6 +323,28 @@ installGitHooks() {
 	done
 }
 
+# Opens a JIRA ticket in chrome.
+# If an argument is pass in, that will be parsed for the ticket to open.
+# Otherwise, the current git branch name will be parsed.
+openTicket() {
+	if [[ -z "$1" ]]; then
+		# Get the ticket number from the current branch.
+		parseTarget="$(gBranch)"
+	else
+		# Get the ticket number from the input.
+		parseTarget="$1"
+	fi
+
+	ticket=$("$MYDOTFILES"/bash/scripts/parseTicket.bash "$parseTarget")
+
+	if [[ -z "$ticket" ]]; then
+		echo "No ticket found in branch name/input!"
+		return 1
+	fi
+
+	open -a 'google chrome' "https://jira.atl.workiva.net/browse/$ticket"
+}
+
 # returns the remote host for the repo as a url.
 getHostUrl() {
 	remoteHost=$(g remote get-url "$(getOriginRemote)")
