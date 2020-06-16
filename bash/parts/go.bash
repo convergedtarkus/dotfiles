@@ -198,9 +198,9 @@ smartGoTest() { _smartGoRunner "go test $*"; }
 # This includes, `goFormat`, `goLint`, `staticcheck` and `go test`
 smartGoAll() {
 	smartGoImports
-	smartGoCiLint -n
 	# Use count=1 so no tests run without the test cache.
 	smartGoTest -count=1
+	smartGoCiLint -n
 }
 
 # Runs 'golangci-lint' using my global config file.

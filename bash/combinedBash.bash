@@ -7,10 +7,6 @@ alias myconfig='git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/bashCompability.bash"
 
-# Dartlang and pub
-# shellcheck source=/dev/null
-source "$MYDOTFILES/bash/parts/dartAndPub.bash"
-
 # Docker
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/docker.bash"
@@ -22,6 +18,10 @@ source "$MYDOTFILES/bash/parts/general.bash"
 # Git
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/git.bash"
+
+# Dartlang and pub
+# shellcheck source=/dev/null
+source "$MYDOTFILES/bash/parts/dartAndPub.bash"
 
 # Golang
 # shellcheck source=/dev/null

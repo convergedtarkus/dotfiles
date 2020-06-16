@@ -73,9 +73,9 @@ pubClean() {
 	find . -type f -name "*.packages" -exec rm {} +
 
 	echo "Removing all packages directories"
-	find . \( -type d -o -type l \) -name "*packages" -exec rm -r {} +
+	find . \( -type d -o -type l \) -not -path "./vendor/*" -name "*packages" -exec rm -r {} +
 
-	if [[ $(isGitTracked pubspec.lock) == false ]]; then
+	if [[ -f "pubspec.lock" && $(isGitTracked pubspec.lock) == false ]]; then
 		echo "Removing untracked pubspec.lock"
 		rm pubspec.lock
 	fi
@@ -94,3 +94,28 @@ alias gaPubspecs='git add "*pubspec.lock" "*pubspec.yaml"'
 
 # quickly add all dart files
 alias gaDart='git add "*.dart"'
+
+# Resets a lot of dart enviroment files and directories to fix build issues.
+dartResetEnv() {
+	if command -v git >/dev/null; then
+		# This ensures there are not local changes (and this is a git repo).
+		if git diff-index --quiet HEAD --; then
+			echo "Running git reset and clean"
+			git reset --hard && safeClean
+		else
+			echo "There are local changes in the repo, not running git reset or clean"
+		fi
+	fi
+
+	echo "Removing .pub-cache"
+	rm -rf ~/.pub-cache/
+
+	echo "Removing .dartServer"
+	rm -rf ~/.dartServer/
+
+	echo "Running a pub clean"
+	pubClean
+
+	echo "Done resetting dart environment!"
+
+}
