@@ -197,9 +197,23 @@ smartGoTest() { _smartGoRunner "go test $*"; }
 # Identies all directories with changed go files the whole suite of go checks
 # This includes, `goFormat`, `goLint`, `staticcheck` and `go test`
 smartGoAll() {
+	# Loop over the arguments and figure out which apply to the variation functions being run.
+	# Currently only the -short option is supported (passed to go test).
+	testArgs=""
+	for arg in "$@"; do
+		case "$arg" in
+		"-short")
+			if [[ -n "$testArgs" ]]; then
+				testArgs="$testArgs "
+			fi
+			testArgs="$testArgs$arg"
+			;;
+		esac
+	done
+
 	smartGoImports
 	# Use count=1 so no tests run without the test cache.
-	smartGoTest -count=1
+	smartGoTest -count=1 "$testArgs"
 	smartGoCiLint -n
 }
 
