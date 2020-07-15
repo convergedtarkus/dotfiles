@@ -286,9 +286,10 @@ goResetEnv() {
 	sudo rm -rf "$GOPATH/pkg/" # If you get errors, you may need to sudo this command
 
 	echo "Using go clear to clean cache, mod cache and all binaries"
+	go clean -cache -i -r
 	# i = removes installed binaries
 	# r = Applies recursively to import paths.
-	go clean -cache -modcache -i -r
+	go clean -modcache -i -r
 
 	echo "Done resetting go environment!"
 }
