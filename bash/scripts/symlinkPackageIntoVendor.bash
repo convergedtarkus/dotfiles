@@ -9,6 +9,8 @@
 # E.X. 'symlinkVendorPackage stretchr/testify' (or even 'symlinkVendorPackage github.com/stretchr/testify') would work even if there was another 'testify' directory under './vendor'
 
 # TODO
+#  - Remove the go pkg files for js builds (darwin_js, linux_js_min etc)
+#    - Something doesn't always handle this correctly and rebuilds do not work correctly.
 #  - Detect existing symlink
 #  - Better search for package in GOPATH (current version could still catch invalid options)
 #    - Searching for t finds testify for example
@@ -133,7 +135,7 @@ _countLines() {
 }
 
 if [[ $_arg_version == "on" ]]; then
-	echo "Version 5.0.1"
+	echo "Version 5.0.2"
 	exit
 fi
 
@@ -192,9 +194,10 @@ if [[ "$_arg_dual_dev" == "on" ]]; then
 else
 	if [ -d "$localDependencyPath/vendor" ]; then
 		echo
-		echo "ATTENTION!! Package '$_arg_symlink_package' in GOPATH has a vendor directory, if left this way, your build will almost certainly break."
+		echo "ATTENTION! Package '$_arg_symlink_package' has a vendor directory. The script will address this, but otherwise this setup will break builds."
+		echo "This will likely make you unable to build in '$_arg_symlink_package'. If you need to build in both, use the --dual-dev flag."
 
-		echo "Moving the nested vendor directory to 'vendor_bak', use \`mv $localDependencyPath/vendor_bak $localDependencyPath/vendor\` to reverse"
+		echo "Moving the nested vendor directory to 'vendor_bak', use \`mv $localDependencyPath/vendor_bak $localDependencyPath/vendor\` to reverse."
 		mv "$localDependencyPath/vendor" "$localDependencyPath/vendor_bak"
 		echo "Moved the nested vendor directory successfully! Your build should work correctly!"
 
