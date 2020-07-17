@@ -135,7 +135,7 @@ _countLines() {
 }
 
 if [[ $_arg_version == "on" ]]; then
-	echo "Version 5.0.2"
+	echo "Version 6.0.0"
 	exit
 fi
 
@@ -237,6 +237,16 @@ if [[ "$_arg_dual_dev" == "on" ]]; then
 else
 	find "$expectedVendorPath" -type f -name "*.go" -exec touch {} +
 fi
+
+# Get the go package name (domain/user/repo) for the package that is receiving the symlink.
+curDirectory=$(pwd)
+targetPackageName=${curDirectory#"$GOPATH/src/"}
+
+# Need to delete build assets to ensure rebuilds correctly recognize the symlink. I'm guessing since this symlink
+# strategy is not really supported, it breaks the build cache somehow.
+echo
+echo "Deleting cached builds for package receving the symlink to ensure rebuilds work correctly."
+find "$GOPATH/pkg" -mindepth 1 -not -path "*/vendor*" -path "*$targetPackageName" -exec rm -rf {} +
 
 echo
 echo "Success! Package '$_arg_symlink_package' was symlinked into vendor from GOPATH correctly!"
