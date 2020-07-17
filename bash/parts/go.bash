@@ -283,7 +283,7 @@ goResetEnv() {
 	rm -rf "$GOPATH/src/github.com/gopherjs/"
 
 	echo "Removing go pkg directory (FYI, this is running with sudo)"
-	sudo rm -rf "$GOPATH/pkg/" # If you get errors, you may need to sudo this command
+	sudo rm -rf "$GOPATH/pkg/"
 
 	echo "Using go clear to clean cache, mod cache and all binaries"
 	go clean -cache -i -r
