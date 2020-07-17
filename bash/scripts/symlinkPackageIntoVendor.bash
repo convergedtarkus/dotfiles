@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Finds a dependency inside the vendor folder by the repro name, removes it vendor and symlinks to to a local copy of that dependency
+# Finds a dependency inside the vendor folder by the repro name, removes its vendor and symlinks to to a local copy of that dependency.
 # If the dependency doesn't exit in vendor, has multiple possible options or a copy doesn't exist in the $GOPATH then nothing will happen
 # Note that the search string is case sensitive
 # Usage
@@ -245,7 +245,7 @@ targetPackageName=${curDirectory#"$GOPATH/src/"}
 # Need to delete build assets to ensure rebuilds correctly recognize the symlink. I'm guessing since this symlink
 # strategy is not really supported, it breaks the build cache somehow.
 echo
-echo "Deleting cached builds for package receving the symlink to ensure rebuilds work correctly."
+echo "Deleting cached builds for package receiving the symlink to ensure rebuilds work correctly."
 find "$GOPATH/pkg" -mindepth 1 -not -path "*/vendor*" -path "*$targetPackageName" -exec rm -rf {} +
 
 echo
