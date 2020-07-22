@@ -10,8 +10,6 @@
 
 # TODO
 #  - Detect existing symlink
-#  - Better search for package in GOPATH (current version could still catch invalid options)
-#    - Searching for t finds testify for example
 #  - Dry run flag
 #  - Break logic into functions
 
@@ -52,7 +50,7 @@ _arg_version="off"
 print_help() {
 	printf '%s\n' "The general script's help msg"
 	printf 'Usage: %s [--(no-)dual-dev] [-v|--(no-)version] [-h|--help] [<symlink-package>]\n' "$0"
-	printf '\t%s\n' "<symlink-package>: The package to symlink into current project"
+	printf '\t%s\n' "<symlink-package>: The package to symlink into current project. Can be an absolute path, full import package name or a unique search string to find the package in GOPATH."
 	printf '\t%s\n' "--dual-dev, --no-dual-dev: Uses a different symlink approach that allows deving in both the current project and the project being symlinked in. (off by default)"
 	printf '\t%s\n' "-v, --version, --no-version: Print the scripts version (off by default)"
 	printf '\t%s\n' "-h, --help: Prints help"
@@ -133,7 +131,7 @@ _countLines() {
 }
 
 if [[ $_arg_version == "on" ]]; then
-	echo "Version 6.0.0"
+	echo "Version 6.0.3"
 	exit
 fi
 
@@ -154,9 +152,13 @@ if [[ "$_arg_dual_dev" == "on" ]]; then
 	echo
 fi
 
-# look for the dependency in GOPATH first, this supports adding a new dependency into vendor if its not already in vendor
-# the maxdepth is since go packages should follow the pattern '$GOPATH/src/domain/user/repo' so only search down three directories to limit results
-localDependencyPath=$(find "$GOPATH/src" -maxdepth 3 -d -path "*$_arg_symlink_package" | grep -v /vendor/)
+# Remove trailing slash from input as that would fail to find anything.
+_arg_symlink_package=${_arg_symlink_package%/}
+
+# Look for the dependency in GOPATH first, this supports adding a new dependency into vendor if its not already in vendor.
+# The maxdepth is since go packages should follow the pattern '$GOPATH/src/domain/user/repo' so only search down three directories to limit results.
+# Setting mindepth prevents a case like 'github.com' from finding $GOPATH/src/github.com where it should find nothing.
+localDependencyPath=$(find "$GOPATH/src" -mindepth 3 -maxdepth 3 -d -path "*$_arg_symlink_package" | grep -v /vendor/)
 
 numResults=$(_countLines "$localDependencyPath")
 
@@ -243,7 +245,7 @@ targetPackageName=${curDirectory#"$GOPATH/src/"}
 # Need to delete build assets to ensure rebuilds correctly recognize the symlink. I'm guessing since this symlink
 # strategy is not really supported, it breaks the build cache somehow.
 echo
-echo "Deleting cached builds for package receiving the symlink to ensure rebuilds work correctly."
+echo "Deleting cached builds for $targetPackageName receiving the symlink to ensure rebuilds work correctly."
 find "$GOPATH/pkg" -mindepth 1 -not -path "*/vendor*" -path "*$targetPackageName" -exec rm -rf {} +
 
 echo
