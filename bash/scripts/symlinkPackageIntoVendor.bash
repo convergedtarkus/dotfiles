@@ -9,8 +9,6 @@
 # E.X. 'symlinkVendorPackage stretchr/testify' (or even 'symlinkVendorPackage github.com/stretchr/testify') would work even if there was another 'testify' directory under './vendor'
 
 # TODO
-#  - Remove the go pkg files for js builds (darwin_js, linux_js_min etc)
-#    - Something doesn't always handle this correctly and rebuilds do not work correctly.
 #  - Detect existing symlink
 #  - Better search for package in GOPATH (current version could still catch invalid options)
 #    - Searching for t finds testify for example
