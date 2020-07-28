@@ -3,3 +3,5 @@
         default = current # Allows pushing a branch to remote with giving a name (uses the current branch name)
 [core]
 	excludesfile = ~/.gitignore_global
+[pull]
+	rebase = false
