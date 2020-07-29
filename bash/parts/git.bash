@@ -224,6 +224,8 @@ isGitTracked() {
 	echo false
 }
 
+# TODO All the log/diffAgainst commands could easily be combined or share code.
+
 # produces the commit log of commits in this branch that are not in master
 # allows passing extra arguments to the final `git log` command
 # E.X. logAgainstMaster -n 1
@@ -235,10 +237,21 @@ logAgainstMaster() {
 # produces the commit log of commits in this branch that are not in master
 # uses 'merge-base' so only changes in this branch should be displayed
 # allows passing extra arguments to the final `git log` command
-# E.X. logAgainstMaster -n 1
+# E.X. logAgainstBase -n 1
 logAgainstBase() {
 	baseCommit=$(masterBase)
 	git log "$baseCommit"..HEAD --first-parent ${*:+"$*"}
+}
+
+# produces a log of code changed in this branch
+# uses 'merge-base' so only changes in this branch should be displayed
+# allows passing extra arguments to the final `git log` command
+# E.X. logAgainstRemote -n 1
+logAgainstRemote() {
+	gfc &>/dev/null # fetch the remote of this branch
+	remote=$(_fetchTarget)
+	remote=$(echo "$remote" | tr " " "/") # Replace the space between the remote name and branch name with a '/'.
+	git log "$remote"..HEAD ${*:+"$*"}
 }
 
 # produces a diff of code in this branch that is not in master
@@ -263,7 +276,7 @@ diffAgainstBase() {
 # produces a diff of code changed in this branch
 # uses 'merge-base' so only changes in this branch should be displayed
 # allows passing extra arguments to the final `git diff` command
-# E.X. diffAgainstBase --stat
+# E.X. diffAgainstRemote --stat
 diffAgainstRemote() {
 	gfc &>/dev/null # fetch the remote of this branch
 	remote=$(_fetchTarget)
