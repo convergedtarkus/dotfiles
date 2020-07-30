@@ -73,7 +73,7 @@ pubClean() {
 	find . -type f -name "*.packages" -exec rm {} +
 
 	echo "Removing all packages directories"
-	find . \( -type d -o -type l \) -not -path "./vendor/*" -name "*packages" -exec rm -r {} +
+	find . \( -type d -o -type l \) -not -path "./vendor/*" -name "packages" -exec rm -r {} +
 
 	if [[ -f "pubspec.lock" && $(isGitTracked pubspec.lock) == false ]]; then
 		echo "Removing untracked pubspec.lock"
@@ -106,6 +106,9 @@ dartResetEnv() {
 			echo "There are local changes in the repo, not running git reset or clean"
 		fi
 	fi
+
+	echo "Killing all dart processes"
+	killDart
 
 	echo "Removing .pub-cache"
 	rm -rf ~/.pub-cache/
