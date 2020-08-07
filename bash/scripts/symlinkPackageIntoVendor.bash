@@ -9,6 +9,7 @@
 # E.X. 'symlinkVendorPackage stretchr/testify' (or even 'symlinkVendorPackage github.com/stretchr/testify') would work even if there was another 'testify' directory under './vendor'
 
 # TODO
+#  - Detect if vendor_bak already exists
 #  - Detect existing symlink
 #  - Dry run flag
 #  - Break logic into functions
@@ -131,7 +132,7 @@ _countLines() {
 }
 
 if [[ $_arg_version == "on" ]]; then
-	echo "Version 6.0.3"
+	echo "Version 6.0.4"
 	exit
 fi
 
@@ -187,6 +188,7 @@ else
 	fi
 fi
 
+echo
 echo "Preparing to symlink '$_arg_symlink_package' into vendor from GOPATH"
 
 if [[ "$_arg_dual_dev" == "on" ]]; then
@@ -194,12 +196,11 @@ if [[ "$_arg_dual_dev" == "on" ]]; then
 else
 	if [ -d "$localDependencyPath/vendor" ]; then
 		echo
-		echo "ATTENTION! Package '$_arg_symlink_package' has a vendor directory. The script will address this, but otherwise this setup will break builds."
+		echo "Package '$_arg_symlink_package' has a vendor directory. This must be moved for builds in the current package to run."
 		echo "This will likely make you unable to build in '$_arg_symlink_package'. If you need to build in both, use the --dual-dev flag."
 
-		echo "Moving the nested vendor directory to 'vendor_bak', use \`mv $localDependencyPath/vendor_bak $localDependencyPath/vendor\` to reverse."
+		echo "Moving the nested vendor directory to 'vendor_bak'"
 		mv "$localDependencyPath/vendor" "$localDependencyPath/vendor_bak"
-		echo "Moved the nested vendor directory successfully! Your build should work correctly!"
 
 	else
 		echo
