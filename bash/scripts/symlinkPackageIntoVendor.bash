@@ -9,7 +9,7 @@
 # E.X. 'symlinkVendorPackage stretchr/testify' (or even 'symlinkVendorPackage github.com/stretchr/testify') would work even if there was another 'testify' directory under './vendor'
 
 # TODO
-#  - Detect if vendor_bak already exists
+#  - Determine why deleting builds takes so long...
 #  - Detect existing symlink
 #  - Dry run flag
 #  - Break logic into functions
@@ -131,8 +131,27 @@ _countLines() {
 	fi
 }
 
+# $1 = path to the vendor directory that needs to be backed up
+_backupVendor() {
+	vendorPath="$1"
+	if [[ -d "$vendorPath"_bak ]]; then
+		vendorNum=2
+		while [[ -d "$vendorPath"_bak"$vendorNum" ]]; do
+			((vendorNum++))
+		done
+	fi
+
+	if [[ -n "$vendorNum" ]]; then
+		echo "The vendor_bak directory already exists, backing up vendor to vendor_bak${vendorNum}"
+	else
+		echo "Moving the nested vendor directory to 'vendor_bak'"
+	fi
+
+	mv "$vendorPath" "${vendorPath}_bak${vendorNum}"
+}
+
 if [[ $_arg_version == "on" ]]; then
-	echo "Version 6.0.4"
+	echo "Version 6.1.0"
 	exit
 fi
 
@@ -199,8 +218,7 @@ else
 		echo "Package '$_arg_symlink_package' has a vendor directory. This must be moved for builds in the current package to run."
 		echo "This will likely make you unable to build in '$_arg_symlink_package'. If you need to build in both, use the --dual-dev flag."
 
-		echo "Moving the nested vendor directory to 'vendor_bak'"
-		mv "$localDependencyPath/vendor" "$localDependencyPath/vendor_bak"
+		_backupVendor "$localDependencyPath/vendor"
 
 	else
 		echo
