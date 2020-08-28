@@ -9,7 +9,6 @@
 # E.X. 'symlinkVendorPackage stretchr/testify' (or even 'symlinkVendorPackage github.com/stretchr/testify') would work even if there was another 'testify' directory under './vendor'
 
 # TODO
-#  - Determine why deleting builds takes so long...
 #  - Detect existing symlink
 #  - Dry run flag
 #  - Break logic into functions
@@ -151,7 +150,7 @@ _backupVendor() {
 }
 
 if [[ $_arg_version == "on" ]]; then
-	echo "Version 6.1.0"
+	echo "Version 6.2.0"
 	exit
 fi
 
@@ -265,7 +264,7 @@ targetPackageName=${curDirectory#"$GOPATH/src/"}
 # strategy is not really supported, it breaks the build cache somehow.
 echo
 echo "Deleting cached builds for $targetPackageName receiving the symlink to ensure rebuilds work correctly."
-find "$GOPATH/pkg" -mindepth 1 -not -path "*/vendor*" -path "*$targetPackageName" -exec rm -rf {} +
+find "$GOPATH/pkg" \( -name mod -o -name vendor \) -prune -o -path "*$targetPackageName" -exec rm -rf {} +
 
 echo
 echo "Success! Package '$_arg_symlink_package' was symlinked into vendor from GOPATH correctly!"
