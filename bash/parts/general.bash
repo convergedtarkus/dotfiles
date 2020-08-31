@@ -56,3 +56,7 @@ debugBash() {
 checkScript() {
 	shfmt -w "$1" && shellcheck "$1"
 }
+
+checkInternet() {
+	ping -i 2 8.8.8.8 --apple-time
+}
