@@ -14,13 +14,123 @@ getRandomLetter() {
 	echo "${letters[RANDOM % 26]}"
 }
 
+# Returns the zero based index of a letter in the english alphabet.
+getLetterIndex() {
+	declare targetLetter="$1"
+	declare -i curIdx=0
+
+	for curLetter in "${letters[@]}"; do
+		if [[ "$curLetter" == "$targetLetter" ]]; then
+			echo "$curIdx"
+			return
+		fi
+
+		((curIdx++))
+	done
+
+	echo "getLetterIndex invalid. targetLetter: '$targetLetter'"
+	return 3
+}
+
+generateOffsetChoices() {
+	if [[ "$#" != "2" ]]; then
+		echo "Wrong number of arguments to generateOffsetChoices. Has $#"
+		return 6
+	fi
+
+	declare -i curLetterIdx="$1"
+
+	declare -i maxOffset="$2"
+	if ((maxOffset == 0)) || ((maxOffset < 0)); then
+		echo "Invalid maxOffset of $maxOffset' must be positive and non-zero"
+		return 7
+	fi
+
+	declare validOffsets=()
+	declare -i curIdx=0
+
+	while ((curIdx < maxOffset)); do
+		nextOffset=$((curLetterIdx + (maxOffset - curIdx)))
+		if ((nextOffset < 26)); then
+			validOffsets+=("$nextOffset")
+		fi
+		((curIdx++))
+	done
+
+	curIdx=0
+	while ((curIdx < maxOffset)); do
+		nextOffset=$((curLetterIdx - (maxOffset - curIdx)))
+		if ((nextOffset > -1)); then
+			validOffsets+=("$nextOffset")
+		fi
+		((curIdx++))
+	done
+
+	echo "${validOffsets[@]}"
+}
+
+generateSecondChoice() {
+	if [[ "$#" != "2" ]]; then
+		echo "Wrong number of arguments to generateSecondChoice. Has $#"
+		return 4
+	fi
+
+	# TODO Validate inputs?
+	declare -r firstLetter="$1"
+	declare -r mode="$2"
+	declare curIdx
+	curIdx=$(getLetterIndex "$firstLetter")
+	declare -i sign=1
+
+	if ((curIdx == 25)); then
+		# Must offset to a lower value
+		sign=-1
+	elif ((curIdx == 0)); then
+		# Must offset to a higher value
+		sign=1
+	elif ((RANDOM % 2 == 1)); then
+		# Use a random sign
+		sign=-1
+	fi
+
+	declare secondIdx
+	declare secondChoice
+	if [[ "$mode" == "random" ]]; then
+		# No extra work required here so just echo and return
+		getRandomLetter
+		return
+	elif [[ "$mode" == "oneoff" ]]; then
+		secondChoice=${letters[((curIdx + (1 * sign)))]}
+	elif [[ "$mode" == "veryclose" ]]; then
+		# 1-3
+		offset=$(((RANDOM % 3) + 1))
+		echo
+	elif [[ "$mode" == "close" ]]; then
+		echo
+	elif [[ "$mode" == "mid" ]]; then
+		echo
+	elif [[ "$mode" == "far" ]]; then
+		echo
+	elif [[ "$mode" == "veryfar" ]]; then
+		echo
+	fi
+
+	if ((secondIdx > 25)); then
+		secondIdx=25
+	elif ((secondIdx < 0)); then
+		secondIdx=0
+	fi
+
+	echo "$secondChoice"
+}
+
 # Takes in two arguments (the two letter choices given to the user) and logs
 # out some helpful data to explain and visualize the difference between
 # the two letters.
 logFailure() {
 	if [[ "$#" != "2" ]]; then
 		echo "Wrong number of arguments to logFailure. Has $#."
-		return
+		return 5
 	fi
 
 	declare -i firstIdx
@@ -56,44 +166,28 @@ logFailure() {
 	printf "%s\n%s\n" "${letters[*]}" "$locationStr"
 }
 
-difficulty="$1"
-if [[ -z "$difficulty" ]]; then
-	difficulty=0
-else
-	# Valid the requested difficulty is a number.
-	if ! [[ "$difficulty" =~ ^[0-9]+$ ]]; then
-		echo "Difficulty must be a value number"
-		return
-	fi
+# ###################################
+# ###################################
+# Script Starts Here
+# ###################################
+# ###################################
 
-	declare -r -i minDifficulty=0
-	declare -r -i maxDifficulty=14
-
-	# TODO Maybe better ideas?
-	# Difficulty levels
-	# unset = random
-	# 5 = Letters appart by 1-3
-	# 4 = Letters appart by 1-8
-	# 3 = Letters appart by 1-14
-	# 2 = Letters appart by 1-20
-	# 1 = Letters appart by 1-26
-
-	# Verify the script supports the requested version
-	declare -i -r requestedVersion="$1"
-	if [[ $requestedVersion < $minDifficulty || $requestedVersion > $maxDifficulty ]]; then
-		echo "Request difficulty of $requestedVersion is out of the accepted range of $minDifficulty to $maxDifficulty."
-		exit 1
-	fi
+runMode="$1"
+if [[ -z "$runMode" ]]; then
+	# Default to random mode
+	runMode="random"
 fi
+
+echo "Running in mode $runMode"
 
 while true; do
 	# Get the two letters to compare
 	declare choiceOne
 	choiceOne=$(getRandomLetter)
 	declare choiceTwo
-	choiceTwo=$(getRandomLetter)
+	choiceTwo=$(generateSecondChoice "$choiceOne" "$runMode")
 	while [[ "$choiceOne" == "$choiceTwo" ]]; do
-		choiceTwo=$(getRandomLetter)
+		choiceTwo=$(generateSecondChoice "$choiceOne" "$runMode")
 	done
 
 	# If the user if picking which letter is first (true) or last (false).
@@ -113,10 +207,10 @@ while true; do
 	# Prompt the user to pick between the letters.
 	if [[ "$pickingFirst" == "true" ]]; then
 		correctAnswer="$orderedFirst"
-		read -r -p "Which comes first: $choiceOne or $choiceTwo? " userChoice
+		read -r -p "Which comes FIRST: $choiceOne or $choiceTwo? " userChoice
 	else
 		correctAnswer="$orderedLast"
-		read -r -p "Which comes last: $choiceOne or $choiceTwo? " userChoice
+		read -r -p "Which comes LAST: $choiceOne or $choiceTwo? " userChoice
 	fi
 
 	# Make sure a valid option was chosen.
