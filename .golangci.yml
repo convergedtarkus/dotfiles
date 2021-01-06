@@ -48,7 +48,7 @@ linters:
     #- gochecknoglobals # Pretty common, noisy
     #- gochecknoinits # TODO Try? Safety is nice
     #- goconst # TODO Worth a shot, noisy?
-    #- gocritic # TODO Would like to try. Need to config a lot I fear
+    - gocritic # TODO Would like to try. Need to config a lot I fear
     #- gocyclo # TODO Existing code will get flagged, maybe try?
     - godox # Not always an issue but worth checking
     - gofmt
