@@ -31,42 +31,47 @@ linters-settings:
   gofmt:
     # simplify code: gofmt with `-s` option, true by default
     simplify: true
+  nakedret:
+    # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
+    max-func-lines: 5
 
 
 linters:
   enable:
-    #- bodyclose # don't use http much
-    #- deadcode # enabled by default
+    - bodyclose # don't use http much but why not
+    - deadcode # enabled by default
     #- depguard # varies too much to help
     #- dupl # TODO Worth a try, noisy?
-    #- errcheck # enabled by default
+    - errcheck # enabled by default
+    - exportloopref
     #- funlen # TODO Worth trying, noisy?
     #- gochecknoglobals # Pretty common, noisy
     #- gochecknoinits # TODO Try? Safety is nice
     #- goconst # TODO Worth a shot, noisy?
     #- gocritic # TODO Would like to try. Need to config a lot I fear
     #- gocyclo # TODO Existing code will get flagged, maybe try?
-    #- godox # Not always an issue
+    - godox # Not always an issue but worth checking
     - gofmt
     - golint
     - goimports
     #- gosec # This is covered in other ways
     #- gosimple # enabled by default
     #- govet # enabled by default
-    #- ineffassign # enabled by default
+    - ineffassign # enabled by default
     #- interfacer # Generally done for a reason
     #- lll # Going to be noisy
     #- maligned # Too noisy and unique setup invalidates
     - misspell
-    #- nakedret # Generally don't use naked returns anyway
+    - nakedret # Generally don't use naked returns but good to know
     - prealloc
     - scopelint
-    #- staticcheck # enabled by default
-    #- structcheck # enabled by default
+    - sqlclosecheck
+    - staticcheck # enabled by default
+    - structcheck # enabled by default
     - stylecheck
     #- typecheck # enabled by default
     #- unused # enabled by default
-    #- varcheck # enabled by default
+    - varcheck # enabled by default
     - unconvert
     - unparam
 
