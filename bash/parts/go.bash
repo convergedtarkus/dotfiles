@@ -69,8 +69,19 @@ installGoimports() {
 }
 
 # remove/install gopherJS, because of caching issues with serve
-removeGopherJS() { rm -rf "$GOPATH/src/github.com/gopherjs"; }
-installGopherJS() { go get -u github.com/gopherjs/gopherjs; }
+removeGopherJSLegacy() {
+	rm -rf "$GOPATH/src/github.com/gopherjs"
+	rm -rf "$GOAPTH/bin/gopherjs"
+}
+installGopherJSLegacy() { go get -u github.com/gopherjs/gopherjs; }
+reinstallGopherJSLegacy() { removeGopherJSLegacy && installGopherJSLegacy; }
+
+# remove/install gopherJS (the more modern goplusjs version), because of caching issues with serve
+removeGopherJS() {
+	rm -rf "$GOPATH/src/github.com/goplusjs"
+	rm -rf "$GOAPTH/bin/gopherjs"
+}
+installGopherJS() { go get -u github.com/goplusjs/gopherjs; }
 reinstallGopherJS() { removeGopherJS && installGopherJS; }
 
 # Can be given to _smartGoRunner to run the command on the changes files rather than directories.
@@ -119,6 +130,7 @@ _smartGoRunner() {
 	else
 		commandToRun=$1
 
+		# Remove the final trailing /file.go to get only directories.
 		# https://unix.stackexchange.com/questions/217628/cut-string-on-last-delimiter
 		# echo, reverse it, get 2nd and beyond fields, reverse again
 		# using `dirname` might be better, but that requires looping over lines
