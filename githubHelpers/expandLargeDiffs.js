@@ -1,4 +1,4 @@
-// This script will expand any diffs that github has collapsed becuase
+// This script will expand any diffs that github has collapsed because
 // github thinks the diff is too large.
 // Other collapsed diffs will not be expanded.
 javascript: (function () {
@@ -12,7 +12,7 @@ javascript: (function () {
 		// Get the div children of the collapsed diff element.
 		let divChildren = [];
 		for (let child of loadDiff.parentElement.children) {
-			if (child.tagName == "DIV") {
+			if (child.tagName === "DIV") {
 				divChildren.push(child);
 			}
 		}
@@ -20,7 +20,7 @@ javascript: (function () {
 		// There should be one div child and if that text is the large diff text then
 		// click it to expand the diff.
 		const expectedDivChildren = 1;
-		if (divChildren.length == expectedDivChildren) {
+		if (divChildren.length === expectedDivChildren) {
 			if (divChildren[0].textContent.match("Large diffs are not rendered by default.")) {
 				loadDiff.click();
 			}
@@ -31,7 +31,7 @@ javascript: (function () {
 		idx++;
 	}
 
-	if (alertMessage != "") {
+	if (alertMessage !== "") {
 		alert(alertMessage);
 	}
 })();
