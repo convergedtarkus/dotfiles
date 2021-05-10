@@ -1,5 +1,5 @@
 # What These Are
-These are small javascript functions/code that can be run from a bookmark to perform bulk operations or simple view modifications.
+These are small javascript functions/code that can be run from a bookmark to perform bulk operations or simple view modifications to Github pages.
 
 # How To Use
 Run the makeBookmark.bash script, give it an input of one of the scripts and copy the output.

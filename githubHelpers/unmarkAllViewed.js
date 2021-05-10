@@ -1,4 +1,4 @@
-// This script will collapse (click 'Viewed') all files in a github pull request.
+// This script will collapse (click 'Viewed') all files in a Github pull request.
 javascript: (function (collapse) {
 	let viewForms = document.getElementsByClassName("js-reviewed-checkbox");
 

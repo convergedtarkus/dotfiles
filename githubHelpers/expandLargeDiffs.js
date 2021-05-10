@@ -1,4 +1,4 @@
-// This script will expand any diffs that github has collapsed because
+// This script will expand any diffs that Github has collapsed because
 // github thinks the diff is too large.
 // Other collapsed diffs will not be expanded.
 javascript: (function () {
