@@ -292,6 +292,19 @@ previewMasterMerge() {
 	git log HEAD.."$(getOriginRemote)/master" --first-parent
 }
 
+# Echos the number of commits this branch is behind master.
+commitsBehindMaster() {
+	gfm &>/dev/null # fetch origin so origin/master is up to date
+	# Pipe to xargs to trim whitespace.
+	individualCommits=$(git log HEAD.."$(getOriginRemote)/master" --oneline | wc -l | xargs)
+	parentCommits=$(git log HEAD.."$(getOriginRemote)/master" --first-parent --oneline | wc -l | xargs)
+	if [[ "$individualCommits" == 0 && "$parentCommits" == 0 ]]; then
+		echo "Branch is up to date with master"
+	else
+		echo "Branch is $parentCommits parent commits and $individualCommits total commits behind master"
+	fi
+}
+
 # Takes piped in input and will highlight any changed files in the input.
 highlightChangedFiles() {
 	changedFiles=$(git diff HEAD --name-only | tr '\n' '|')
