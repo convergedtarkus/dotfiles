@@ -10,12 +10,15 @@ javascript: (function() {
         // Collapse the file if it is test file. Not an exhaustive list (largely Go + Dart specific).
         // Also collapses dependency files.
         let shouldShow = true;
+	// TODO Is there a more performant way of running all these checks?
         if (
             // Direct test files/directories.
             fileNameElement.textContent.endsWith("_test.go") ||
             fileNameElement.textContent.includes("/test/") ||
             // Test util file matches, not perfect but should work pretty well.
             fileNameElement.textContent.includes("test_utils.") ||
+            fileNameElement.textContent.includes("test_util.") ||
+            fileNameElement.textContent.includes("/testutil/") ||
             fileNameElement.textContent.includes("testutils.") ||
             // Dependency files/directories.
             fileNameElement.textContent.startsWith("vendor/") ||
