@@ -15,3 +15,7 @@
 
 	Generally used for replace, but can be used in a regex to match and exact characters.
 		`(\w+?) \1` matches 'Dog Dog` but not 'Dog Cat'
+
+## Negative Lookahead
+	(?!A)
+	Not support in some basic systems.
