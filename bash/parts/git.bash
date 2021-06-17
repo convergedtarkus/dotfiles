@@ -90,6 +90,7 @@ alias gl='git pull'
 # glum must be a function. If its an alias, the $(getOriginRemote) is evaluated right away, defeating the purpose of the _getOriginRemotePreHook
 # shellcheck disable=SC2120 # Disabled since arguments are optional.
 glum() { git pull "$(getOriginRemote)" master --no-edit ${1:+"$1"}; } # pull in upstream master, $1 allows passing extra args to the pull (like -r)
+alias glumri='glum --rebase=interactive'
 
 # git stash
 alias gst='git stash'
