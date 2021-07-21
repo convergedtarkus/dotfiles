@@ -31,5 +31,14 @@ bash-it enable completion bash-it brew defaults git makefile system tmux
 # Working with
 Edit a tracked file and then use the `myconfig` alias to commit and push. If you need to integrate remote changes, you'll need to reclone unfortunately (if you've have a better solution I would love to hear it!).
 
+# Updating Bash-It submodule
+1. Checkout my [Bash-It fork](https://github.com/convergedtarkus/bash-it)
+2. Pull in upstream master (that is https://github.com/Bash-it/bash-it)
+3. Push that up.
+4. cd into .bash-it
+5. git pull master
+6. cd to root
+7. Commit the .bash-it folder
+
 # License
 This project uses the https://unlicense.org license. Basically no copyright, you can copy, modify, use, sell etc any code here without giving me credit (though if this is helpful to you, I'd love a shout out!). I give no warranty of any kind on this code.
