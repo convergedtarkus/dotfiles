@@ -23,7 +23,9 @@ javascript: (function() {
             // Dependency files/directories.
             fileNameElement.textContent.startsWith("vendor/") ||
             fileNameElement.textContent.endsWith(".sum") ||
-            fileNameElement.textContent.endsWith(".lock")) {
+            fileNameElement.textContent.endsWith(".lock") ||
+	    // Generated files
+	    fileNameElement.textContent.endsWith(".sg.g.dart")) {
             shouldShow = false;
         }
 
