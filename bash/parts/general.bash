@@ -3,6 +3,9 @@
 # Do not run homebrew clean up automatically. This will prevent old versions from being uninstalled.
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
+# Source the asdf script.
+source /usr/local/opt/asdf/asdf.sh
+
 # For whatever reason, Sophos keeps overwritting permissions for man8, so this quickly reclaims permissions.
 # This command was taken directly from the brew help message.
 alias ownMan8='sudo chown -R $(whoami) /usr/local/share/man/man8'
