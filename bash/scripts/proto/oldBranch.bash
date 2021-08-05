@@ -32,9 +32,8 @@ hour=$((60 * minute))
 day=$((hour * 24))
 year=$((day * 365))
 
-formatAge() {
-	seconds="$1"
-	echo "$(bc <<<"scale=2;$seconds/$year") years"
+ageInYears() {
+	bc <<<"scale=2;$1/$year"
 }
 
 if [[ -z "$targetRemote" ]]; then
@@ -90,23 +89,18 @@ while IFS= read -r branch; do
 	if ((branchAgeSeconds <= 0)); then
 		printf "\033[1;31mBranch '%s' is invalid age of '%s'\033[0m\n" "${branchData[1]}" "$branchAgeSeconds}"
 	else
-		ageString=$(formatAge "$branchAgeSeconds")
-
-		IFS=" "
-		read -r -a ageData <<<"$ageString"
-		IFS="$originalIFS"
+		branchAgeYears=$(ageInYears "$branchAgeSeconds")
 
 		if [[ -z "$staleOnly" && -z "$simpleOutput" ]]; then
-			echo "Head: '${branchData[0]}' ref: '${branchData[1]}' author: '$branchHeadAuthorName' ($branchHeadAuthorEmail) age: $branchAgeSeconds ($ageString)"
+			echo "Head: '${branchData[0]}' ref: '${branchData[1]}' author: '$branchHeadAuthorName' ($branchHeadAuthorEmail) age: $branchAgeSeconds ($branchAgeYears years)"
 		fi
-		if [[ "${ageData[1]}" == "years" ]]; then
-			if (($(echo "${ageData[0]} > $staleBranchAge" | bc -l))); then
-				((numBranchesToDelete++))
-				if [[ -n "$simpleOutput" ]]; then
-					printf "%s\t%s\t%s\t%s\n" "${branchData[1]}" "$branchHeadAuthorName" "$branchHeadAuthorEmail" "${ageData[0]}"
-				else
-					printf "\033[1;34mBranch '%s' should be deleted, it is %s years old!' Ask '%s' (%s) to do so!\033[0m\n" "${branchData[1]}" "${ageData[0]}" "$branchHeadAuthorName" "$branchHeadAuthorEmail"
-				fi
+
+		if (($(echo "$branchAgeYears > $staleBranchAge" | bc -l))); then
+			((numBranchesToDelete++))
+			if [[ -n "$simpleOutput" ]]; then
+				printf "%s\t%s\t%s\t%s\n" "${branchData[1]}" "$branchHeadAuthorName" "$branchHeadAuthorEmail" "$branchAgeYears"
+			else
+				printf "\033[1;34mBranch '%s' should be deleted, it is %s years old!' Ask '%s' (%s) to do so!\033[0m\n" "${branchData[1]}" "$branchAgeYears" "$branchHeadAuthorName" "$branchHeadAuthorEmail"
 			fi
 		fi
 	fi
