@@ -14,6 +14,7 @@ javascript: (function() {
         if (
             // Direct test files/directories.
             fileNameElement.textContent.endsWith("_test.go") ||
+            fileNameElement.textContent.endsWith("_test.dart") ||
             fileNameElement.textContent.includes("/test/") ||
             // Test util file matches, not perfect but should work pretty well.
             fileNameElement.textContent.includes("test_utils.") ||
