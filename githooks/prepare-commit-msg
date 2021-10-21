@@ -26,9 +26,9 @@ parsedTicket=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$branchName")
 if [[ -n "$parsedTicket" ]]; then
 	if [[ "$COMMIT_SOURCE" == "message" ]]; then
 		# Append parsed ticket after the -m message.
-		printf "%s\n%s" "$(cat "$COMMIT_MSG_FILE")" "$parsedTicket" >"$COMMIT_MSG_FILE"
+		printf "%s\n\n%s" "$(cat "$COMMIT_MSG_FILE")" "$parsedTicket" >"$COMMIT_MSG_FILE"
 	else
 		# Leave a blank line at the start and the parsed ticket on the next line.
-		printf "\n%s%s" "$parsedTicket" "$(cat "$COMMIT_MSG_FILE")" >"$COMMIT_MSG_FILE"
+		printf "\n\n%s%s" "$parsedTicket" "$(cat "$COMMIT_MSG_FILE")" >"$COMMIT_MSG_FILE"
 	fi
 fi
