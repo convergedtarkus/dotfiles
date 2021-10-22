@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Function to define the "upstream" repo alias name. Needs to be first for use below
 # Uses the first matching remote in git config upstream > origin
 # Can define a custom _getOriginRemotePreHook for using a non-standard alias
@@ -47,6 +45,13 @@ alias gcomb='git fetch $(getOriginRemote) master && git checkout $(getOriginRemo
 gcomup() { git checkout master ${1:+"$1"} && git pull; }                                       # $1 allows passing -f to dump current changes
 alias gcob='git checkout -b'
 gcoClean() { git checkout ${1:+"$1"} && git clean -fd ${1:+"$1"}; }
+# Will accept (git checkout --ours) files that have conflicts and are auto-generated.
+# The assumption is that these files will get regenerated/updated by dependency systems and so on, so no need to hand edit/resolve.
+gResolveGenConflicts() {
+	generatedFiles=("*go.sum" "*vendor/modules.txt")
+	git checkout --ours "${generatedFiles[@]}"
+	git add "${generatedFiles[@]}"
+}
 
 # git commit
 alias gc='git commit -v'
@@ -150,6 +155,12 @@ masterBase() {
 # Rebase the current branch based on its base against master. Good for cleaning/re-organizing commits
 gRebaseBase() {
 	git rebase -i "$(masterBase)"
+}
+
+# Reabse the current branch based on origin master. Good for adjusting commits and merging master at once.
+gRebaseMaster() {
+	gfm &>/dev/null # fetch origin so origin/master is up to date.
+	git rebase -i "$(getOriginRemote)/master"
 }
 
 # Merges upstream master into the given branch, pushes it up and deleted the local branch.
