@@ -44,7 +44,7 @@ alias gcom='git checkout master'
 alias gcomb='git fetch $(getOriginRemote) master && git checkout $(getOriginRemote)/master -b' # Creates a new branch based on upstream/master (not your local master).
 gcomup() { git checkout master ${1:+"$1"} && git pull; }                                       # $1 allows passing -f to dump current changes
 alias gcob='git checkout -b'
-gcoClean() { git checkout ${1:+"$1"} && git clean -fd ${1:+"$1"}; }
+gcoClean() { git checkout ${*:+$*} && git clean -fd ${*:+$*}; }
 # Will accept (git checkout --ours) files that have conflicts and are auto-generated.
 # The assumption is that these files will get regenerated/updated by dependency systems and so on, so no need to hand edit/resolve.
 gResolveGenConflicts() {
