@@ -67,3 +67,27 @@ checkInternet() {
 killTop() {
 	sudo killall top
 }
+
+murderTop() {
+	secondsWaited=0
+	readonly secondsToWait=10
+
+	while ((secondsWaited < secondsToWait)); do
+		killTop &>/dev/null
+		exitCode="$?"
+		if [[ "$exitCode" == 0 ]]; then
+			# A top process was killed, reset the waited time.
+			secondsWaited=0
+		elif [[ "$exitCode" == 1 ]]; then
+			# No top process was found, increment the waited time and wait one second.
+			((secondsWaited++))
+			sleep 1
+		else
+			# Unknown exit code, abort.
+			echo "killall returned an unknown exit code of '$exitCode'"
+			return 1
+		fi
+	done
+
+	echo "No top process has run in $secondsWaited seconds. Ending murder process."
+}
