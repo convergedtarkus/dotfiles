@@ -70,7 +70,7 @@ killTop() {
 
 murderTop() {
 	secondsWaited=0
-	readonly secondsToWait=10
+	secondsToWait=10
 
 	while ((secondsWaited < secondsToWait)); do
 		killTop &>/dev/null
