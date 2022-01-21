@@ -76,6 +76,7 @@ murderTop() {
 		killTop &>/dev/null
 		exitCode="$?"
 		if [[ "$exitCode" == 0 ]]; then
+			echo "top killed after waiting $secondsWaited seconds. Will wait $secondsToWait seconds more."
 			# A top process was killed, reset the waited time.
 			secondsWaited=0
 		elif [[ "$exitCode" == 1 ]]; then
