@@ -5,7 +5,8 @@
 # Github issue follows the form #[0-9]+ and must be at the end of the input.
 # The extract ticket/issue is echoed. Nothing is echoed if nothing is found.
 # Example
-#  TEAM-123DoWork > 'TEAM-123'
+#  ATEAM-123DoWork > 'ATEAM-123'
+#  bteam-456FixWork > 'BTEAM-456'
 #  FixStuff#14 > '#14'
 #  IBrokeItAll > (nothing)
 #  TEAM-123FixIt#15 > (nothing)
@@ -14,14 +15,14 @@
 #    The above two are intentional to handle referencing a ticket/issue in the branch name.
 
 input="$1"
-jiraTicket=$(echo "$input" | grep -o '^[A-Z]\+-[0-9]\+')
+jiraTicket=$(echo "$input" | grep -o '^[A-Za-z]\+-[0-9]\+')
 githubIssue=$(echo "$input" | grep -o '#[0-9]\+$')
 
 if [[ -n "$jiraTicket" && -n "$githubIssue" ]]; then
 	# both set, so don't do anything
 	exit 1
 elif [[ -n "$jiraTicket" ]]; then
-	echo "$jiraTicket"
+	echo "${jiraTicket^^}" # Capatalize the characters for consistency.
 	exit 0
 elif [[ -n "$githubIssue" ]]; then
 	echo "Issue $githubIssue"
