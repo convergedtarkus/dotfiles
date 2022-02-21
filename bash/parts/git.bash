@@ -341,6 +341,10 @@ highlightChangedFiles() {
 # Takes in a single parameter, the repo to clone `user/repo`.
 clonePersonalRepo() {
 	git clone "git@github.com-personal:$1.git"
+	if [[ $? != 0 ]]; then
+		echo "Clone failed!"
+		return 2
+	fi
 	path=${1##*/}
 	cd "$path" || return
 	git config user.name "convergedtarkus"
