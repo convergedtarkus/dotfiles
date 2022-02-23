@@ -18,6 +18,26 @@ getOriginRemote() {
 	echo "origin"
 }
 
+# Returns the branch name for this repo that is main/master.
+# Starts by looking for a main branch and if that fails, checks for master.
+# This only checks known remotes so it is not an exhaustive search.
+getMainBranch() {
+	# Check if main exists.
+	if git rev-parse refs/remotes/"$(getOriginRemote)"/main &>/dev/null; then
+		echo "main"
+		return
+	fi
+
+	# Check if master exists.
+	if git rev-parse refs/remotes/"$(getOriginRemote)"/master &>/dev/null; then
+		echo "master"
+		return
+	fi
+
+	# Bail.
+	return 1
+}
+
 # Called at the start of getOriginRemote
 # Can be used to return a custom origin remote alias
 _getOriginRemotePreHook() { :; }
@@ -40,9 +60,9 @@ alias gbDPrev='git branch -D @{-1}' # Delete the previous branch you were on.
 
 # git checkout
 alias gco='git checkout'
-alias gcom='git checkout master'
-alias gcomb='git fetch $(getOriginRemote) master && git checkout $(getOriginRemote)/master -b' # Creates a new branch based on upstream/master (not your local master).
-gcomup() { git checkout master ${1:+"$1"} && git pull; }                                       # $1 allows passing -f to dump current changes
+alias gcom='git checkout $(getMainBranch)'
+alias gcomb='git fetch $(getOriginRemote) $(getMainBranch) && git checkout $(getOriginRemote)/$(getMainBranch) -b' # Creates a new branch based on upstream/main (not your local main).
+gcomup() { git checkout "$(getMainBranch)" ${1:+"$1"} && git pull; }                                               # $1 allows passing -f to dump current changes
 alias gcob='git checkout -b'
 gcoClean() { git checkout ${*:+$*} && git clean -fd ${*:+$*}; }
 # Will accept (git checkout --ours) files that have conflicts and are auto-generated.
@@ -68,7 +88,7 @@ gdv() { git diff -w "$@" | vim -R -; } # git diff, ignore whitespace, in vim
 # git fetch
 alias gf='git fetch --all --prune'
 alias gft='git fetch --all --prune --tags'
-alias gfm='git fetch "$(getOriginRemote)" master' # fetch remote master
+alias gfm='git fetch "$(getOriginRemote)" $(getMainBranch)' # fetch remote main
 _fetchTarget() {
 	fetchTarget=$(git rev-parse --symbolic-full-name --abbrev-ref "@{upstream}" | sed 's|/| |')
 	if [[ -z "$fetchTarget" ]]; then
@@ -94,7 +114,7 @@ gfc() {
 alias gl='git pull'
 # glum must be a function. If its an alias, the $(getOriginRemote) is evaluated right away, defeating the purpose of the _getOriginRemotePreHook
 # shellcheck disable=SC2120 # Disabled since arguments are optional.
-glum() { git pull "$(getOriginRemote)" master --no-edit ${1:+"$1"}; } # pull in upstream master, $1 allows passing extra args to the pull (like -r)
+glum() { git pull "$(getOriginRemote)" "$(getMainBranch)" --no-edit ${1:+"$1"}; } # pull in upstream main, $1 allows passing extra args to the pull (like -r)
 alias glumri='glum --rebase=interactive'
 
 # git stash
@@ -147,36 +167,36 @@ alias safeClean='git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode' # will 
 alias testSafeClean='safeClean -n'                                       # safeClean but only list what would be removed (do not delete anything).
 alias gpristine='git reset --hard && safeClean'                          # safeClean + reset to HEAD
 
-# Get the base commit between the current branch and master.
-masterBase() {
-	gfm &>/dev/null # fetch origin so origin/master is up to date
-	git merge-base "$(getOriginRemote)/master" HEAD
+# Get the base commit between the current branch and main.
+mainBase() {
+	gfm &>/dev/null # fetch origin so origin/main is up to date
+	git merge-base "$(getOriginRemote)/$(getMainBranch)" HEAD
 }
 
-# Rebase the current branch based on its base against master. Good for cleaning/re-organizing commits
+# Rebase the current branch based on its base against main. Good for cleaning/re-organizing commits
 gRebaseBase() {
-	git rebase -i "$(masterBase)"
+	git rebase -i "$(mainBase)"
 }
 
-# Reabse the current branch based on origin master. Good for adjusting commits and merging master at once.
-gRebaseMaster() {
-	gfm &>/dev/null # fetch origin so origin/master is up to date.
-	git rebase -i "$(getOriginRemote)/master"
+# Reabse the current branch based on origin main. Good for adjusting commits and merging main at once.
+gRebaseMain() {
+	gfm &>/dev/null # fetch origin so origin/main is up to date.
+	git rebase -i "$(getOriginRemote)/$(getMainBranch)"
 }
 
-# Merges upstream master into the given branch, pushes it up and deleted the local branch.
-# Good for updating a remote branch with master that you don't need checked-out locally.
-mergeMasterIntoBranch() {
+# Merges upstream main into the given branch, pushes it up and deleted the local branch.
+# Good for updating a remote branch with main that you don't need checked-out locally.
+mergeMainIntoBranch() {
 	if [[ -z "$1" ]]; then
 		echo "Must supply a branch name!"
 		return 1
 	fi
 	gf       # Fetch everything (not tags though)
 	gco "$1" # Checkout the passed in branch
-	glum     # Merge master into the checked-out branch
+	glum     # Merge main into the checked-out branch
 	gp       # Push up the merge
 	gco -    # Switch back to the previous branch
-	gbd "$1" # Delete the branch that master was merged into
+	gbd "$1" # Delete the branch that main was merged into
 }
 
 # List all tags. Use tags pulled down, consider running a fetch with tags before hand.
@@ -190,24 +210,24 @@ listTags() {
 	git tag -l --sort=-v:refname | head -n "$1"
 }
 
-# Merges master and produces a string to say when the merge was done. Produce the same format of string if up to date with master.
-qaMasterMerge() {
+# Merges main and produces a string to say when the merge was done. Produce the same format of string if up to date with main.
+qaMainMerge() {
 	startingHeadHash=$(git rev-parse HEAD)
 
-	git pull "$(getOriginRemote)" master &>/dev/null
+	git pull "$(getOriginRemote)" "$(getMainBranch)" &>/dev/null
 
 	endingHeadHash=$(git rev-parse HEAD)
 
 	logString=""
 	if [[ "$startingHeadHash" != "$endingHeadHash" ]]; then
-		logString="Pulled in master at '$(git log -1 -s --format="%cd")'"
+		logString="Pulled in $(getMainBranch) at '$(git log -1 -s --format="%cd")'"
 	else
-		logString="Up to date with master as of '$(date '+%c %z')'"
+		logString="Up to date with $(getMainBranch) as of '$(date '+%c %z')'"
 	fi
 
-	gfm &>/dev/null # fetch origin so origin/master is up to date
+	gfm &>/dev/null # fetch origin so origin/main is up to date
 
-	echo "$logString, master commit: $(masterBase), head commit: $(git rev-parse HEAD)"
+	echo "$logString, $(getMainBranch) commit: $(mainBase), head commit: $(git rev-parse HEAD)"
 }
 
 # Add a remote to the current repo. `addRemote someone`. Fetches after to ensure everything is up to date.
@@ -239,20 +259,20 @@ isGitTracked() {
 
 # TODO All the log/diffAgainst commands could easily be combined or share code.
 
-# produces the commit log of commits in this branch that are not in master
+# produces the commit log of commits in this branch that are not in main
 # allows passing extra arguments to the final `git log` command
-# E.X. logAgainstMaster -n 1
-logAgainstMaster() {
-	gfm &>/dev/null # fetch origin so origin/master is up to date
-	git log "$(getOriginRemote)/master"..HEAD --first-parent ${*:+"$*"}
+# E.X. logAgainstMain -n 1
+logAgainstMain() {
+	gfm &>/dev/null # fetch origin so origin/main is up to date
+	git log "$(getOriginRemote)/$(getMainBranch)"..HEAD --first-parent ${*:+"$*"}
 }
 
-# produces the commit log of commits in this branch that are not in master
+# produces the commit log of commits in this branch that are not in main
 # uses 'merge-base' so only changes in this branch should be displayed
 # allows passing extra arguments to the final `git log` command
 # E.X. logAgainstBase -n 1
 logAgainstBase() {
-	baseCommit=$(masterBase)
+	baseCommit=$(mainBase)
 	git log "$baseCommit"..HEAD --first-parent ${*:+"$*"}
 }
 
@@ -267,14 +287,14 @@ logAgainstRemote() {
 	git log "$remote"..HEAD ${*:+"$*"}
 }
 
-# produces a diff of code in this branch that is not in master
-# remember, this shows all code differences so if this branch is behind master it will look messy
+# produces a diff of code in this branch that is not in main
+# remember, this shows all code differences so if this branch is behind main it will look messy
 # consider using `diffAgainstBase` for cleaner diffs of only changes in this branch
 # allows passing extra arguments to the final `git diff` command
-# E.X. diffAgainstMaster --stat
-diffAgainstMaster() {
-	gfm &>/dev/null # fetch origin so origin/master is up to date
-	git diff "$(getOriginRemote)/master"..HEAD ${*:+"$*"}
+# E.X. diffAgainstMain --stat
+diffAgainstMain() {
+	gfm &>/dev/null # fetch origin so origin/main is up to date
+	git diff "$(getOriginRemote)/$(getMainBranch)"..HEAD ${*:+"$*"}
 }
 
 # produces a diff of code changed in this branch
@@ -282,7 +302,7 @@ diffAgainstMaster() {
 # allows passing extra arguments to the final `git diff` command
 # E.X. diffAgainstBase --stat
 diffAgainstBase() {
-	baseCommit=$(masterBase)
+	baseCommit=$(mainBase)
 	git diff "$baseCommit"..HEAD ${*:+"$*"}
 }
 
@@ -297,24 +317,24 @@ diffAgainstRemote() {
 	git diff "$remote"..HEAD ${*:+"$*"}
 }
 
-# shows new parent commits in master that are not in this branch
+# shows new parent commits in main that are not in this branch
 # allows passing extra arguments to the final `git log` command
-# E.X. previewMasterMerge -n 1
-previewMasterMerge() {
-	gfm &>/dev/null # fetch origin so origin/master is up to date
-	git log HEAD.."$(getOriginRemote)/master" --first-parent
+# E.X. previewMainMerge -n 1
+previewMainMerge() {
+	gfm &>/dev/null # fetch origin so origin/main is up to date
+	git log HEAD.."$(getOriginRemote)/$(getMainBranch)" --first-parent
 }
 
-# Echos the number of commits this branch is behind master.
-commitsBehindMaster() {
-	gfm &>/dev/null # fetch origin so origin/master is up to date
+# Echos the number of commits this branch is behind main.
+commitsBehindMain() {
+	gfm &>/dev/null # fetch origin so origin/main is up to date
 	# Pipe to xargs to trim whitespace.
-	individualCommits=$(git log HEAD.."$(getOriginRemote)/master" --oneline | wc -l | xargs)
-	parentCommits=$(git log HEAD.."$(getOriginRemote)/master" --first-parent --oneline | wc -l | xargs)
+	individualCommits=$(git log HEAD.."$(getOriginRemote)/$(getMainBranch)" --oneline | wc -l | xargs)
+	parentCommits=$(git log HEAD.."$(getOriginRemote)/$(getMainBranch)" --first-parent --oneline | wc -l | xargs)
 	if [[ "$individualCommits" == 0 && "$parentCommits" == 0 ]]; then
-		echo "Branch is up to date with master"
+		echo "Branch is up to date with $(getMainBranch)"
 	else
-		echo "Branch is $parentCommits parent commits and $individualCommits total commits behind master"
+		echo "Branch is $parentCommits parent commits and $individualCommits total commits behind $(getMainBranch)"
 	fi
 }
 
@@ -340,8 +360,7 @@ highlightChangedFiles() {
 #  4. Clone repos using this command to clone with personal credentials.
 # Takes in a single parameter, the repo to clone `user/repo`.
 clonePersonalRepo() {
-	git clone "git@github.com-personal:$1.git"
-	if [[ $? != 0 ]]; then
+	if ! git clone "git@github.com-personal:$1.git"; then
 		echo "Clone failed!"
 		return 2
 	fi
