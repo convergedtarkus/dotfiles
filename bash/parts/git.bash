@@ -83,6 +83,7 @@ alias gcAmend='git commit --amend -C HEAD' # like gcaa, but only add staged chan
 
 # git diff
 alias gd='git diff'
+alias gdc='git diff --cached'
 gdv() { git diff -w "$@" | vim -R -; } # git diff, ignore whitespace, in vim
 
 # git fetch
