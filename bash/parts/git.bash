@@ -174,6 +174,8 @@ mainBase() {
 	git merge-base "$(getOriginRemote)/$(getMainBranch)" HEAD
 }
 
+alias gRebase='git rebase'
+
 # Rebase the current branch based on its base against main. Good for cleaning/re-organizing commits
 gRebaseBase() {
 	git rebase -i "$(mainBase)"
