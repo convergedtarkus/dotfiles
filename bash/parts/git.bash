@@ -136,9 +136,11 @@ alias gResetToRemote='gfc && git reset --hard @{u}'         # Fetches this branc
 alias gr='git rebase'
 alias gra='git rebase --abort'
 alias grc='git rebase --continue'
+alias grca='gall && git rebase --continue'
 
 # git command shortcuts
 alias gcp='git cherry-pick'
+alias gcpnc='git cherry-pick --no-commit'
 alias gm='git merge'
 alias gs='git status'
 
