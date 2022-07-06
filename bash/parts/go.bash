@@ -206,6 +206,9 @@ smartGoCiLintFiles() {
 # Identies all directories with changed go files and runs `go test` in all those directories
 smartGoTest() { _smartGoRunner "go test $*"; }
 
+# Identies all directories with changed go files and runs `go build` in all those directories
+smartGoBuild() { _smartGoRunner "go build $*"; }
+
 # Identies all directories with changed go files the whole suite of go checks
 # This includes, `goFormat`, `goLint`, `staticcheck` and `go test`
 smartGoAll() {
