@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 
 # Commands to kill, start and restart (kill + start) docker. Helps clean up memory.
-killDocker() { killall Docker; }
+killDocker() {
+	if [[ $(pgrep -x Docker) ]]; then
+		killall Docker
+	fi
+	if [[ $(pgrep -x "Docker Desktop") ]]; then
+		killall Docker\ Desktop
+	fi
+}
 startDocker() { open -g -a Docker; } # -g will not focus Docker when it starts.
 restartDocker() {
 	if killDocker >/dev/null 2>&1; then
