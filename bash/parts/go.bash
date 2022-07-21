@@ -232,6 +232,29 @@ smartGoAll() {
 	smartGoCiLint -n
 }
 
+# A variation of smartGoAll that runs all tests rather than over just the changed directories.
+# The name is silly, but it works I guess.
+smartGoAllAll() {
+	# Loop over the arguments and figure out which apply to the variation functions being run.
+	# Currently only the -short option is supported (passed to go test).
+	testArgs=""
+	for arg in "$@"; do
+		case "$arg" in
+		"-short")
+			if [[ -n "$testArgs" ]]; then
+				testArgs="$testArgs "
+			fi
+			testArgs="$testArgs$arg"
+			;;
+		esac
+	done
+
+	smartGoImports
+	# Use count=1 so no tests run without the test cache.
+	go test ./... -count=1 "$testArgs"
+	smartGoCiLint -n
+}
+
 # Runs 'golangci-lint' using my global config file.
 # Passes arguments to the command so `goCiLint -n` or `goCiLint ./path` etc work.
 goCiLint() {
