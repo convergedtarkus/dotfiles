@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ $# != 2 ]]; then
+if [[ $# -lt 2 ]]; then
 	echo "Must have at least two parameters. Directroy to read images from and directroy to copy images to."
 	exit 1
 fi
@@ -11,11 +11,26 @@ readRoot=""
 # The directory all images will be moved to.
 copyToDir=""
 
+deleteCopyDir=""
+
 while [[ -n "$1" ]]; do
 	if [[ -z "$readRoot" ]]; then
 		readRoot=${1%/}
 	elif [[ -z "$copyToDir" ]]; then
 		copyToDir=${1%/}
+	else
+		case "$1" in
+		--delete)
+			deleteCopyDir="true"
+			;;
+		--nodelete)
+			deleteCopyDir="false"
+			;;
+		*)
+			echo "Unknown argument of '$1'. Aborting"
+			exit 1
+			;;
+		esac
 	fi
 	shift
 done
@@ -27,13 +42,27 @@ if [[ -z "$readRoot" || -z "$copyToDir" ]]; then
 fi
 
 # Clean up the target directory.
-if find "$copyToDir" -not -path "*/\.*" -mindepth 1 -maxdepth 1 | read -r; then
-	echo "Copy target dir ($copyToDir) is not empty, do you want to delete contents?"
-	read -r input_variable
-	if [[ "$input_variable" == "y" ]]; then
+handleCopyDir() {
+	if [[ "$deleteCopyDir" == "false" ]]; then
+		# Do not delete contents of copy to directory.
+		return
+	fi
+
+	if find "$copyToDir" -not -path "*/\.*" -mindepth 1 -maxdepth 1 | read -r; then
+		if [[ "$deleteCopyDir" != "true" ]]; then
+			# Ask user if content of copy to directory should be deleted.
+			echo "Copy target dir ($copyToDir) is not empty, do you want to delete contents?"
+			read -r input_variable
+			if [[ "$input_variable" != "y" ]]; then
+				# User say not to delete contents of copy directory.
+				return
+			fi
+		fi
+
+		# Delete option given or user confirmed deleting contents of copy to directory.
 		rm -rf "${copyToDir:?}"/*
 	fi
-fi
+}
 
 copyIfImage() {
 	filename=$(basename -- "$1")
@@ -58,5 +87,7 @@ findAndCopyScreensavers() {
 		fi
 	done
 }
+
+handleCopyDir
 
 findAndCopyScreensavers "$readRoot"
