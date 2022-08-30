@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# Wrapper to use the latest version of a given go version.
+# E.X. useGoVersion 1.18
+useGoVersion() {
+	if asdf global golang latest:"$1"; then
+		echo "New go version '$(go version)'"
+	else
+		echo "Failed to switch go version. Version is '$(go version)'"
+	fi
+}
+
 # clear go test cache
 alias goClearTestCache='go clean -testcache'
 
