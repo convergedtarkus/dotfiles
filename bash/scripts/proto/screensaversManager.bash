@@ -64,13 +64,15 @@ handleCopyDir() {
 	fi
 }
 
-copyIfImage() {
+declare -a imagesToCopy
+
+addToImagesToCopy() {
 	filename=$(basename -- "$1")
 	extension="${filename##*.}"
 	filename="${filename%.*}"
 	case "$extension" in
 	jpg | jpeg | png | webp)
-		cp -i "$1" "$copyToDir"
+		imagesToCopy+=("$1")
 		;;
 	*)
 		echo "$1 is not an image"
@@ -81,7 +83,7 @@ copyIfImage() {
 findAndCopyScreensavers() {
 	for f in "$1"/*; do
 		if [[ -f "$f" ]]; then
-			copyIfImage "$f"
+			addToImagesToCopy "$f"
 		elif [[ -d "$f" ]]; then
 			findAndCopyScreensavers "$f"
 		fi
@@ -91,3 +93,6 @@ findAndCopyScreensavers() {
 handleCopyDir
 
 findAndCopyScreensavers "$readRoot"
+
+# Copy all the images in one shot. Faster than one by one.
+cp -i "${imagesToCopy[@]}" "$copyToDir"
