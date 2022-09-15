@@ -261,7 +261,7 @@ smartGoAllAll() {
 
 	smartGoImports
 	# Use count=1 so no tests run without the test cache.
-	go test ./... -count=1 "$testArgs"
+	goTestAll "$testArgs"
 	smartGoCiLint -n
 }
 
