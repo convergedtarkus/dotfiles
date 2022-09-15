@@ -266,5 +266,14 @@ echo
 echo "Deleting cached builds for $targetPackageName receiving the symlink to ensure rebuilds work correctly."
 find "$GOPATH/pkg" \( -name mod -o -name vendor \) -prune -o -path "*$targetPackageName" -exec rm -rf {} +
 
+if command -v goSymlinkVendorPostOpHook &>/dev/null; then
+	echo
+	echo "Running post operation hook function."
+	goSymlinkVendorPostOpHook "$expectedVendorPath/$_arg_symlink_package" "${localDependencyPath#$GOPATH/src/}" "$_arg_dual_dev"
+else
+	echo
+	echo "Post operation hook does not exist, skipping it."
+fi
+
 echo
 echo "Success! Package '$_arg_symlink_package' was symlinked into vendor from GOPATH correctly!"
