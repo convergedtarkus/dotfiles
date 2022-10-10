@@ -66,10 +66,13 @@ _goTestAll() {
 
 # install golangci-lint (https://github.com/golangci/golangci-lint)
 installGolangCiLint() {
-	version="v1.41.1"
+	if [[ -z "$1" ]]; then
+		version="v1.49.0"
+	else
+		version="$1"
+	fi
 	GO111MODULE=off go get -d github.com/golangci/golangci-lint
-	# Most recent release (2/24/2020)
-	(cd "$(go env GOPATH)"/src/github.com/golangci/golangci-lint/ && git checkout "$version" && cd cmd/golangci-lint &&
+	(cd "$(go env GOPATH)"/src/github.com/golangci/golangci-lint/ && git fetch --all --prune --tags && git checkout "$version" && cd cmd/golangci-lint &&
 		go install -ldflags "-X 'main.version=$(git describe --tags)' -X 'main.commit=$(git rev-parse --short HEAD)' -X 'main.date=$(date)'")
 }
 
