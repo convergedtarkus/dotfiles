@@ -11,12 +11,15 @@ while [[ -n "$1" ]]; do
 		echo "-simple: Only log stale branches and in a simple format of ref<TAB>UserName<TAB>UserEmail<TAB>yearsOld"
 		echo "--stale-only: Only log out stale branches"
 		echo "--remote: If you have multiple remotes, use this to specific the target (next parameter is the remote to use)"
+		echo "--no-fetch: Will not run a fetch on the remote before running the script"
 		exit 1
 	elif [[ "$1" == "-simple" ]]; then
 		simpleOutput="true"
 	elif [[ "$1" == "--remote" ]]; then
 		shift
 		targetRemote="$1"
+	elif [[ "$1" == "--no-fetch" ]]; then
+		noFetch="true"
 	else
 		echo "Unknown input parameter of '$1'"
 		exit 1
@@ -58,6 +61,10 @@ else
 		echo "The remote you specificed ('$targetRemote') is not a valid one"
 		exit 1
 	fi
+fi
+
+if [[ -z "$noFetch" ]]; then
+	git fetch -q "$targetRemote"
 fi
 
 # This will be used to determine the age of the branch.
