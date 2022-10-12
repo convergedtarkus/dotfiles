@@ -15,6 +15,7 @@ output:
   print-linter-name: true
 
 
+# TODO Need to look into all settings for linters. https://golangci-lint.run/usage/linters/
 # all available settings of specific linters
 linters-settings:
   errcheck:
@@ -24,7 +25,14 @@ linters-settings:
 
     # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
     # default is false: such cases aren't reported by default.
-    check-blank: false
+    check-blank: true
+  exhaustive:
+    # check switch statements in generated files also
+    check-generated: false
+    # indicates that switch statements are to be considered exhaustive if a
+    # 'default' case is present, even if all enum members aren't listed in the
+    # switch
+    default-signifies-exhaustive: true # Not perfect, but generally how the setup works.
   govet:
     # report about shadowed variables
     check-shadowing: true
@@ -33,47 +41,231 @@ linters-settings:
     simplify: true
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
-    max-func-lines: 5
-
+   max-func-lines: 5
 
 linters:
   enable:
-    - bodyclose # don't use http much but why not
-    - deadcode # enabled by default
-    #- depguard # varies too much to help
-    #- dupl # TODO Worth a try, noisy?
-    - errcheck # enabled by default
+    # Disallow non-ascii in identifers.
+    - asciicheck
+
+    # Close HTTP response bodies.
+    - bodyclose
+    
+    # Function/package complexity. TODO Probably verify noisy.
+    #- cyclop
+    
+    # Finds unused code (default).
+    - deadcode
+
+    # Disallow certain imports. Varies too much.
+    #- depguard
+    
+    # Looks for lots of blank assignments (x, _, _, :=) etc. Very noisy in setup.
+    #- dogsled
+
+    # Code duplicate detection.
+    - dupl
+    
+    # Check for two durations multipled.
+    - durationcheck
+
+    # Looks for checked errors (default).
+    - errcheck
+
+    # Looks for issues with error wrapping (go 1.13). Most setups do not error wrap.
+    #- errorlint
+    
+    # Checks enum switch statements for completion.
+    - exhaustive
+
+    # Checks if all struct fields are initalized. Not always needed.
+    #- exhaustivestruct
+
+    # Checks for pointers to enclosing loop variables. Like scopelint.
     - exportloopref
-    #- funlen # TODO Worth trying, noisy?
-    #- gochecknoglobals # Pretty common, noisy
-    #- gochecknoinits # TODO Try? Safety is nice
-    #- goconst # TODO Worth a shot, noisy?
-    - gocritic # TODO Would like to try. Need to config a lot I fear
-    #- gocyclo # TODO Existing code will get flagged, maybe try?
-    - godox # Not always an issue but worth checking
+
+    # Forbids certain identifers (prints by default). TODO Maybe try?
+    #- forbidigo
+
+    # Find forced type assertions.
+    - forcetypeassert
+
+    # Detect long functions. TODO Worth trying but noisy.
+    #- funlen
+
+    # Forces package import order I believe. TODO Worth a try.
+    #- gci
+
+    # No global varaibles. Common in setups.
+    #- gochecknoglobals
+
+    # No init functions. Used in some setups.
+    #- gochecknoinits
+
+    # Finds places for constants.
+    - goconst
+
+    # Lots of aggressive lint opinions. TODO Should setup more.
+    - gocritic
+
+    # Check function complexity. TODO Should try.
+    #- gocyclo
+    
+    # Verify comments end with a period.
+    #- godot
+
+    # Avoid todos and alike etc.
+    - godox
+
+    # Go formatting with simplification.
     - gofmt
-    - golint
+
+    # Stricter gofmt. Won't hold in setup.
+    #- gofumpt
+
+    # File liscense header matches patter. Not my concern.
+    #- goheader
+
+    # Better gofmt (no simplfy though).
     - goimports
-    #- gosec # This is covered in other ways
-    #- gosimple # enabled by default
-    #- govet # enabled by default
-    - ineffassign # enabled by default
-    #- interfacer # Generally done for a reason
-    #- lll # Going to be noisy
-    #- maligned # Too noisy and unique setup invalidates
+    
+    # Go linting. TODO Deprecated. TODO use revive.
+    - golint
+
+    # Detects magic numbers. TODO Should try but noisy.
+    #- gomnd
+
+    # Manage replace, excludes etc in go mod. Not helpful for setup.
+    #- gomoddirectives
+
+    # Block certain versions etc in go mod. Not helpful for setup.
+    #- gomodguard
+    
+    # Checks prinf like functions end in f. Not very helpful.
+    #- goprintffuncname
+
+    # Checks for security issues.
+    - gosec
+
+    # Linter to help simply code (default).
+    - gosimple
+
+    # Reports suspicious contructs in go code (default).
+    - govet
+
+    # Checks to use short if syntax.
+    - ifshort
+    
+    # Enforce consistent import aliases. TODO Could be helpful.
+    #- importas
+
+    # Reports assigments that are not used (default).
+    - ineffassign
+
+    # Checks for interface design. Deprecated.
+    #- interfacer
+
+    # Checks for long lines. Noisy and not super helpful.
+    #- lll
+
+    # Finds initial zero length slices.
+    - makezero
+
+    # Depreted, use fieldalignment. Doesn't work for unique setup.
+    #- maligned
+
+    # Check for common misspellings.
     - misspell
-    - nakedret # Generally don't use naked returns but good to know
+
+    # Find long functions with naked returns.
+    - nakedret
+
+    # Reports deeply nested ifs. TODO Should try, need to config min-complexity.
+    #- nestif
+    
+    # Checks for not returning errors up higher.
+    - nilerr
+
+    # Forces newline before return. Good idea but too aggressive.
+    #- nlreturn
+
+    # Find HTTP with Context.
+    - noctx
+
+    # Checks for bad nolint directives.
+    - nolintlint
+
+    # Checks for testing parallel usage. Not something I've ever done.
+    #- paralleltest
+
+    # Preallocate slices.
     - prealloc
-    - scopelint
+
+    # Avoid shadowing go identifiers.
+    - predeclared
+    
+    # For Prometheus metrics. Not helpful for setup.
+    #- promlinter
+
+    # New golint. TODO Need to get config setup. I think it default to be golint like.
+    - revive
+
+    # Forces rows error to be checks.
+    - rowserrcheck
+
+    # Scoping issues. Deprecated, use exportloopref.
+    #- scopelint
+
+    # Close sql stuff.
     - sqlclosecheck
-    - staticcheck # enabled by default
-    - structcheck # enabled by default
+
+    # Go vet on steroids (default).
+    - staticcheck
+
+    # Finds unused struct fields (default).
+    - structcheck
+
+    # Replacement for golint.
     - stylecheck
-    #- typecheck # enabled by default
-    #- unused # enabled by default
-    - varcheck # enabled by default
+
+    # Check struct tags format (id > ID). TODO Maybe, have to setup.
+    #- tagliatelle
+
+    # Forces use of a _test package. No, I like the normal approach.
+    #- testpackage
+
+    # Forces t.Helper for better test lines output. No, noise and not super helpful.
+    #- thelper
+    
+    # Handles bad t.Parallel in tests.
+    - tparallel
+
+    # Type checks go code (default).
+    - typecheck
+
+    # Avoid unneeded type conversions.
     - unconvert
+
+    # Find unused function parameters.
     - unparam
+
+    # Checks for unused go code (default).
+    - unused
+
+    # Find unused gloabs (default).
+    - varcheck
+
+    # Finds wasted assignments. Like ineffassign.
+    - wastedassign
+
+    # Looks for unneeded whitespace. Complains about splitting long methods onto multiple lines, so no go.
+    #- whitespace
+
+    # Makes sure errors are wrapped. Not the pattern setup uses.
+    #- wrapcheck
+
+    # Forces you to use empty lines. Very aggressive and forces tons of lines. TODO Config is powerful though.
+    #- wsl
 
 
 issues:
