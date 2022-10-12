@@ -4,7 +4,6 @@
 alias preview='open -a "preview"'
 alias chrome='open -a google\ chrome'
 alias finder='open -a Finder'
-alias sublime='open -a '"'"'Sublime Text'"'"
 
 # open the target file in a new tab of mvim
 alias mvi='open -a MacVim'

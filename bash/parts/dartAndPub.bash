@@ -7,7 +7,6 @@ alias dd='pub run dart_dev'
 alias ddAnalyze='pub run dart_dev analyze'
 alias ddTest='pub run dart_dev test'
 alias ddFormat='pub run dart_dev format'
-alias ddGenTestRunner='pub run dart_dev gen-test-runner'
 
 # Runs dart_dev formar, analyze and test
 # Normally removes deprecated member use hints from analyze output, use "-a" to include these hints.
@@ -51,19 +50,6 @@ analyzeNoDeprecated() {
 	return "$analyzeErrorCode"
 }
 
-# Runs a safe clean and full pub get. Good for getting up and going.
-cleanAndGet() { safeClean && libAndAppGet; }
-
-# Runs pub get in root and ./app (if it exists).
-libAndAppGet() {
-	pub get
-
-	if [ -d app ]; then
-		echo "Pub getting in app"
-		(cd app && pub get)
-	fi
-}
-
 # Removes all pub related junk anywhere in the repo (works for repos with an app/ directory as well).
 pubClean() {
 	echo "Removing all .pub directories"
@@ -81,9 +67,6 @@ pubClean() {
 	fi
 }
 
-# Like cleanAGet, but pub specific and probably safer.
-pubCleanAndGet() { pubClean && libAndAppGet; }
-
 # Kills any dart processes. Sometimes they get stuck.
 killDart() { killall -KILL dart; }
 
@@ -91,9 +74,6 @@ killDart() { killall -KILL dart; }
 alias gcoPubspecs='git checkout "*pubspec.lock" "*pubspec.yaml"'
 alias gusPubspecs='git reset "*pubspec.lock" "*pubspec.yaml"'
 alias gaPubspecs='git add "*pubspec.lock" "*pubspec.yaml"'
-
-# quickly add all dart files
-alias gaDart='git add "*.dart"'
 
 # Resets a lot of dart enviroment files and directories to fix build issues.
 dartResetEnv() {

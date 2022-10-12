@@ -81,22 +81,6 @@ installGoimports() {
 	go get -u golang.org/x/tools/cmd/goimports
 }
 
-# remove/install gopherJS, because of caching issues with serve
-removeGopherJSLegacy() {
-	rm -rf "$GOPATH/src/github.com/gopherjs"
-	rm -rf "$GOAPTH/bin/gopherjs"
-}
-installGopherJSLegacy() { go get -u github.com/gopherjs/gopherjs; }
-reinstallGopherJSLegacy() { removeGopherJSLegacy && installGopherJSLegacy; }
-
-# remove/install gopherJS (the more modern goplusjs version), because of caching issues with serve
-removeGopherJS() {
-	rm -rf "$GOPATH/src/github.com/goplusjs"
-	rm -rf "$GOAPTH/bin/gopherjs"
-}
-installGopherJS() { go get -u github.com/goplusjs/gopherjs; }
-reinstallGopherJS() { removeGopherJS && installGopherJS; }
-
 # Can be given to _smartGoRunner to run the command on the changes files rather than directories.
 readonly _runOnFiles="--runOnFiles"
 

@@ -52,7 +52,6 @@ alias gall='git add -A' # add everything
 # git branch
 alias gb='git branch'
 alias gba='git branch -a'
-alias gbt='git branch --track'
 alias gbm='git branch -m'
 alias gbd='git branch -d'
 alias gbD='git branch -D'
@@ -412,24 +411,4 @@ openTicket() {
 	open -a 'google chrome' "https://jira.atl.workiva.net/browse/$ticket"
 }
 
-# returns the remote host for the repo as a url.
-getHostUrl() {
-	remoteHost=$(g remote get-url "$(getOriginRemote)")
-	if [[ -z "$remoteHost" ]]; then
-		echo "No remote found"
-		return 1
-	fi
-
-	echo "Raw remoteHost is '$remoteHost'"
-	if [[ "$remoteHost" == $https* ]]; then
-		echo "remoteHost is web address"
-	fi
-
-	remoteHost=${remoteHost%.git}
-	echo "$remoteHost"
-}
-
-# ssh HOST -G | grep "^hostname"| sed 's/hostname //'
 alias trackingBranch='git rev-parse --abbrev-ref --symbolic-full-name @{u}'
-alias hostCommit='open "$(getHostUrl)/commit/$(gHeadHash)"'
-alias hostBranchTag='open "$(getHostUrl)/tree/$(gBranch)"'
