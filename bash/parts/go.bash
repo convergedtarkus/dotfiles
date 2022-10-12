@@ -46,7 +46,7 @@ goTestFile() {
 	testDir=$(dirname "$filePath")
 
 	# Run the test, any arguments after the first are applied to the test command.
-	go test "$testDir" --run "$testRunRegex" "${@:2}"
+	go test "$testDir" --run "$testRunRegex" "${@:2}" -count=1
 }
 
 # Helper for go test ./... that adds output for test run status.
