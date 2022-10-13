@@ -59,6 +59,8 @@ handleCopyDir() {
 	if find "$copyToDir" -not -path "*/\.*" -mindepth 1 -maxdepth 1 | read -r; then
 		if [[ "$deleteCopyDir" != "true" ]]; then
 			# Ask user if content of copy to directory should be deleted.
+			echo
+			echo
 			echo "Copy target dir ($copyToDir) is not empty, do you want to delete contents?"
 			read -r input_variable
 			if [[ "$input_variable" != "y" ]]; then
@@ -88,19 +90,24 @@ addToImagesToCopy() {
 	esac
 }
 
-findAndCopyScreensavers() {
+findScreensavers() {
 	for f in "$1"/*; do
 		if [[ -f "$f" ]]; then
 			addToImagesToCopy "$f"
 		elif [[ -d "$f" ]]; then
-			findAndCopyScreensavers "$f"
+			if [[ "$f" == "$copyToDir" ]]; then
+				echo "Skipping images in copy to target of '$copyToDir'"
+				continue
+			fi
+			findScreensavers "$f"
 		fi
 	done
 }
 
+findScreensavers "$readRoot"
+
 handleCopyDir
 
-findAndCopyScreensavers "$readRoot"
-
 # Copy all the images in one shot. Faster than one by one.
+echo "Copying ${#imagesToCopy[@]} images to $copyToDir"
 cp -i "${imagesToCopy[@]}" "$copyToDir"
