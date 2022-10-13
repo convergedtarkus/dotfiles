@@ -16,8 +16,16 @@ deleteCopyDir=""
 while [[ -n "$1" ]]; do
 	if [[ -z "$readRoot" ]]; then
 		readRoot=${1%/}
+		if [[ ! -d "$readRoot" ]]; then
+			echo "Read location '$readRoot' is not a directroy, aborting!"
+			exit 2
+		fi
 	elif [[ -z "$copyToDir" ]]; then
 		copyToDir=${1%/}
+		if [[ ! -d "$copyToDir" ]]; then
+			echo "Copy location '$copyToDir' is not a directroy, aborting!"
+			exit 2
+		fi
 	else
 		case "$1" in
 		--delete)
