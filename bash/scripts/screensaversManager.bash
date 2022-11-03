@@ -49,6 +49,16 @@ if [[ -z "$readRoot" || -z "$copyToDir" ]]; then
 	exit 1
 fi
 
+# Convert input directories to absolute paths.
+readRoot=$(
+	cd "$readRoot" || exit
+	pwd
+)
+copyToDir=$(
+	cd "$copyToDir" || exit
+	pwd
+)
+
 # Clean up the target directory.
 handleCopyDir() {
 	if [[ "$deleteCopyDir" == "false" ]]; then
