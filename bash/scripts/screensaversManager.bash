@@ -61,7 +61,7 @@ copyToDir=$(
 
 # Clean up the target directory.
 handleCopyDir() {
-	if [[ "$deleteCopyDir" == "false" ]]; then
+	if [[ "$deleteCopyDir" == "false" || "$readRoot" == "$copyToDir" ]]; then
 		# Do not delete contents of copy to directory.
 		return
 	fi
