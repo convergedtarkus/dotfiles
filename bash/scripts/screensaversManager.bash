@@ -13,6 +13,9 @@ copyToDir=""
 
 deleteCopyDir=""
 
+# Directories to not try and read
+declare -a directoriesToSkip
+
 while [[ -n "$1" ]]; do
 	if [[ -z "$readRoot" ]]; then
 		readRoot=${1%/}
@@ -35,8 +38,17 @@ while [[ -n "$1" ]]; do
 			deleteCopyDir="false"
 			;;
 		*)
-			echo "Unknown argument of '$1'. Aborting"
-			exit 1
+			if [[ ! -d "$1" ]]; then
+				echo "Director to skip '$1' is not a directory, aborting!"
+				exit 2
+			fi
+
+			# Convert directory to skip to absolute paths.
+			dirToSkip=$(
+				cd "$1" || exit
+				pwd
+			)
+			directoriesToSkip+=("$dirToSkip")
 			;;
 		esac
 	fi
@@ -48,6 +60,8 @@ if [[ -z "$readRoot" || -z "$copyToDir" ]]; then
 	echo "Missing readRoot or copyToDir!"
 	exit 1
 fi
+
+echo "There are ${#directoriesToSkip[@]} directories to skip. They are ${directoriesToSkip[*]}"
 
 # Convert input directories to absolute paths.
 readRoot=$(
@@ -109,12 +123,25 @@ findScreensavers() {
 				echo "Skipping images in copy to target of '$copyToDir'"
 				continue
 			fi
-			findScreensavers "$f"
+
+			shouldSkip=""
+			for dirToSkip in "${directoriesToSkip[@]}"; do
+				if [[ "$f" == "$dirToSkip" ]]; then
+					shouldSkip="true"
+					break
+				fi
+			done
+			if [[ -z "$shouldSkip" ]]; then
+				findScreensavers "$f"
+			else
+				echo "Skipping images in directory '$f'"
+			fi
 		fi
 	done
 }
 
 findScreensavers "$readRoot"
+echo "Found ${#imagesToCopy[@]} images."
 
 handleCopyDir
 
