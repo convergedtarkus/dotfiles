@@ -159,6 +159,10 @@ alias gnew='git log HEAD@{1}..HEAD@{0}'
 
 # Quick ways to get the head commit.
 alias gHead='git log -1'
+gHeadRemote() {
+	git log -1 "$(git rev-parse --abbrev-ref --symbolic-full-name @\{u\})"
+}
+
 alias gHeadHash='git rev-parse HEAD'
 
 # Quick way to get the current branch
