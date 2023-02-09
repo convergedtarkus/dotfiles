@@ -169,7 +169,7 @@ alias gHeadHash='git rev-parse HEAD'
 alias gBranch='git rev-parse --abbrev-ref HEAD'
 
 # Clean commands
-alias safeClean='git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode' # will remove ignored files and untracked files (git add anything you want to keep). Keeps IDE files/settings.
+alias safeClean='git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode -e .tool-versions' # will remove ignored files and untracked files (git add anything you want to keep). Keeps IDE files/settings.
 alias testSafeClean='safeClean -n'                                       # safeClean but only list what would be removed (do not delete anything).
 alias gpristine='git reset --hard && safeClean'                          # safeClean + reset to HEAD
 
