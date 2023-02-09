@@ -6,10 +6,6 @@ export HOMEBREW_NO_INSTALL_CLEANUP=1
 # Source the asdf script.
 source /usr/local/opt/asdf/asdf.sh
 
-# For whatever reason, Sophos keeps overwritting permissions for man8, so this quickly reclaims permissions.
-# This command was taken directly from the brew help message.
-alias ownMan8='sudo chown -R $(whoami) /usr/local/share/man/man8'
-
 # Many of these were copied or inspired from bash-it general.aliases.bash and base.plugin.bash
 # reload everything
 alias reload='source ~/.bash_profile'

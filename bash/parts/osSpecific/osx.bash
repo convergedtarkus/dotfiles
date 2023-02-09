@@ -16,4 +16,16 @@ alias hidehidden='defaults write com.apple.finder AppleShowAllFiles FALSE'
 # Strips the ending newline so the command will not auto run when pasted
 getLastCmd() { fc -ln -1 | awk '{$1=$1}1' | tr -d '\n' | pbcopy; }
 
-copyFileName() { realpath "$1" | pbcopy; }
+# Copies the piped in data (echo "blah" | pbcopynonewline) minus the final newline.
+# ALl lowercase for faster and eay tab completion.
+pbcopynonewline() {
+	allData=""
+	while read -r data; do
+		allData+="$data"
+	done
+	echo "$allData" | tr -d '\n' | pbcopy
+}
+
+# Copy the filename given as input.
+# Trim the trailing newline to make sure paste doesn't trigger command line to run or do anything else weird.
+copyFileName() { realpath "$1" | pbcopynonewline; }
