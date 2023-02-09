@@ -15,3 +15,5 @@ alias hidehidden='defaults write com.apple.finder AppleShowAllFiles FALSE'
 # From http://apple.stackexchange.com/questions/110343/copy-last-command-in-terminal
 # Strips the ending newline so the command will not auto run when pasted
 getLastCmd() { fc -ln -1 | awk '{$1=$1}1' | tr -d '\n' | pbcopy; }
+
+copyFileName() { realpath "$1" | pbcopy; }
