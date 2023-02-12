@@ -67,9 +67,10 @@ gcoClean() { git checkout ${*:+$*} && git clean -fd ${*:+$*}; }
 # Will accept (git checkout --ours) files that have conflicts and are auto-generated.
 # The assumption is that these files will get regenerated/updated by dependency systems and so on, so no need to hand edit/resolve.
 gResolveGenConflicts() {
-	generatedFiles=("*go.sum" "*vendor/modules.txt")
-	git checkout --ours "${generatedFiles[@]}"
-	git add "${generatedFiles[@]}"
+	generatedFiles=$(git ls-files "*go.sum" "*vendor/modules.txt" "*vendor/sums.hashdeep" | uniq)
+	# TODO Appears to work but I'm worried about not quoting these...
+	git checkout --ours -- $generatedFiles
+	git add -- $generatedFiles
 }
 
 # git commit
