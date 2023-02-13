@@ -356,8 +356,9 @@ highlightChangedFiles() {
 
 # Clone a repo using my personal ssh key setup.
 # How to setup (from https://gist.github.com/jexchan/2351996/)
-#  1. Make a new ssh key `ssh-keygen -t rsa -b 4096 -C <EMAIL>`
-#     - Save it to ~/.ssh/id_rsa_personal
+#  1. Make a new ssh key `ssh-keygen -t ed25519 -C <EMAIL>` (must be real email)
+#     - See https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account#adding-a-new-ssh-key-to-your-account for latest instructions.
+#     - Save it to .ssh/id_rsa_personal (must be in home directory)
 #  2. Add it to github (or other host) `pbcopy < ~/.ssh/id_rsa_personal.pub`
 #  3. Add this to ~/.ssh/config
 #     # Personal account
