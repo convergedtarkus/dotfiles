@@ -40,5 +40,14 @@ Edit a tracked file and then use the `myconfig` alias to commit and push. If you
 6. cd to root
 7. Commit the .bash-it folder
 
+# Common Issues/Gotcha
+## Auth issues with submodules
+- If you are me and use the kind of setup from clonePersonalRepo in bash/parts/git.bash, you'll need to change all the 'git@github.com' urls to be 'git@github.com-personal'.
+
+## Bash-It Not Loading Personal Files
+- Add a symlink under .bash-it/enabled/ to .bash-it/aliases/available/personal.bash and name it '150--personal.bash'.
+  - This is how bash-it enables things and will enable loading the personal.bash file.
+
+
 # License
 This project uses the https://unlicense.org license. Basically no copyright, you can copy, modify, use, sell etc any code here without giving me credit (though if this is helpful to you, I'd love a shout out!). I give no warranty of any kind on this code.
