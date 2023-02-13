@@ -3,6 +3,12 @@
 # Do not run homebrew clean up automatically. This will prevent old versions from being uninstalled.
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
+if [[ -d /opt/homebrew ]]; then
+	# Add homebrew to path.
+	# But homebrew first so that brew installed stuff takes priority over built versions.
+	export PATH="/opt/homebrew/bin:$PATH"
+fi
+
 # Source the asdf script.
 if [[ -f /usr/local/opt/asdf/asdf.sh ]]; then
 	source /usr/local/opt/asdf/asdf.sh
