@@ -4,7 +4,9 @@
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 # Source the asdf script.
-source /usr/local/opt/asdf/asdf.sh
+if [[ -f /usr/local/opt/asdf/asdf.sh ]]; then
+	source /usr/local/opt/asdf/asdf.sh
+fi
 
 # Many of these were copied or inspired from bash-it general.aliases.bash and base.plugin.bash
 # reload everything
