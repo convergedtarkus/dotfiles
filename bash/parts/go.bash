@@ -67,7 +67,7 @@ _goTestAll() {
 # install golangci-lint (https://github.com/golangci/golangci-lint)
 installGolangCiLint() {
 	if [[ -z "$1" ]]; then
-		version="v1.49.0"
+		version="v1.51.1"
 	else
 		version="$1"
 	fi
