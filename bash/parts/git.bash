@@ -170,6 +170,7 @@ gHeadRemote() {
 }
 
 alias gHeadHash='git rev-parse HEAD'
+alias gDiffHead='git diff --stat HEAD~' # Shows the changed files from the last commit.
 
 # Quick way to get the current branch
 alias gBranch='git rev-parse --abbrev-ref HEAD'

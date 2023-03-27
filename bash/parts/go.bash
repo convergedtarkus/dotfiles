@@ -10,6 +10,10 @@ useGoVersion() {
 	fi
 }
 
+# Alias for easily generating or removing vendor folder.
+alias gmv='go mod vendor'
+alias gmvr='rm -rf ./vendor'
+
 # clear go test cache
 alias goClearTestCache='go clean -testcache'
 

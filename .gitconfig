@@ -4,5 +4,6 @@
 [core]
 	excludesfile = ~/.gitignore_global
 	pager = less -FRX # Disables using less (or alike) for git command output. This behavior changed in git 2.16. See https://stackoverflow.com/a/49862151 for details.
+	editor = vim
 [pull]
 	rebase = false
