@@ -134,6 +134,12 @@ gUndoLastCommit() {
 	echo
 	git reset --soft HEAD~ && git reset
 }
+
+gUndoBranchCommits() {
+	echo "Undoing all commits to branch"
+	echo
+	git reset --soft $(mainBase) && git reset
+}
 alias gRevertLastCommit='git reset --hard HEAD~'    # Will delete the last commit made to the branch.
 alias gResetToRemote='gfc && git reset --hard @{u}' # Fetches this branch and then resets to the head of the remote.
 
@@ -170,6 +176,16 @@ gHeadRemote() {
 }
 
 alias gHeadHash='git rev-parse HEAD'
+gHeadHashCopy() {
+	headHash=$(gHeadHash)
+
+	echo "Head hash is '$headHash'. Copying to clipboard"
+	if command -v pbcopynonewline >/dev/null; then
+		echo "$headHash" | pbcopynonewline
+	else
+		echo "$headHash" | pbcopy
+	fi
+}
 alias gDiffHead='git diff --stat HEAD~' # Shows the changed files from the last commit.
 
 # Quick way to get the current branch
