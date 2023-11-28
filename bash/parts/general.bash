@@ -9,6 +9,11 @@ if [[ -d /opt/homebrew ]]; then
 	export PATH="/opt/homebrew/bin:$PATH"
 fi
 
+if [[ -d /opt/homebrew/opt/imagemagick@6/bin ]]; then
+	# Add imagemagick to path, if it exists.
+	export PATH="/opt/homebrew/opt/imagemagick@6/bin:$PATH"
+fi
+
 # Source the asdf script.
 if [[ -f /usr/local/opt/asdf/asdf.sh ]]; then
 	source /usr/local/opt/asdf/asdf.sh
