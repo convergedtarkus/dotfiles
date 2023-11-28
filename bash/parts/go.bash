@@ -23,6 +23,8 @@ alias goTestQuiet='go test -count=1'
 alias goTest='go test -count=1 -v'
 # run all go tests. Uses -count=1 to bust all go test caches so all tests are run from scratch even if no changes have been made.
 alias goTestAll='_goTestAll -count=1'
+# Uses go test to build all the go tests but not run them. Helpful for finding compile errors without seeing test failure noise.
+alias goTestBuildOnly='go test ./... -run="^$"'
 # run all go tests without any caching busting.
 alias goTestAllCache='_goTestAll'
 
