@@ -21,7 +21,22 @@ if [[ ! -f "$MYDOTFILES/bash/scripts/parseTicket.bash" ]]; then
 	exit 0
 fi
 
+# Branch name finding is a copy of gBranch from my dotfiles.
+# Get the current branch name.
 branchName=$(git rev-parse --abbrev-ref HEAD)
+
+if [[ "$branchName" == "HEAD" ]]; then
+	# During a rebase, a different approach is needed to get the branch name.
+	# Taken from https://stackoverflow.com/a/59115583.
+	for location in rebase-merge rebase-apply; do
+		path=$(git rev-parse --git-path ${location})
+		if test -d ${path}; then
+			revision=$(<${path}/head-name)
+			branchName=${revision##refs/heads/}
+		fi
+	done
+fi
+
 parsedTicket=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$branchName")
 if [[ -n "$parsedTicket" ]]; then
 	if [[ "$COMMIT_SOURCE" == "message" ]]; then

@@ -197,7 +197,28 @@ gHeadHashCopy() {
 alias gDiffHead='git diff --stat HEAD~' # Shows the changed files from the last commit.
 
 # Quick way to get the current branch
-alias gBranch='git rev-parse --abbrev-ref HEAD'
+# A copy of this is used in my prepare-commit-msg git hook script.
+gBranch() {
+	# Get the current branch name.
+	result=$(git rev-parse --abbrev-ref HEAD)
+	if [[ "$result" != "HEAD" ]]; then
+		echo "$result"
+		return 0
+	fi
+
+	# During a rebase, a different approach is needed to get the branch name.
+	# Taken from https://stackoverflow.com/a/59115583.
+	for location in rebase-merge rebase-apply; do
+		path=$(git rev-parse --git-path ${location})
+		if test -d ${path}; then
+			revision=$(<${path}/head-name)
+			echo ${revision##refs/heads/}
+			return 0
+		fi
+	done
+
+	echo "$result"
+}
 
 # Clean commands
 alias safeClean='git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode -e .tool-versions' # will remove ignored files and untracked files (git add anything you want to keep). Keeps IDE files/settings.
