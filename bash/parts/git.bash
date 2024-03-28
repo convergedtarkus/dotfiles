@@ -138,7 +138,7 @@ alias gsts='git stash save'
 alias gus='git reset'
 gUndoLastCommit() {
 	echo "Undoing the last commit"
-	git log -1 --pretty=short
+	git log -1
 	echo
 	git reset --soft HEAD~ && git reset
 }
