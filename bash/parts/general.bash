@@ -16,9 +16,16 @@ fi
 
 # Source the asdf script.
 if [[ -f /usr/local/opt/asdf/asdf.sh ]]; then
+	# shellcheck source=/dev/null
 	source /usr/local/opt/asdf/asdf.sh
 elif [[ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]]; then
+	# shellcheck source=/dev/null
 	source /opt/homebrew/opt/asdf/libexec/asdf.sh
+fi
+
+# Enable completions for github CLI
+if command -v gh >/dev/null; then
+	eval "$(gh completion -s bash)"
 fi
 
 # Many of these were copied or inspired from bash-it general.aliases.bash and base.plugin.bash
@@ -56,15 +63,6 @@ touchFiles() {
 # Takes piped in input and echos to stdout and copies to clipboard
 copyEcho() {
 	tee /dev/tty | pbcopy
-}
-
-# Runs a given command in bash with the x flag for debug output.
-# This does not work if the command is a script (or calls one). Use
-# bash -x path/to/script in that case.
-debugBash() {
-	set -x
-	eval "$@"
-	set +x
 }
 
 checkScript() {
