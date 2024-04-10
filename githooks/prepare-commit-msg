@@ -30,11 +30,18 @@ if [[ "$branchName" == "HEAD" ]]; then
 	# Taken from https://stackoverflow.com/a/59115583.
 	for location in rebase-merge rebase-apply; do
 		path=$(git rev-parse --git-path ${location})
-		if test -d ${path}; then
-			revision=$(<${path}/head-name)
+		if test -d "${path}"; then
+			revision=$(<"${path}"/head-name)
 			branchName=${revision##refs/heads/}
 		fi
 	done
+fi
+
+# Check if there is already a ticket in the commit message to avoid adding another one.
+ticketLine=$(grep -v '^#\|^$' "$COMMIT_MSG_FILE" | tail -n 1)
+existingTicket=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$ticketLine")
+if [[ -n "$existingTicket" ]]; then
+	exit 0
 fi
 
 parsedTicket=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$branchName")
