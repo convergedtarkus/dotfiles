@@ -421,6 +421,11 @@ highlightChangedFiles() {
 #  4. Clone repos using this command to clone with personal credentials.
 # Takes in a single parameter, the repo to clone `user/repo`.
 clonePersonalRepo() {
+	if [[ -z "$1" || $1 != *"/"* ]]; then
+		echo "First argument must be user/repo"
+		return 1
+	fi
+
 	if ! git clone "git@github.com-personal:$1.git"; then
 		echo "Clone failed!"
 		return 2
