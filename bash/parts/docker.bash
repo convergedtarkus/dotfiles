@@ -86,3 +86,15 @@ nukeDocker() {
 	echo
 	printf "\033[1;32mFinished nuking!\033[0m\n"
 }
+
+dockerUsedSpace() {
+	dockerDir="$HOME/Library/Containers/com.docker.docker/Data/vms/0/data/"
+	if [[ ! -d "$dockerDir" ]]; then
+		echo "Cannot find docker file at $dockerDir"
+		return
+	fi
+
+	fileSize=$(du -sh "${dockerDir}/Docker.raw" | cut -f 1 | xargs)
+
+	echo "Docker is using $fileSize"
+}
