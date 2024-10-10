@@ -2,6 +2,8 @@
 
 # Commands to kill, start and restart (kill + start) docker. Helps clean up memory.
 killDocker() {
+	dockerUsedSpace
+
 	if [[ $(pgrep -x Docker) ]]; then
 		killall Docker
 	fi
@@ -9,7 +11,12 @@ killDocker() {
 		killall Docker\ Desktop
 	fi
 }
-startDocker() { open -g -a Docker; } # -g will not focus Docker when it starts.
+
+startDocker() {
+	dockerUsedSpace
+	open -g -a Docker # -g will not focus Docker when it starts.
+}
+
 restartDocker() {
 	if killDocker >/dev/null 2>&1; then
 		echo "Docker was killed"
@@ -87,14 +94,33 @@ nukeDocker() {
 	printf "\033[1;32mFinished nuking!\033[0m\n"
 }
 
+# Prints the amount of used and available space for docker.
+# Warns if the used space is over 75%.
 dockerUsedSpace() {
 	dockerDir="$HOME/Library/Containers/com.docker.docker/Data/vms/0/data/"
-	if [[ ! -d "$dockerDir" ]]; then
+	if [[ ! -d "$dockerDir" || ! -f "$dockerDir/Docker.raw" ]]; then
 		echo "Cannot find docker file at $dockerDir"
 		return
 	fi
 
-	fileSize=$(du -sh "${dockerDir}/Docker.raw" | cut -f 1 | xargs)
+	# Get file size in Kb to calculate percent and trim trailing zeros.
+	fileSizeKB=$(du -k "${dockerDir}/Docker.raw" | cut -f 1 | xargs)
+	maxFileSizeKB=$(du -A -k "${dockerDir}/Docker.raw" | cut -f 1 | xargs)
+	percent=$(bc <<<"scale=3; ($fileSizeKB/$maxFileSizeKB)*100")
 
-	echo "Docker is using $fileSize"
+	if [ "$(bc <<<"${percent}>=75")" -ne 0 ]; then
+		spaceOk=false
+	fi
+
+	percent=$(printf "%.1f" "$percent")
+
+	# Get human readable sizes.
+	fileSizeHuman=$(du -sh "${dockerDir}/Docker.raw" | cut -f 1 | xargs)
+	maxFileSizeHuman=$(du -A -sh "${dockerDir}/Docker.raw" | cut -f 1 | xargs)
+
+	echo "Docker is using $fileSizeHuman out of $maxFileSizeHuman max (${percent}%)"
+
+	if [[ $spaceOk == "false" ]]; then
+		printf "\033[0;31mDocker has exceeded safe used space. This may cause build failures!\033[0,\n"
+	fi
 }
