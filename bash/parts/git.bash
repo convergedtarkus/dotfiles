@@ -129,7 +129,7 @@ alias glumri='glum --rebase=interactive'
 # git stash
 alias gst='git stash'
 alias gstd='git stash drop'
-alias gstl='git stash list'
+alias gstl='git stash list --date=local'
 alias gsta='git stash apply'
 alias gstp='git stash pop'
 alias gsts='git stash save'
