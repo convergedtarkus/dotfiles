@@ -56,6 +56,7 @@ alias gbm='git branch -m'
 alias gbd='git branch -d'
 alias gbD='git branch -D'
 alias gbDPrev='git branch -D @{-1}' # Delete the previous branch you were on.
+alias deleteMergedBranches='$MYDOTFILES/bash/scripts/deleteMergedBranches.sh'
 
 # git checkout
 alias gco='git checkout'
