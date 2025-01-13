@@ -47,6 +47,8 @@ Edit a tracked file and then use the `myconfig` alias to commit and push. If you
 ## Bash-It Not Loading Personal Files
 - Add a symlink under .bash-it/enabled/ to .bash-it/aliases/available/personal.bash and name it '150--personal.bash'.
   - This is how bash-it enables things and will enable loading the personal.bash file.
+  - `ln -s $HOME/.bash-it/aliases/available/personal.bash $HOME/.bash-it/enabled/150--personal.bash`
+    - The `$HOME` is very important as the symlink does not get created correctly otherwise.
 
 
 # License
