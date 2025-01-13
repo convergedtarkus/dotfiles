@@ -5,7 +5,7 @@
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 export MYDOTFILES="$scriptDir"
 
-if [ -d "$HOME/.bash-it" ]; then
+if [ -d "$HOME/.bash-it" -a -f "$HOME/.bash-it/bash_it.sh" ]; then
 	# Path to the bash it configuration
 	export BASH_IT="$HOME/.bash-it"
 
