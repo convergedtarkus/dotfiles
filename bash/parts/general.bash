@@ -4,9 +4,14 @@
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 if [[ -d /opt/homebrew ]]; then
+	# Eval this to get brew environment variables and completions working.
+	# From https://apple.stackexchange.com/a/413207
+	# Must be before adding homebrew bin/sbin as once those are added, this command will output nothing.
+	eval $(/opt/homebrew/bin/brew shellenv)
+
 	# Add homebrew to path.
 	# But homebrew first so that brew installed stuff takes priority over built versions.
-	export PATH="/opt/homebrew/bin:$PATH"
+	export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 fi
 
 if [[ -d /opt/homebrew/opt/imagemagick@6/bin ]]; then
@@ -27,6 +32,9 @@ fi
 if command -v gh >/dev/null; then
 	eval "$(gh completion -s bash)"
 fi
+
+# Stop direnv from logging when starting a terminal, changing directories etc.
+export DIRENV_LOG_FORMAT=""
 
 # Many of these were copied or inspired from bash-it general.aliases.bash and base.plugin.bash
 # reload everything

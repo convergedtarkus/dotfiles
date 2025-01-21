@@ -88,7 +88,7 @@ installGoimports() {
 }
 
 # Can be given to _smartGoRunner to run the command on the changes files rather than directories.
-readonly _runOnFiles="--runOnFiles"
+_runOnFiles="--runOnFiles"
 
 # Identies all directories with changed go files and runs the given command ($1) in all those directories
 # passed in command must be able to run with a single in the form `command $directory $anotherDirectroy $etc`
