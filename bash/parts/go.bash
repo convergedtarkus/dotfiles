@@ -34,8 +34,15 @@ goTestFile() {
 	# The whole path to the file './blah/blah/file.go'
 	filePath="$1"
 
+	# Make sure an argument is provided.
 	if [[ -z "$filePath" ]]; then
-		printf "\033[33mMust provide an input file!\033[0m\n"
+		printf "\033[33mFirst argument must be provided and be the path to the file!\033[0m\n"
+		return 1
+	fi
+
+	# Make sure the file exists.
+	if [[ ! -f "$filePath" ]]; then
+		printf "\033[33mFirst argument does not point to a file!\033[0m\n"
 		return 1
 	fi
 
@@ -51,8 +58,22 @@ goTestFile() {
 	# Get just the directory path ('./blah/blah')
 	testDir=$(dirname "$filePath")
 
-	# Run the test, any arguments after the first are applied to the test command.
-	go test "$testDir" --run "$testRunRegex" "${@:2}" -count=1
+	# Get the rest of the input arguments and check if -count is set. If not,
+	# add a -count=1 argument to bust test caches.
+	inputArgs=("${@:2}")
+	for i in "${inputArgs[@]}"; do
+		if [[ "$i" == "-count"* ]]; then
+			hasCount="true"
+		fi
+	done
+
+	# No -count argument provided, add it.
+	if [[ -z "$hasCount" ]]; then
+		inputArgs=("${inputArgs[@]}" "-count=1")
+	fi
+
+	# Run the test.
+	go test "$testDir" --run "$testRunRegex" "${inputArgs[@]}"
 }
 
 # Helper for go test ./... that adds output for test run status.
