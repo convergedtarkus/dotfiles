@@ -28,6 +28,12 @@ elif [[ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]]; then
 	source /opt/homebrew/opt/asdf/libexec/asdf.sh
 fi
 
+# Helpers for using direnv with asdf.
+# setLocalVersion golang 1.19.13 would set this directory to always be 1.19.13
+# setTempVersion golang 1.19.13 would set the shell to golang 1.19.13 until reset.
+alias setLocalVersion='asdf direnv local'
+alias setTempVersion='asdf direnv shell'
+
 # Enable completions for github CLI
 if command -v gh >/dev/null; then
 	eval "$(gh completion -s bash)"
