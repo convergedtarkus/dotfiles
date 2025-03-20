@@ -372,3 +372,5 @@ restoreVendorDir() {
 	if [ ! -d ./vendor_bak ]; then return; fi
 	mv ./vendor_bak ./vendor
 }
+
+alias gResetVendor='git checkout ./vendor go.mod go.sum'
