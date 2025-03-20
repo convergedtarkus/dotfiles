@@ -26,6 +26,7 @@ source "$MYDOTFILES/bash/parts/dartAndPub.bash"
 # Golang
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/go.bash"
+source "$MYDOTFILES/bash/completions/go_completion.bash"
 
 # No support for linux yet, should at least not source this if on linux
 # shellcheck source=/dev/null
