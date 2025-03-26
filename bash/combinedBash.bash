@@ -33,6 +33,7 @@ source "$MYDOTFILES/bash/completions/go_completion.bash"
 source "$MYDOTFILES/bash/parts/osSpecific/osx.bash"
 
 # Find any custom files under ./custom (other than .keep) and source them
+# This allows loading external files depending on the local machine.
 if [[ -d "$MYDOTFILES/custom" ]]; then
 	for file in "$MYDOTFILES"/custom/*; do
 		if [[ -e "$file" ]]; then
