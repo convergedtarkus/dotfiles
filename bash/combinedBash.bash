@@ -22,6 +22,7 @@ source "$MYDOTFILES/bash/parts/git.bash"
 # Dartlang and pub
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/dartAndPub.bash"
+source "$MYDOTFILES/bash/completions/dartAndPub_completion.bash"
 
 # Golang
 # shellcheck source=/dev/null
