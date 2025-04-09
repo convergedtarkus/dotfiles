@@ -13,27 +13,41 @@ fi
 
 # Verify the current branch is main and fetch it.
 if [[ -z "$mainName" ]]; then
-	echo "Could not find main/master branch, aborting."
+	echo "Could not find main branch, aborting."
 	exit 1
 else
 	currentBranch=$(git rev-parse --abbrev-ref HEAD)
 	if [[ "$mainName" != "$currentBranch" ]]; then
-		echo "This script only works when on the main/master branch"
-		exit 1
+		echo -e "\033[0;33mScript is being run while not on the main branch. This works but will not delete the current branch if it is merged.\033[0m"
 	fi
 
-	echo "Fetching $mainName"
-	git fetch 2>/dev/null || (echo "Fetch failed" && exit 1)
+	mainName=$(git rev-parse --symbolic-full-name --abbrev-ref ${mainName}"@{upstream}")
+	remoteName=$(echo "$mainName" | cut -d "/" -f 1)
+	mainBranchMain=$(echo "$mainName" | cut -d "/" -f 2-)
 
-	mainName=$(git rev-parse --symbolic-full-name --abbrev-ref "@{upstream}")
+	echo "Fetching $remoteName $mainBranchMain"
+	git fetch "$remoteName" "$mainBranchMain" 2>/dev/null || {
+		echo -e "\033[0;31mFetch failed\033[0m"
+		exit 1
+	}
 fi
 
 # From https://stackoverflow.com/a/6127884
 # Gets all branches that are merged excluding the current, other worktrees and master/main/dev
-mergedBranches=$(git branch --merged "$mainName" | grep -Ev "(^\*|^\+|master|main|dev)")
+mergedBranches=$(git branch --merged "$mainName" | grep -Ev "(^\+|master|main|dev)")
 
-# Trim leading and triling white space from https://unix.stackexchange.com/a/205854
+if [[ "$mergedBranches" == *"$currentBranch"* ]]; then
+	echo -e "\033[0;33mThe branch you are currently on, $currentBranch, is merged into $mainName. It will not be deleted.\033[0m"
+	mergedBranches=$(echo "$mergedBranches" | grep -Ev "($currentBranch)")
+fi
+
+# Trim leading and trailing white space from https://unix.stackexchange.com/a/205854
 mergedBranches=$(echo "$mergedBranches" | awk '{$1=$1};1')
+
+if [[ "$mergedBranches" == "" ]]; then
+	echo "No branches to delete"
+	exit 0
+fi
 
 echo
 echo "Branches to delete:"
