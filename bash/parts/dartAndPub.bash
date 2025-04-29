@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
 # Simple alias for running dart_dev
-alias dd='dart pub run dart_dev'
+alias dd='dart run dart_dev'
 
 # Quick aliases for various dart_dev tasks
-alias ddAnalyze='dart pub run dart_dev analyze'
-alias ddTest='dart pub run dart_dev test'
-alias ddFormat='dart pub run dart_dev format'
+alias ddAnalyze='dart run dart_dev analyze'
+alias ddTest='dart run dart_dev test'
+alias ddFormat='dart run dart_dev format'
+alias pub='dart pub'
 
 # Runs dart_dev formar, analyze and test
 # Normally removes deprecated member use hints from analyze output, use "-a" to include these hints.
