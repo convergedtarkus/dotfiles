@@ -29,3 +29,9 @@ pbcopynonewline() {
 # Copy the filename given as input.
 # Trim the trailing newline to make sure paste doesn't trigger command line to run or do anything else weird.
 copyFileName() { realpath "$1" | pbcopynonewline; }
+
+# This was a suggestion from Reddit to fix cases where dictation appears to no longer work on Mac.
+# This appears to happen more often when switching between microphones or using an external microphone.
+fixDictation() {
+	killall corespeechd
+}
