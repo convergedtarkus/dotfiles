@@ -221,6 +221,9 @@ gBranch() {
 	echo "$result"
 }
 
+# Opens the current branch in a browser using the github command line tool.
+alias openBranch='gh browse -b $(gBranch )'
+
 # Clean commands
 alias safeClean='git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode -e .tool-versions' # will remove ignored files and untracked files (git add anything you want to keep). Keeps IDE files/settings.
 alias testSafeClean='safeClean -n'                                                         # safeClean but only list what would be removed (do not delete anything).

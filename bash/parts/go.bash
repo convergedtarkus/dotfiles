@@ -382,4 +382,6 @@ restoreVendorDir() {
 	mv ./vendor_bak ./vendor
 }
 
-alias gResetVendor='git checkout ./vendor go.mod go.sum'
+# This handles repos with nested vendor directories.
+# The find command is designed to skip hidden directories which greatly improves speed.
+alias gResetVendor='find . -type d \( -path "*/.*" \) -prune -o -type d -name vendor -prune -print0 -o -type f \( -name go.mod -o -name go.sum \) -print0 | xargs -0 git checkout --'
