@@ -3,11 +3,11 @@
 # Do not run homebrew clean up automatically. This will prevent old versions from being uninstalled.
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-if [[ -d /opt/homebrew ]]; then
+if [[ -f /opt/homebrew/bin/brew ]]; then
 	# Eval this to get brew environment variables and completions working.
 	# From https://apple.stackexchange.com/a/413207
 	# Must be before adding homebrew bin/sbin as once those are added, this command will output nothing.
-	eval $(/opt/homebrew/bin/brew shellenv)
+	eval "$(/opt/homebrew/bin/brew shellenv)"
 
 	# Add homebrew to path.
 	# But homebrew first so that brew installed stuff takes priority over built versions.
