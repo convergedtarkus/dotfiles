@@ -46,7 +46,7 @@ _getOriginRemotePreHook() { :; }
 alias g='git'
 
 # git add
-alias ga='git add'
+alias ga='git add -v'   # The -v will print what is added, helpful when using wildcards
 alias gall='git add -A' # add everything
 
 # git branch
