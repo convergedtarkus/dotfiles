@@ -12,6 +12,8 @@ useGoVersion() {
 
 # Source the asdf golang script
 if [[ -d ${ASDF_DATA_DIR:-$HOME/.asdf} ]]; then
+	# I don't own this script, so tell shellcheck to ignore it.
+	# shellcheck source=/dev/null
 	. "${ASDF_DATA_DIR:-$HOME/.asdf}"/plugins/golang/set-env.bash
 fi
 
@@ -214,50 +216,6 @@ smartGoImports() { _smartGoRunner "$_runOnFiles" goImports; }
 # Passes all arguments along, use -n for only new issues.
 smartGoCiLint() { _smartGoRunner "goCiLint ${*:+ $*}"; }
 
-smartGoCiLintFiles() {
-	echo "#### Limiting results to changed files only."
-	rawChangedFiles=$(git diff HEAD --name-only)
-
-	# Turn the changed files into one big or regex.
-	changedFiles=""
-	while read -r line; do
-		changedFiles+="$line:|"
-	done <<<"$rawChangedFiles"
-	# Trim off the last '|' to make the regex valid.
-	changedFiles="${changedFiles::-1}"
-
-	# 0 = no match yet
-	# 1 = found a match
-	matchState="0"
-
-	while read -r outputLine; do
-		# _smartGoRunner uses this pattern for comments and logging, so don't filter it out.
-		if [[ "$outputLine" == '####'* ]]; then
-			echo "$outputLine"
-			continue
-		fi
-
-		if [[ "$matchState" -eq "1" ]]; then
-			# Look for a line starting with a control character and [1m which matches the
-			# color formatting golangci-lint uses when printing a lint match.
-			if echo "$outputLine" | grep -q '^[[:cntrl:]]\[1m'; then
-				matchState="0"
-			else
-				# Otherwise echo the line as it relates to a changed file (or is sometype
-				# of important log/error).
-				echo "$outputLine"
-				continue
-			fi
-		fi
-
-		# Match a line that contains any of the currently changed files.
-		if echo "$outputLine" | grep -qE "$changedFiles"; then
-			echo "$outputLine"
-			matchState="1"
-		fi
-	done <<<$(_smartGoRunner "goCiLint --color=always $*")
-}
-
 # Identifies all directories with changed go files and runs `go test` in all those directories
 smartGoTest() { _smartGoRunner "go test${*:+ $*}"; }
 
@@ -319,32 +277,32 @@ goCiLint() {
 
 # runs `gofmt -w` in the given directory. If no input, assume the current ('.') directory
 goFormat() {
-	input=$*
-	if [[ -z "$input" ]]; then
-		input="."
+	input=("$@")
+	if [[ ${#input[@]} -eq 0 ]]; then
+		input=(".")
 	fi
 
-	gofmt -w $input
+	gofmt -w "${input[@]}"
 }
 
 # runs `goimports -w` in the given directory. If no input, assume the current ('.') directory
 goImports() {
-	input=$*
-	if [[ -z "$input" ]]; then
-		input="."
+	input=("$@")
+	if [[ ${#input[@]} -eq 0 ]]; then
+		input=(".")
 	fi
 
-	goimports -w $input
+	goimports -w "${input[@]}"
 }
 
 # runs `golint` in the given directory. If no input, assume the current ('.') directory
 goLint() {
-	input=$*
-	if [[ $input == "" ]]; then
-		input="."
+	input=("$@")
+	if [[ ${#input[@]} -eq 0 ]]; then
+		input=(".")
 	fi
 
-	golint $input
+	golint "${input[@]}"
 }
 
 # populate these two variables with options for paths to not delete when running cleanGoPath. These will be given to a find command.
