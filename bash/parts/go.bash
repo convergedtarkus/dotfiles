@@ -120,7 +120,7 @@ installGoimports() {
 # Can be given to _smartGoRunner to run the command on the changes files rather than directories.
 _runOnFiles="--runOnFiles"
 
-# Identies all directories with changed go files and runs the given command ($1) in all those directories
+# Identifies all directories with changed go files and runs the given command ($1) in all those directories
 # passed in command must be able to run with a single in the form `command $directory $anotherDirectroy $etc`
 # In addition, _runOnFiles can be given as the first argument to this function to run the given command (which is
 # the second argument) on all changed files rather than directories.
@@ -141,56 +141,78 @@ _smartGoRunner() {
 	# Print changed files, no deleted files, .go files only regardless of index or working tree.
 	# The --relative flag returns paths relative to the current path, allowing running in sub-directories.
 	# Use grep to remove any entries from the vendor directory as these should never be touched.
-	changedFiles=$(git diff HEAD --relative --name-only --diff-filter=d -- '*.go' | grep -v '^vendor/')
-	if [[ "$changedFiles" == "" ]]; then
+	# Add './' to the start of each line as go test (and others) require it.
+	# This also allows for correct handling of test files at the current directory level.
+	mapfile -t changedFiles < <(git diff HEAD --relative --name-only --diff-filter=d -- '*.go' | grep -v '^vendor/' | sed 's|^|./|')
+	if [[ "${changedFiles[*]}" == "" ]]; then
 		echo "No changed files found, aborting"
 		return 0
 	fi
 
-	# Add './' to the start of each line as go test (and others) require it.
-	# This also allows for correct handling of test files at the current directroy level.
-	# shellcheck disable=SC2001
-	# As far as I know, bash cannot handle this correctly, so use sed.
-	changedFiles=$(echo "$changedFiles" | sed 's|^|./|')
+	# For each changed file, find its module root
+	declare -A files_by_mod
 
-	commandToRun=""
-	commandInput=""
-	if [[ "$1" == "$_runOnFiles" ]]; then
-		commandToRun=$2
+	if [[ "$1" != "$_runOnFiles" ]]; then
+		# Get all go.mod directories as these command will be run per module.
+		mapfile -t mod_dirs < <(find . -name go.mod -print0 | xargs -0 -n1 dirname | awk -F'/' '{print NF-1, $0}' | sort -nr | cut -d' ' -f2-)
 
-		# Put all the directories on a single line (separated by a space).
-		commandInput="$changedFiles"
+		for file in "${changedFiles[@]}"; do
+			for mod_dir in "${mod_dirs[@]}"; do
+				if [[ "$file" == "$mod_dir"* ]]; then
+					file="./${file#"$mod_dir"/}"
+					files_by_mod["$mod_dir"]+="$file"$'\n'
+					break
+				fi
+			done
+		done
 	else
-		commandToRun=$1
-
-		# Remove the final trailing /file.go to get only directories.
-		# https://unix.stackexchange.com/questions/217628/cut-string-on-last-delimiter
-		# echo, reverse it, get 2nd and beyond fields, reverse again
-		# using `dirname` might be better, but that requires looping over lines
-		endingsRemoved=$(echo "$changedFiles" | rev | cut -d'/' -f2- | rev)
-
-		# Get a list of all the unique directories to use as the command input.
-		commandInput=$(echo "$endingsRemoved" | sort | uniq)
+		# For running on files, just put all the changed files under the current directory (.)
+		files_by_mod["."]=${changedFiles[*]}
 	fi
 
-	# Put all the directories on a single line (separated by a space).
-	commandInput=$(echo "$commandInput" | tr '\n' ' ')
+	# Run the commands based on module structure.
+	for mod_dir in "${!files_by_mod[@]}"; do
+		moduleFiles="${files_by_mod[$mod_dir]}"
 
-	echo "####"
-	echo "#### Running $commandToRun $commandInput"
-	echo "####"
-	eval "$commandToRun" "$commandInput"
+		commandToRun=""
+		commandInput=""
+		if [[ "$1" == "$_runOnFiles" ]]; then
+			commandToRun=$2
+
+			# Put all the directories on a single line (separated by a space).
+			commandInput="$moduleFiles"
+		else
+			commandToRun=$1
+
+			# Remove the final trailing /file.go to get only directories.
+			# https://unix.stackexchange.com/questions/217628/cut-string-on-last-delimiter
+			# echo, reverse it, get 2nd and beyond fields, reverse again
+			# using `dirname` might be better, but that requires looping over lines
+			endingsRemoved=$(echo "$moduleFiles" | rev | cut -d'/' -f2- | rev)
+
+			# Get a list of all the unique directories to use as the command input.
+			commandInput=$(echo "$endingsRemoved" | sort | uniq)
+		fi
+
+		# Put all the directories on a single line (separated by a space).
+		commandInput=$(echo "$commandInput" | tr '\n' ' ')
+
+		echo "####"
+		echo "#### Running in module '$mod_dir' '$commandToRun $commandInput'"
+		echo "####"
+		eval "(cd $mod_dir && $commandToRun $commandInput)"
+	done
 }
 
-# Identies all directories with changed go files and runs `goFormat` in all those directories
+# Identifies all directories with changed go files and runs `goFormat` in all those directories
 smartGoFormat() { _smartGoRunner "$_runOnFiles" goFormat; }
 
-# Identies all directories with changed go files and runs `goImports` in all those directories
+# Identifies all directories with changed go files and runs `goImports` in all those directories
 smartGoImports() { _smartGoRunner "$_runOnFiles" goImports; }
 
-# Identies all directories with changed go files and runs `goCiLint` in all those directories
+# Identifies all directories with changed go files and runs `goCiLint` in all those directories
 # Passes all arguments along, use -n for only new issues.
-smartGoCiLint() { _smartGoRunner "goCiLint $*"; }
+smartGoCiLint() { _smartGoRunner "goCiLint ${*:+ $*}"; }
 
 smartGoCiLintFiles() {
 	echo "#### Limiting results to changed files only."
@@ -236,13 +258,13 @@ smartGoCiLintFiles() {
 	done <<<$(_smartGoRunner "goCiLint --color=always $*")
 }
 
-# Identies all directories with changed go files and runs `go test` in all those directories
-smartGoTest() { _smartGoRunner "go test $*"; }
+# Identifies all directories with changed go files and runs `go test` in all those directories
+smartGoTest() { _smartGoRunner "go test${*:+ $*}"; }
 
-# Identies all directories with changed go files and runs `go build` in all those directories
-smartGoBuild() { _smartGoRunner "go build $*"; }
+# Identifies all directories with changed go files and runs `go build` in all those directories
+smartGoBuild() { _smartGoRunner "go build${*:+ $*}"; }
 
-# Identies all directories with changed go files the whole suite of go checks
+# Identifies all directories with changed go files the whole suite of go checks
 # This includes, `goFormat`, `goLint`, `staticcheck` and `go test`
 smartGoAll() {
 	# Loop over the arguments and figure out which apply to the variation functions being run.
@@ -384,4 +406,4 @@ restoreVendorDir() {
 
 # This handles repos with nested vendor directories.
 # The find command is designed to skip hidden directories which greatly improves speed.
-alias gResetVendor='find . -type d \( -path "*/.*" \) -prune -o -type d -name vendor -prune -print0 -o -type f \( -name go.mod -o -name go.sum \) -print0 | xargs -0 git checkout --'
+alias gResetVendor='find . -type d \( -path "*/.*" \) -prune -o -type d -name vendor -prune -o -type f \( -name go.mod -o -name go.sum \) -print0 | xargs -0 git checkout --'
