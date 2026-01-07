@@ -98,6 +98,11 @@ alias gf='git fetch --all --prune'
 alias gft='git fetch --all --prune --tags'
 alias gfm='git fetch "$(getOriginRemote)" $(getMainBranch)' # fetch remote main
 _fetchTarget() {
+	if ! git symbolic-ref -q HEAD >/dev/null 2>&1; then
+		# This echo value is used in gfc, make sure to chance both.
+		echo "No fetch target"
+		return 1
+	fi
 	fetchTarget=$(git rev-parse --symbolic-full-name --abbrev-ref "@{upstream}" | sed 's|/| |')
 	if [[ -z "$fetchTarget" ]]; then
 		echo "Cannot parse upstream"
@@ -109,12 +114,17 @@ _fetchTarget() {
 
 # gfc fetches just the current branch.
 gfc() {
-	fetchTarget=$(_fetchTarget)
-	echo "Fetch target is '$fetchTarget'"
-	if [[ -z "$fetchTarget" ]]; then
-		echo "Cannot parse upstream"
-		return 1
+	if ! fetchTarget=$(_fetchTarget); then
+		if [[ "$fetchTarget" != "No fetch target" ]]; then
+			# Something went wrong with finding the target.
+			echo "Cannot find fetch target"
+			return 1
+		fi
+
+		# Head is disconnected, so there is nothing to fetch.
+		return 0
 	fi
+	echo "Fetch target is '$fetchTarget'"
 	eval git fetch "$fetchTarget"
 }
 
