@@ -64,6 +64,12 @@ alias gcom='git checkout $(getMainBranch)'
 alias gcomb='git fetch $(getOriginRemote) $(getMainBranch) && git checkout $(getOriginRemote)/$(getMainBranch) -b' # Creates a new branch based on upstream/main (not your local main).
 gcomup() { git checkout "$(getMainBranch)" ${1:+"$1"} && git pull; }                                               # $1 allows passing -f to dump current changes
 alias gcob='git checkout -b'
+gcoClean() {
+	# Only run if there are arguments.
+	if (($# != 0)); then
+		git checkout -- "$@" && git clean -fd -- "$@"
+	fi
+}
 # Will accept (git checkout --ours) files that have conflicts and are auto-generated.
 # The assumption is that these files will get regenerated/updated by dependency systems and so on, so no need to hand edit/resolve.
 gResolveGenConflicts() {
