@@ -88,9 +88,18 @@ goTestFile() {
 }
 
 # Helper for go test ./... that adds output for test run status.
+# Aggregates all stderr output and displays it at the end so it is easier to find.
 _goTestAll() {
-	go test ./... "$@"
-	exitCode="$?"
+	# Capture stderr while still displaying everything in real-time
+	local errorOutput
+
+	# Save original stdout to fd 3, then capture stderr while displaying it
+	# The fancy file descriptor code is AI generated.
+	exec 3>&1
+	errorOutput=$(go test ./... "$@" 2>&1 1>&3 | tee /dev/stderr)
+	exitCode="${PIPESTATUS[0]}"
+	exec 3>&-
+
 	echo
 	if [[ "$exitCode" == 0 ]]; then
 		printf "\033[32mAll tests passed!\033[0m\n"
@@ -99,6 +108,16 @@ _goTestAll() {
 	else
 		printf "\033[34;1mExit code '%s'. There may be build or package structure issues.\033[0m\n" "$exitCode"
 		printf "\033[34;1mThis does not necessarily mean any tests failed though.\033[0m\n"
+	fi
+
+	# If there was error output, display it at the end
+	if [[ -n "$errorOutput" ]]; then
+		echo
+		printf "\033[33m========================================\033[0m\n"
+		printf "\033[33mError Output Summary:\033[0m\n"
+		printf "\033[33m========================================\033[0m\n"
+		printf '%s\n' "$errorOutput"
+		printf "\033[33m========================================\033[0m\n"
 	fi
 }
 
