@@ -91,14 +91,28 @@ goTestFile() {
 # Aggregates all stderr output and displays it at the end so it is easier to find.
 _goTestAll() {
 	# Capture stderr while still displaying everything in real-time
+	# The fancy routing and error capturing is AI generated code.
 	local errorOutput
+	local exitCode
 
-	# Save original stdout to fd 3, then capture stderr while displaying it
-	# The fancy file descriptor code is AI generated.
+	# Set pipefail to ensure we capture the correct exit code
+	local oldPipefail
+	oldPipefail=$(set +o | grep pipefail)
+	set -o pipefail
+
+	# Redirect stderr through tee to both display and capture it
+	# Run the command, capturing stderr to a temporary location
 	exec 3>&1
-	errorOutput=$(go test ./... "$@" 2>&1 1>&3 | tee /dev/stderr)
-	exitCode="${PIPESTATUS[0]}"
+	errorOutput=$(
+		go test ./... "$@" 2>&1 1>&3 | tee /dev/stderr
+		# Return the exit code of go test (first element in PIPESTATUS)
+		exit "${PIPESTATUS[0]}"
+	)
+	exitCode=$?
 	exec 3>&-
+
+	# Restore pipefail setting
+	eval "$oldPipefail"
 
 	echo
 	if [[ "$exitCode" == 0 ]]; then
