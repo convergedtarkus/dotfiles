@@ -1,6 +1,11 @@
 # module files created by IntelliJ and alike
 *.iml
 
+# IDE project files
+.idea/
+.atom/
+.vscode/
+
 # Mac folder attributes files
 .DS_Store
 
