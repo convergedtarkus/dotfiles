@@ -18,6 +18,7 @@ source "$MYDOTFILES/bash/parts/general.bash"
 # Git
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/git.bash"
+source "$MYDOTFILES/bash/completions/git_completion.bash"
 
 # Dartlang and pub
 # shellcheck source=/dev/null

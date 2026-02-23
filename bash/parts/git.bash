@@ -61,8 +61,10 @@ alias deleteMergedBranches='$MYDOTFILES/bash/scripts/deleteMergedBranches.sh'
 # git checkout
 alias gco='git checkout'
 alias gcom='git checkout $(getMainBranch)'
-alias gcomb='git fetch $(getOriginRemote) $(getMainBranch) && git checkout $(getOriginRemote)/$(getMainBranch) -b' # Creates a new branch based on upstream/main (not your local main).
-gcomup() { git checkout "$(getMainBranch)" ${1:+"$1"} && git pull; }                                               # $1 allows passing -f to dump current changes
+# Creates a new branch based on upstream/main (not your local main).
+alias gcomb='git fetch $(getOriginRemote) $(getMainBranch) && git checkout $(getOriginRemote)/$(getMainBranch) -b'
+# $1 allows passing -f to dump current changes
+gcomup() { git checkout "$(getMainBranch)" ${1:+"$1"} && git pull; }
 alias gcob='git checkout -b'
 gcoClean() {
 	# Only run if there are arguments.
@@ -194,6 +196,7 @@ alias gnew='git log HEAD@{1}..HEAD@{0}'
 
 # Quick ways to get the head commit.
 alias gHead='git log -1'
+# Returns the head commit based on the remote.
 gHeadRemote() {
 	git log -1 "$(git rev-parse --abbrev-ref --symbolic-full-name @\{u\})"
 }
@@ -253,13 +256,13 @@ alias gRebase='git rebase'
 
 # Rebase the current branch based on its base against main. Good for cleaning/re-organizing commits
 gRebaseBase() {
-	git rebase -i "$(mainBase)"
+	git rebase -i "$(mainBase)" "$@"
 }
 
 # Reabse the current branch based on origin main. Good for adjusting commits and merging main at once.
 gRebaseMain() {
 	gfm &>/dev/null # fetch origin so origin/main is up to date.
-	git rebase -i "$(getOriginRemote)/$(getMainBranch)"
+	git rebase -i "$(getOriginRemote)/$(getMainBranch)" "$@"
 }
 
 # Merges upstream main into the given branch, pushes it up and deleted the local branch.
@@ -444,7 +447,7 @@ clonePersonalRepo() {
 		return 1
 	fi
 
-	if ! git clone "git@github.com-personal:$1.git"; then
+	if ! git clone "git@github.com-personal:$1.git" "$@"; then
 		echo "Clone failed!"
 		return 2
 	fi
