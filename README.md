@@ -21,15 +21,20 @@ I'm using the setup from https://www.atlassian.com/git/tutorials/dotfiles which 
 6. If using bash-it, enable the following things
 ```
 bash-it enable alias personal
-bash-it enable plugin alias-completion man
-bash-it enable completion bash-it brew defaults git makefile system tmux
+bash-it enable plugin man
+bash-it enable completion aliases bash-it brew dart defaults docker git makefile personal system
 ```
 7. Restart the terminal again.
 8. Run `myconfig config --local status.showUntrackedFiles no` to not show untracked files. Otherwise all files in your home directory will report when running `git status`. You will need to manually add new files to commit them to the repo.
     - Verify by running `myconfig status` and it doesn't report a ton of files.
 
 # Working with
-Edit a tracked file and then use the `myconfig` alias to commit and push. If you need to integrate remote changes, you'll need to reclone unfortunately (if you've have a better solution I would love to hear it!).
+Use the `myconfig` alias to perform git operations.
+
+# Custom Bash-it setup
+- This uses a custom fork of Bash-it to deal with some load order issues.
+- My Bash-it fork (located in .bash-it) includes aliases/available/personal.bash which loads up combinedBash.bash.
+  - Make sure to enable the personal alias and personal completion in bash-it to load this file.
 
 # Updating Bash-It submodule
 1. Checkout my [Bash-It fork](https://github.com/convergedtarkus/bash-it)
@@ -45,10 +50,12 @@ Edit a tracked file and then use the `myconfig` alias to commit and push. If you
 - If you are me and use the kind of setup from clonePersonalRepo in bash/parts/git.bash, you'll need to change all the 'git@github.com' urls to be 'git@github.com-personal'.
 
 ## Bash-It Not Loading Personal Files
-- Add a symlink under .bash-it/enabled/ to .bash-it/aliases/available/personal.bash and name it '150--personal.bash'.
-  - This is how bash-it enables things and will enable loading the personal.bash file.
-  - `ln -s $HOME/.bash-it/aliases/available/personal.bash $HOME/.bash-it/enabled/150--personal.bash`
-    - The `$HOME` is very important as the symlink does not get created correctly otherwise.
+- Make ensure alias personal and completion personal are enabled in bash-it.
+- To do so manually:
+  - Add a symlink under .bash-it/enabled/ to .bash-it/aliases/available/personal.bash and name it '150--personal.bash'.
+    - This is how bash-it enables things and will enable loading the personal.bash file.
+    - `ln -s $HOME/.bash-it/aliases/available/personal.bash $HOME/.bash-it/enabled/150--personal.bash`
+      - The `$HOME` is very important as the symlink does not get created correctly otherwise.
 
 
 # License

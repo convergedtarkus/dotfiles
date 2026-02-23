@@ -26,6 +26,7 @@ else
 	# Just use my base bash info
 	# shellcheck source=/dev/null
 	source "$MYDOTFILES/bash/combinedBash.bash"
+	source "$MYDOTFILES/bash/combinedBashCompletions.bash"
 fi
 
 export NVM_DIR="$HOME/.nvm"
