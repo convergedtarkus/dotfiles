@@ -28,6 +28,20 @@ bash-it enable completion aliases bash-it brew dart defaults docker git makefile
 8. Run `myconfig config --local status.showUntrackedFiles no` to not show untracked files. Otherwise all files in your home directory will report when running `git status`. You will need to manually add new files to commit them to the repo.
     - Verify by running `myconfig status` and it doesn't report a ton of files.
 
+# Using brew bash
+- All of these script assume you are using bash 4+.
+    - MacOS ships with bash 3.
+- To use a modern bash on MacOS
+    - Install brew
+    - `brew install bash`
+    - Find the installation path of brew bash usually /opt/homebrew/bin/bash
+        - The install command should output this.
+    - `echo "/opt/homebrew/bin/bash" | sudo tee -a /etc/shells`
+        - This adds the brew bash sell to the valid login shells.
+    - `chsh -s /opt/homebrew/bin/bash` to set the new version as default.
+    - Restart the terminal and run `echo $BASH_VERSION` or `bash --version`.
+        - This should output a modern bash version.
+
 # Working with
 Use the `myconfig` alias to perform git operations.
 
