@@ -33,8 +33,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
-# Add asdf shims directroy to path
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
-
-# Add asdf completions
-. <(asdf completion bash)
+if [[ -d ${ASDF_DATA_DIR:-$HOME/.asdf} ]]; then
+	export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+	# Add asdf completions
+	. <(asdf completion bash)
+fi
