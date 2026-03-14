@@ -47,7 +47,20 @@ Use the `myconfig` alias to perform git operations.
 
 # Common Issues/Gotcha
 ## Auth issues with submodules
+- Errors like
+```
+Cloning into '<PATH>/.vim/pack/convergedtarkus/start/vim-gitgutter'...
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+fatal: clone of 'git@github.com:airblade/vim-gitgutter.git' into submodule path '<PATH>/.vim/pack/convergedtarkus/start/vim-gitgutter' failed
+```
 - If you are me and use the kind of setup from clonePersonalRepo in bash/parts/git.bash, you'll need to change all the 'git@github.com' urls to be 'git@github.com-personal'.
+- Make sure to add a SSH key
+    - [Generate A New SSH Key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+    - [Add A New SSH Key To Github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
 
 ## Bash-It Not Loading Personal Files
 - Make ensure alias personal and completion personal are enabled in bash-it.
