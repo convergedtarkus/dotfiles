@@ -49,7 +49,7 @@ fixDictation() {
 _managedPasswords=()
 
 # Adds the given password name to the list of managed passwords for tab completion.
-_addtoManagedPasswords() {
+_addToManagedPasswords() {
 	_managedPasswords+=("$1")
 }
 
