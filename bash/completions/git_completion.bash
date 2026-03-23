@@ -46,3 +46,36 @@ __git_complete gpu _git_push
 
 # Completion for other git command wrappers
 __git_complete mergeMainIntoBranch _git_checkout
+
+_gitCheckoutCompletionPreferLocalBranches() {
+	# Get the current word being completed.
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+
+	# Get the list of local branches.
+	local branches
+	branches=$(git branch --format='%(refname:short)')
+
+	# Filter branches based on the current input.
+	local candidates
+	candidates=$(compgen -W "${branches}" -- "${cur}")
+
+	# If no local branches match, fall back to git's checkout completion.
+	# __git_func_wrap initializes git completion internals (_git_checkout expects these).
+	if [[ -z "$candidates" ]]; then
+		if declare -F __git_func_wrap >/dev/null 2>&1; then
+			__git_func_wrap _git_checkout
+		else
+			_git_checkout
+		fi
+		return
+	fi
+
+	# Output the candidates for completion
+	COMPREPLY=()
+	while IFS= read -r candidate; do
+		COMPREPLY+=("$candidate")
+	done <<<"$candidates"
+}
+
+# Add custom completion for gco using git's completion wrapper plumbing.
+__git_complete gco _gitCheckoutCompletionPreferLocalBranches
