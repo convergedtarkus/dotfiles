@@ -94,7 +94,7 @@ while IFS= read -r branch; do
 	branchAgeSeconds=$((curTime - branchHeadTime))
 
 	if ((branchAgeSeconds <= 0)); then
-		printf "\033[1;31mBranch '%s' is invalid age of '%s'\033[0m\n" "${branchData[1]}" "$branchAgeSeconds}"
+		printf "\033[1;31mBranch '%s' is invalid age of '%s'\033[0m\n" "${branchData[1]}" "$branchAgeSeconds"
 	else
 		branchAgeYears=$(ageInYears "$branchAgeSeconds")
 

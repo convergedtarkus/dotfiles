@@ -4,10 +4,7 @@
 mainName=""
 if [ "$(git rev-parse --verify main 2>/dev/null)" ]; then
 	mainName="main"
-
-fi
-
-if [ "$(git rev-parse --verify master 2>/dev/null)" ]; then
+elif [ "$(git rev-parse --verify master 2>/dev/null)" ]; then
 	mainName="master"
 fi
 
@@ -21,7 +18,7 @@ else
 		echo -e "\033[0;33mScript is being run while not on the main branch. This works but will not delete the current branch if it is merged.\033[0m"
 	fi
 
-	mainName=$(git rev-parse --symbolic-full-name --abbrev-ref ${mainName}"@{upstream}")
+	mainName=$(git rev-parse --symbolic-full-name --abbrev-ref "${mainName}@{upstream}")
 	remoteName=$(echo "$mainName" | cut -d "/" -f 1)
 	mainBranchMain=$(echo "$mainName" | cut -d "/" -f 2-)
 

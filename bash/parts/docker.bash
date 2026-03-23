@@ -29,7 +29,8 @@ restartDocker() {
 }
 
 # Kills all running docker containers.
-alias killAllDockerContainers='docker rm -f $(docker ps -aq) >/dev/null 2>&1 || true'
+# shellcheck disable=SC2046 # Word splitting is intentional for docker container IDs.
+killAllDockerContainers() { docker rm -f $(docker ps -aq) >/dev/null 2>&1 || true; }
 
 # Removes all docker containers. This does not use the force flag, so some images may require manual deletion.
 removeAllDockerContainers() { docker image rm "$(docker image ls | awk '{print $3}')"; }
@@ -121,6 +122,6 @@ dockerUsedSpace() {
 	echo "Docker is using $fileSizeHuman out of $maxFileSizeHuman max (${percent}%)"
 
 	if [[ $spaceOk == "false" ]]; then
-		printf "\033[0;31mDocker has exceeded safe used space. This may cause build failures!\033[0,\n"
+		printf "\033[0;31mDocker has exceeded safe used space. This may cause build failures!\033[0m\n"
 	fi
 }

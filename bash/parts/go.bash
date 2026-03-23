@@ -168,7 +168,7 @@ _runOnFiles="--runOnFiles"
 #   be a pain).
 _smartGoRunner() {
 	# Throw an alert if not at the repo root just so no mistakes are made
-	if [[ $(git rev-parse --show-toplevel) != $(pwd) ]]; then
+	if [[ "$(git rev-parse --show-toplevel)" != "$(pwd)" ]]; then
 		echo "FYI: Not running at repo root, not all files may be processed"
 		echo
 	fi
@@ -235,7 +235,7 @@ _smartGoRunner() {
 		echo "####"
 		echo "#### Running in module '$mod_dir' '$commandToRun $commandInput'"
 		echo "####"
-		eval "(cd $mod_dir && $commandToRun $commandInput)"
+		eval "(cd '$mod_dir' && $commandToRun $commandInput)"
 	done
 }
 
@@ -343,8 +343,8 @@ export cleanGoPathDomainProtected=""                            # E.X '! -name g
 export cleanGoPathGithubUserProtected="! -name convergedtarkus" # Of course I protect my repos, they are just too awesome to delete
 
 cleanGoPath() {
-	# the "$*" passes all arguments to the symlink script
-	eval "$MYDOTFILES/bash/scripts/cleanGoPath.bash $*"
+	# The "$@" passes all arguments to the symlink script.
+	"$MYDOTFILES/bash/scripts/cleanGoPath.bash" "$@"
 }
 
 # Resets a lot of go environment files to fix build issues.
@@ -379,8 +379,8 @@ goResetEnv() {
 }
 
 symlinkVendorPackage() {
-	# the "$*" passes all arguments to the symlink script
-	eval "$MYDOTFILES/bash/scripts/symlinkPackageIntoVendor.bash $*"
+	# The "$@" passes all arguments to the symlink script.
+	"$MYDOTFILES/bash/scripts/symlinkPackageIntoVendor.bash" "$@"
 }
 
 # Helper to easily move the vendor directory. Pairs with the symlinkVendorPackage function.

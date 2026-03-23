@@ -195,13 +195,13 @@ logString=$(getLogString)
 # git push $_arg_remote -d $line or git push $_arg_remote :$line
 deleteCommand="git push $_arg_remote"
 
-if [ $_arg_delete != "on" ]; then
+if [ "$_arg_delete" != "on" ]; then
 	# run with --dry-run (no deleting) if correct parameter not given
 	echo "Running with --dry-run becuase you don't know what you're doing"
 	deleteCommand="$deleteCommand --dry-run --delete"
 else
 	# make sure they know what they are doing before allowing live delete
-	reproName=$(basename $(git rev-parse --show-toplevel))
+	reproName=$(basename "$(git rev-parse --show-toplevel)")
 	echo "Are you sure you know what you're doing for remote: '$_arg_remote' of repro: '$reproName' deleting $logString?"
 	read -r input_variable
 	if [ "$input_variable" != "y" ] && [ "$input_variable" != "Y" ]; then
