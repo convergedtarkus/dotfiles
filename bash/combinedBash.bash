@@ -29,7 +29,7 @@ source "$MYDOTFILES/bash/parts/go.bash"
 
 # No support for linux yet, should at least not source this if on linux
 # shellcheck source=/dev/null
-source "$MYDOTFILES/bash/parts/osSpecific/osx.bash"
+source "$MYDOTFILES/bash/parts/osx.bash"
 
 # Find any custom files under ./custom (other than .keep) and source them
 # This allows loading external files depending on the local machine.
