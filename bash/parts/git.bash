@@ -159,11 +159,23 @@ alias gsts='git stash save'
 
 # git reset
 alias gus='git reset'
-gUndoLastCommit() {
+
+_verifyUndoCommitIsOk() {
 	# Before doing this, check if this commit has been pushed.
-	
-	
+	if git log --oneline "@{u}".. 2>&1; then
+		# Confirm with the user that they want to undo a commit that has not been pushed.
+		read -rp "This content has not been pushed. Are you sure you want to undo it? [y/N] " confirm
+		if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+			echo "Aborting."
+			return 1
+		fi
+	fi
+	return 0
+}
+
+gUndoLastCommit() {
 	echo "Undoing the last commit"
+	_verifyUndoCommitIsOk || return 1
 	git log -1
 	echo
 	git reset --soft HEAD~ && git reset
@@ -172,6 +184,7 @@ gUndoLastCommit() {
 gUndoBranchCommits() {
 	echo "Undoing all commits to branch"
 	echo
+	_verifyUndoCommitIsOk || return 1
 	git reset --soft "$(mainBase)" && git reset
 }
 alias gRevertLastCommit='git reset --hard HEAD~'    # Will delete the last commit made to the branch.
