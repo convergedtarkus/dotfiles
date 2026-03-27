@@ -160,6 +160,9 @@ alias gsts='git stash save'
 # git reset
 alias gus='git reset'
 gUndoLastCommit() {
+	# Before doing this, check if this commit has been pushed.
+	
+	
 	echo "Undoing the last commit"
 	git log -1
 	echo
