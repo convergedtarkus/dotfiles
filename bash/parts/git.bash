@@ -162,13 +162,16 @@ alias gus='git reset'
 
 _verifyUndoCommitIsOk() {
 	# Before doing this, check if this commit has been pushed.
-	if git log --oneline "@{u}".. 2>&1; then
-		# Confirm with the user that they want to undo a commit that has not been pushed.
-		read -rp "This content has not been pushed. Are you sure you want to undo it? [y/N] " confirm
-		if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-			echo "Aborting."
-			return 1
-		fi
+	if [[ -z $(logAgainstRemote --oneline) ]]; then
+		# No difference between local and remote, so this commit has been pushed.
+		return 0
+	fi
+
+	# Confirm with the user that they want to undo a commit that has not been pushed.
+	read -rp "This content has not been pushed. Are you sure you want to undo it? [y/N] " confirm
+	if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+		echo "Aborting."
+		return 1
 	fi
 	return 0
 }
