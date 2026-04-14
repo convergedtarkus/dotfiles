@@ -89,7 +89,7 @@ gResetDependencyGenFiles() {
 	# TODO Currently does not cover all conditions
 	# TODO Each "language file" (go.bash for example) should define what it wants to reset.
 	# TODO Add repo specific resetting.
-	git checkout -- '*go.sum' '*vendor/*'
+	gcoClean -- '*go.sum' '*vendor/*'
 }
 
 # git commit
