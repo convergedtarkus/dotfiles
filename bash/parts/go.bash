@@ -162,7 +162,6 @@ _smartGoRunner() {
 		return 1
 	fi
 
-	local smartgoPath="$MYDOTFILES/tools/smartgorunner/cmd/smartgorunner"
 	local onFilesFlag=""
 	if [[ "$1" == "$_runOnFiles" ]]; then
 		onFilesFlag="--on-files"
@@ -174,10 +173,16 @@ _smartGoRunner() {
 		return 1
 	fi
 
+	# Check if smartgorunner is installed
+	if ! command -v smartgorunner >/dev/null; then
+		echo "smartgorunner is not installed."
+		return 1
+	fi
+
 	if [[ -n "$onFilesFlag" ]]; then
-		go run "$smartgoPath" "$onFilesFlag" -- "$@"
+		smartgorunner "$onFilesFlag" -- "$@"
 	else
-		go run "$smartgoPath" -- "$@"
+		smartgorunner -- "$@"
 	fi
 }
 
