@@ -66,12 +66,15 @@ func GetModuleDirs(workingDir string) ([]string, error) {
 			return walkErr
 		}
 		if entry.IsDir() {
+			// Completely skip vendor directories and hidden directories.
+			if entry.Name() == "vendor" || strings.HasPrefix(entry.Name(), ".") {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		if entry.Name() != "go.mod" {
 			return nil
 		}
-		// TODO (CF) Skip vendor directories
 
 		rel, err := filepath.Rel(workingDir, filepath.Dir(filePath))
 		if err != nil {
