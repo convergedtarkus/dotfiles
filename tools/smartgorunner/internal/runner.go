@@ -1,8 +1,7 @@
-package smartrunner
+package internal
 
 import (
 	"context"
-	"dotfiles/tools/smartgo/internal/smartrunner/utils"
 	"errors"
 	"fmt"
 	"os"
@@ -11,6 +10,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	
+	"dotfiles/tools/smartgorunner/internal/utils"
 )
 
 var ErrNoChangedGoFiles = errors.New("no changed go files found")

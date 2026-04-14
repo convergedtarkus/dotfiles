@@ -15,6 +15,6 @@
 ## Quick usage
 
 ```bash
-go run ./cmd/smartgo -- go test -count=1
-go run ./cmd/smartgo --on-files gofmt -w
+go run ./cmd/smartgorunner -- go test -count=1
+go run ./cmd/smartgorunner --on-files gofmt -w
 ```

@@ -6,18 +6,18 @@ import (
 	"fmt"
 	"os"
 
-	"dotfiles/tools/smartgo/internal/smartrunner"
+	"dotfiles/tools/smartgorunner/internal"
 )
 
-// Main entry point for the smartgo command line tool.
+// Main entry point for the smartgorunner command line tool.
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "smartgo error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "smartgorunner error: %v\n", err)
 		os.Exit(1)
 	}
 }
 
-// run is the main helper for the smartgo command line tool.
+// run is the main helper for the smartgorunner command line tool.
 func run() error {
 	// TODO (CF) I believe this can be removed.
 	var onFiles bool
@@ -26,10 +26,10 @@ func run() error {
 
 	command := flag.Args()
 	if len(command) == 0 {
-		return fmt.Errorf("missing command (example: smartgo --on-files gofmt -w)")
+		return fmt.Errorf("missing command (example: smartgorunner --on-files gofmt -w)")
 	}
 
-	return smartrunner.Run(context.Background(), smartrunner.Options{
+	return internal.Run(context.Background(), internal.Options{
 		OnFiles: onFiles,
 		Command: command,
 	})

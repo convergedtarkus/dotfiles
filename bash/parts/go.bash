@@ -155,14 +155,14 @@ installGoimports() {
 # Can be given to _smartGoRunner to run the command on the changes files rather than directories.
 _runOnFiles="--runOnFiles"
 
-# Runs the native Go smartgo runner while preserving the old bash entry points.
+# Runs the native Go smartgorunner runner while preserving the old bash entry points.
 _smartGoRunner() {
 	if [[ -z "$MYDOTFILES" ]]; then
 		echo "MYDOTFILES must be set before calling smartGoRunner commands"
 		return 1
 	fi
 
-	local smartgoPath="$MYDOTFILES/tools/smartgo/cmd/smartgorunner"
+	local smartgoPath="$MYDOTFILES/tools/smartgorunner/cmd/"
 	local onFilesFlag=""
 	if [[ "$1" == "$_runOnFiles" ]]; then
 		onFilesFlag="--on-files"
