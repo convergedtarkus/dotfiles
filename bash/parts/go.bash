@@ -162,7 +162,7 @@ _smartGoRunner() {
 		return 1
 	fi
 
-	local smartgoPath="$MYDOTFILES/tools/smartgorunner/cmd/"
+	local smartgoPath="$MYDOTFILES/tools/smartgorunner/cmd/smartgorunner"
 	local onFilesFlag=""
 	if [[ "$1" == "$_runOnFiles" ]]; then
 		onFilesFlag="--on-files"
