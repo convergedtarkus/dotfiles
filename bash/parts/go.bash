@@ -152,55 +152,21 @@ installGoimports() {
 	go get -u golang.org/x/tools/cmd/goimports
 }
 
-# Can be given to _smartGoRunner to run the command on the changes files rather than directories.
-_runOnFiles="--runOnFiles"
-
-# Runs the native Go smartgorunner runner while preserving the old bash entry points.
-_smartGoRunner() {
-	if [[ -z "$MYDOTFILES" ]]; then
-		echo "MYDOTFILES must be set before calling smartGoRunner commands"
-		return 1
-	fi
-
-	local onFilesFlag=""
-	if [[ "$1" == "$_runOnFiles" ]]; then
-		onFilesFlag="--on-files"
-		shift
-	fi
-
-	if [[ $# -eq 0 ]]; then
-		echo "_smartGoRunner requires a command"
-		return 1
-	fi
-
-	# Check if smartgorunner is installed
-	if ! command -v smartgorunner >/dev/null; then
-		echo "smartgorunner is not installed."
-		return 1
-	fi
-
-	if [[ -n "$onFilesFlag" ]]; then
-		smartgorunner "$onFilesFlag" -- "$@"
-	else
-		smartgorunner -- "$@"
-	fi
-}
-
 # Identifies all directories with changed go files and runs `goFormat` in all those directories
-smartGoFormat() { _smartGoRunner "$_runOnFiles" gofmt -w; }
+smartGoFormat() { smartgorunner --on-files gofmt -w; }
 
 # Identifies all directories with changed go files and runs `goImports` in all those directories
-smartGoImports() { _smartGoRunner "$_runOnFiles" goimports -w; }
+smartGoImports() { smartgorunner --on-files goimports -w; }
 
 # Identifies all directories with changed go files and runs `goCiLint` in all those directories
 # Passes all arguments along, use -n for only new issues.
-smartGoCiLint() { _smartGoRunner golangci-lint run -c "$MYDOTFILES/.golangci.yml" "$@"; }
+smartGoCiLint() { smartgorunner golangci-lint run -c "$MYDOTFILES/.golangci.yml" "$@"; }
 
 # Identifies all directories with changed go files and runs `go test` in all those directories
-smartGoTest() { _smartGoRunner go test "$@"; }
+smartGoTest() { smartgorunner go test "$@"; }
 
 # Identifies all directories with changed go files and runs `go build` in all those directories
-smartGoBuild() { _smartGoRunner go build "$@"; }
+smartGoBuild() { smartgorunner go build "$@"; }
 
 # Identifies all directories with changed go files the whole suite of go checks
 # This includes, `goFormat`, `goLint`, `staticcheck` and `go test`
