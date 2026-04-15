@@ -161,7 +161,6 @@ func fileInModule(file string, modDir string) bool {
 
 // Converts a file path to be relative to the module directory.
 func toModuleRelativeFile(file string, modDir string) string {
-	// TODO (CF) Lots of places that handle the period in a special manner, can that be better?
 	if modDir == "." {
 		return file
 	}

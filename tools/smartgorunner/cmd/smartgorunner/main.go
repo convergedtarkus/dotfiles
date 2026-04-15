@@ -19,7 +19,6 @@ func main() {
 
 // run is the main helper for the smartgorunner command line tool.
 func run() error {
-	// TODO (CF) I believe this can be removed.
 	var onFiles bool
 	flag.BoolVar(&onFiles, "on-files", false, "run command on changed files instead of changed directories")
 	flag.Parse()
