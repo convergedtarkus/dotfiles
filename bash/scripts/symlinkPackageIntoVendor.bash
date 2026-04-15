@@ -31,7 +31,7 @@ die() {
 	test -n "$_ret" || _ret=1
 	test "$_PRINT_HELP" = yes && print_help >&2
 	echo "$1" >&2
-	exit ${_ret}
+	exit "${_ret}"
 }
 
 begins_with_short_option() {
@@ -193,7 +193,7 @@ fi
 
 echo "Found package '$_arg_symlink_package' inside GOPATH at '$localDependencyPath'"
 
-expectedVendorPath="./vendor"${localDependencyPath#$GOPATH/src}
+expectedVendorPath="./vendor"${localDependencyPath#"$GOPATH"/src}
 
 # path matches against the whole path name
 if [ ! -d "$expectedVendorPath" ]; then
@@ -242,10 +242,10 @@ if [[ "$_arg_dual_dev" == "on" ]]; then
 		if [[ ! -e "$filename" || "$filename" == *vendor ]]; then
 			continue
 		fi
-		ln -s "$filename" "${expectedVendorPath%/$_arg_symlink_package/}"
+		ln -s "$filename" "${expectedVendorPath%/"$_arg_symlink_package"/}"
 	done
 else
-	ln -s "$localDependencyPath" "${expectedVendorPath%/$_arg_symlink_package}"
+	ln -s "$localDependencyPath" "${expectedVendorPath%/"$_arg_symlink_package"}"
 fi
 
 # touch all files in the symlinked package to ensure gopherJS and other tools see the changes correctly
@@ -269,7 +269,7 @@ find "$GOPATH/pkg" \( -name mod -o -name vendor \) -prune -o -path "*$targetPack
 if command -v goSymlinkVendorPostOpHook &>/dev/null; then
 	echo
 	echo "Running post operation hook function."
-	goSymlinkVendorPostOpHook "$expectedVendorPath/$_arg_symlink_package" "${localDependencyPath#$GOPATH/src/}" "$_arg_dual_dev"
+	goSymlinkVendorPostOpHook "$expectedVendorPath/$_arg_symlink_package" "${localDependencyPath#"$GOPATH"/src/}" "$_arg_dual_dev"
 else
 	echo
 	echo "Post operation hook does not exist, skipping it."
