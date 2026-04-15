@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -36,25 +37,45 @@ func GetChangedGoFiles(ctx context.Context, workingDir string) ([]string, error)
 // out any files in the vendor directory.
 func normalizeChangedFiles(changedFiles []string) []string {
 	normalaizedFiles := make([]string, 0, len(changedFiles))
-	for _, file := range changedFiles {
+	for _, file := range normalFileStrings(changedFiles) {
+		// Filter out any files in the vendor directory.
+		regexpedFile := regexp.MustCompile(`^\.?/?vendor/`)
+		if regexpedFile.MatchString(file) {
+			continue
+		}
+		normalaizedFiles = append(normalaizedFiles, file)
+	}
+	return normalaizedFiles
+}
+
+// normalFileStrings normalizes file or directory paths by trimming whitespace,
+// converting to slash format, ensuring they start with "./", and removing duplicates.
+func normalFileStrings(filePaths []string) []string {
+	set := make(map[string]struct{}, len(filePaths))
+	for _, file := range filePaths {
 		// Trim whitespace and convert to slash format for consistency across platforms.
 		normalized := filepath.ToSlash(strings.TrimSpace(file))
 		if normalized == "" {
 			continue
 		}
 
-		// Filter out any files in the vendor directory.
-		if strings.HasPrefix(normalized, "vendor/") {
-			continue
-		}
-
-		// Ensure the path starts with "./" for consistency with Go tool expectations.
-		if !strings.HasPrefix(normalized, "./") {
+		if normalized == "." || normalized == "./" {
+			normalized = "."
+		} else if !strings.HasPrefix(normalized, "./") {
+			// Ensure the path starts with "./" for consistency with Go tool expectations.
 			normalized = "./" + normalized
 		}
-		normalaizedFiles = append(normalaizedFiles, normalized)
+
+		set[normalized] = struct{}{}
 	}
-	return normalaizedFiles
+
+	// Convert set back to slice.
+	out := make([]string, 0, len(set))
+	for dir := range set {
+		out = append(out, dir)
+	}
+
+	return out
 }
 
 // GetModuleDirs walks the working directory to find all directories containing a
@@ -100,38 +121,19 @@ func GetModuleDirs(workingDir string) ([]string, error) {
 // It also sorts the directories by depth (deepest first) and then alphabetically
 // to ensure submodules are processed before parent modules.
 func normalizeModDirs(modDirs []string) []string {
-	set := make(map[string]struct{}, len(modDirs))
-	// TODO (CF) I think some of this normalization is duplicated in the normalizedChangedFiles function.
-	for _, dir := range modDirs {
-		normalized := filepath.ToSlash(strings.TrimSpace(dir))
-		if normalized == "" {
-			continue
-		}
-		if normalized == "." || normalized == "./" {
-			normalized = "."
-		} else if !strings.HasPrefix(normalized, "./") {
-			normalized = "./" + strings.TrimPrefix(normalized, "./")
-		}
-		set[normalized] = struct{}{}
-	}
-
-	// Convert set back to slice.
-	out := make([]string, 0, len(set))
-	for dir := range set {
-		out = append(out, dir)
-	}
+	cleanedModDirs := normalFileStrings(modDirs)
 
 	// Sort by depth (deepest first) and then alphabetically to ensure submodules
 	// are processed before parent modules.
-	sort.Slice(out, func(i, j int) bool {
-		depthI := strings.Count(out[i], "/")
-		depthJ := strings.Count(out[j], "/")
+	sort.Slice(cleanedModDirs, func(i, j int) bool {
+		depthI := strings.Count(cleanedModDirs[i], "/")
+		depthJ := strings.Count(cleanedModDirs[j], "/")
 		if depthI == depthJ {
-			return out[i] < out[j]
+			return cleanedModDirs[i] < cleanedModDirs[j]
 		}
 		return depthI > depthJ
 	})
-	return out
+	return cleanedModDirs
 }
 
 // UniqueSorted returns a sorted slice of unique strings from the input slice.
