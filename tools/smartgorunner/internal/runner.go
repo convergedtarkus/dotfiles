@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	
+
 	"dotfiles/tools/smartgorunner/internal/utils"
 )
 
@@ -93,7 +93,10 @@ func Run(ctx context.Context, options Options) error {
 
 // BuildPlan creates a plan for running commands based on the inputs.
 func BuildPlan(changedFiles []string, modDirs []string, onFiles bool) (Plan, error) {
-	grouped := groupByModule(changedFiles, modDirs)
+	grouped, err := groupByModule(changedFiles, modDirs)
+	if err != nil {
+		return Plan{}, err
+	}
 	orderedModules := orderedModuleKeys(grouped)
 	items := make([]PlanItem, 0, len(orderedModules))
 
@@ -112,7 +115,7 @@ func BuildPlan(changedFiles []string, modDirs []string, onFiles bool) (Plan, err
 // groupByModule takes a list of changed files and module directories, and groups
 // the files by their corresponding module directory.
 // Returns a map of module directory to the list of changed files within that module.
-func groupByModule(changedFiles []string, modDirs []string) map[string][]string {
+func groupByModule(changedFiles []string, modDirs []string) (map[string][]string, error) {
 	out := make(map[string][]string, len(modDirs))
 	for _, file := range changedFiles {
 		assigned := false
@@ -126,15 +129,14 @@ func groupByModule(changedFiles []string, modDirs []string) map[string][]string 
 			break
 		}
 		if !assigned {
-			// TODO (CF) Probably should be an error
-			out["."] = append(out["."], file)
+			return nil, errors.New("file does not belong to any module: " + file)
 		}
 	}
 
 	for modDir := range out {
 		out[modDir] = utils.UniqueSorted(out[modDir])
 	}
-	return out
+	return out, nil
 }
 
 // orderedModuleKeys takes the grouped module map and returns the module directories
