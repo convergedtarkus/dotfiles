@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"dotfiles/tools/smartgorunner/internal/utils"
@@ -97,11 +96,14 @@ func BuildPlan(changedFiles []string, modDirs []string, onFiles bool) (Plan, err
 	if err != nil {
 		return Plan{}, err
 	}
-	orderedModules := orderedModuleKeys(grouped)
-	items := make([]PlanItem, 0, len(orderedModules))
+	items := make([]PlanItem, 0, len(modDirs))
 
-	for _, modDir := range orderedModules {
+	for _, modDir := range modDirs {
 		moduleFiles := grouped[modDir]
+		if len(moduleFiles) == 0 {
+			continue
+		}
+
 		inputs := moduleFiles
 		if !onFiles {
 			inputs = toDirectories(moduleFiles)
@@ -137,25 +139,6 @@ func groupByModule(changedFiles []string, modDirs []string) (map[string][]string
 		out[modDir] = utils.UniqueSorted(out[modDir])
 	}
 	return out, nil
-}
-
-// orderedModuleKeys takes the grouped module map and returns the module directories
-// ordered by depth (deepest first) and then alphabetically.
-// TODO (CF) I'm not 100% sure this ordering is required but some ordering is needed for consistent ordering.
-func orderedModuleKeys(grouped map[string][]string) []string {
-	keys := make([]string, 0, len(grouped))
-	for key := range grouped {
-		keys = append(keys, key)
-	}
-	sort.Slice(keys, func(i, j int) bool {
-		depthI := strings.Count(keys[i], "/")
-		depthJ := strings.Count(keys[j], "/")
-		if depthI == depthJ {
-			return keys[i] < keys[j]
-		}
-		return depthI > depthJ
-	})
-	return keys
 }
 
 // toDirectories converts a list of file paths to their corresponding directories,

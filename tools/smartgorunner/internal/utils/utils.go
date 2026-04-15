@@ -80,6 +80,8 @@ func normalFileStrings(filePaths []string) []string {
 
 // GetModuleDirs walks the working directory to find all directories containing a
 // go.mod file, returning them in normalized form.
+// The returned module directories are ordered by depth (deepest first) and then
+// alphabetically,
 func GetModuleDirs(workingDir string) ([]string, error) {
 	var foundModDirs []string
 	err := filepath.WalkDir(workingDir, func(filePath string, entry os.DirEntry, walkErr error) error {
@@ -123,6 +125,13 @@ func GetModuleDirs(workingDir string) ([]string, error) {
 func normalizeModDirs(modDirs []string) []string {
 	cleanedModDirs := normalFileStrings(modDirs)
 
+	orderModuleDirectories(cleanedModDirs)
+	return cleanedModDirs
+}
+
+// orderModuleDirectories sorts the module directories by depth (deepest first) and
+// then alphabetically to ensure submodules are processed before parent modules.
+func orderModuleDirectories(cleanedModDirs []string) {
 	// Sort by depth (deepest first) and then alphabetically to ensure submodules
 	// are processed before parent modules.
 	sort.Slice(cleanedModDirs, func(i, j int) bool {
@@ -133,7 +142,6 @@ func normalizeModDirs(modDirs []string) []string {
 		}
 		return depthI > depthJ
 	})
-	return cleanedModDirs
 }
 
 // UniqueSorted returns a sorted slice of unique strings from the input slice.
