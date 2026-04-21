@@ -146,9 +146,20 @@ func groupByModule(changedFiles []string, modDirs []string) (map[string][]string
 func toDirectories(moduleFiles []string) []string {
 	dirs := make([]string, 0, len(moduleFiles))
 	for _, file := range moduleFiles {
-		dirs = append(dirs, path.Dir(file))
+		dirs = append(dirs, normalizeDirectoryArg(path.Dir(file)))
 	}
 	return utils.UniqueSorted(dirs)
+}
+
+// normalizeDirectoryArg ensures command directory args are dot-slash relative.
+func normalizeDirectoryArg(dir string) string {
+	if dir == "." || dir == "./" {
+		return "./"
+	}
+	if strings.HasPrefix(dir, "./") {
+		return dir
+	}
+	return "./" + dir
 }
 
 // fileInModule checks if the given file is within the module directory.
