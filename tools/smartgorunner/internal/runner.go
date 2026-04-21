@@ -13,7 +13,7 @@ import (
 	"dotfiles/tools/smartgorunner/internal/utils"
 )
 
-var ErrNoChangedGoFiles = errors.New("no changed go files found")
+var errNoChangedGoFiles = errors.New("no changed go files found")
 
 // Options represents the configuration options for running commands in modules based on changed files.
 type Options struct {
@@ -21,14 +21,14 @@ type Options struct {
 	Command []string
 }
 
-// Plan represents the execution plan for running commands in modules based on changed files.
-type Plan struct {
-	Items []PlanItem
+// plan represents the execution plan for running commands in modules based on changed files.
+type plan struct {
+	Items []planItem
 }
 
-// PlanItem represents a single command execution plan for a module, including the
+// planItem represents a single command execution plan for a module, including the
 // module directory and the inputs (files or directories) that should be passed to the command.
-type PlanItem struct {
+type planItem struct {
 	ModuleDir string
 	Inputs    []string
 }
@@ -50,7 +50,7 @@ func Run(ctx context.Context, options Options) error {
 		return err
 	}
 	if len(changedFiles) == 0 {
-		return ErrNoChangedGoFiles
+		return errNoChangedGoFiles
 	}
 
 	// Get the list of module directories in the working directory.
@@ -60,13 +60,13 @@ func Run(ctx context.Context, options Options) error {
 	}
 
 	// Build the execution plan.
-	plan, err := BuildPlan(changedFiles, moduleDirs, options.OnFiles)
+	planToRun, err := buildPlan(changedFiles, moduleDirs, options.OnFiles)
 	if err != nil {
 		return err
 	}
 
 	// Run all the commands in the plan.
-	for _, item := range plan.Items {
+	for _, item := range planToRun.Items {
 		joinedInputs := strings.Join(item.Inputs, " ")
 		fmt.Fprintln(os.Stdout, "####")
 		fmt.Fprintf(os.Stdout, "#### Running in module '%s' '%s %s'\n", item.ModuleDir, strings.Join(options.Command, " "), joinedInputs)
@@ -90,13 +90,13 @@ func Run(ctx context.Context, options Options) error {
 	return nil
 }
 
-// BuildPlan creates a plan for running commands based on the inputs.
-func BuildPlan(changedFiles []string, modDirs []string, onFiles bool) (Plan, error) {
+// buildPlan creates a plan for running commands based on the inputs.
+func buildPlan(changedFiles []string, modDirs []string, onFiles bool) (plan, error) {
 	grouped, err := groupByModule(changedFiles, modDirs)
 	if err != nil {
-		return Plan{}, err
+		return plan{}, err
 	}
-	items := make([]PlanItem, 0, len(modDirs))
+	items := make([]planItem, 0, len(modDirs))
 
 	for _, modDir := range modDirs {
 		moduleFiles := grouped[modDir]
@@ -108,10 +108,10 @@ func BuildPlan(changedFiles []string, modDirs []string, onFiles bool) (Plan, err
 		if !onFiles {
 			inputs = toDirectories(moduleFiles)
 		}
-		items = append(items, PlanItem{ModuleDir: modDir, Inputs: inputs})
+		items = append(items, planItem{ModuleDir: modDir, Inputs: inputs})
 	}
 
-	return Plan{Items: items}, nil
+	return plan{Items: items}, nil
 }
 
 // groupByModule takes a list of changed files and module directories, and groups
