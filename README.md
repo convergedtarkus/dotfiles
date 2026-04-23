@@ -71,5 +71,10 @@ fatal: clone of 'git@github.com:airblade/vim-gitgutter.git' into submodule path 
       - The `$HOME` is very important as the symlink does not get created correctly otherwise.
 
 
+# DefaultKeyBinding.dict
+- This file is used to set up custom keybindings on MacOS.
+- Copy this to `~/Library/KeyBindings/DefaultKeyBinding.dict`.
+- Currently this only overrides CMD+Control+Left/Right arrow to be a noop to prevent MacOS from making a noise when this combination is used.
+
 # License
 This project uses the https://unlicense.org license. Basically no copyright, you can copy, modify, use, sell etc any code here without giving me credit (though if this is helpful to you, I'd love a shout out!). I give no warranty of any kind on this code.
