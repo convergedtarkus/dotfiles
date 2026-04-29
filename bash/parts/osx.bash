@@ -41,6 +41,24 @@ fixDictation() {
 	killall corespeechd
 }
 
+# Opens the IntelliJ Copilot configuration file in vim.
+openIntellijCopilotConfig() {
+	local basePath="$HOME/Library/Application Support/JetBrains/"
+	
+	# Find the latest version of IntelliJ IDEA in the JetBrains directory.
+	# sort -V sorts version numbers correctly, and tail -n 1 will get the latest one.
+	local latestVersion
+	latestVersion=$(find "$basePath" -maxdepth 1 -name "IntelliJIdea*" 2>/dev/null | sort -V | tail -n 1)
+	if [[ -z "$latestVersion" ]]; then
+		echo "No IntelliJ IDEA versions found in $basePath"
+		return 1
+	else 
+		echo "Latest IntelliJ IDEA version found: $latestVersion"
+	fi
+	
+	vim "$latestVersion/options/github-copilot.xml"
+}
+
 # #############################################
 # Keychain Password Management
 # #############################################
