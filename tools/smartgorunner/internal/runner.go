@@ -33,19 +33,51 @@ type planItem struct {
 	Inputs    []string
 }
 
+type runnerDeps struct {
+	getWorkingDir   func() (string, error)
+	getChangedFiles func(context.Context, string) ([]string, error)
+	getModuleDirs   func(string) ([]string, error)
+	runCommand      func(context.Context, string, string, []string) error
+}
+
+// defaultRunnerDeps returns production dependencies for Run.
+func defaultRunnerDeps() runnerDeps {
+	return runnerDeps{
+		getWorkingDir:   os.Getwd,
+		getChangedFiles: utils.GetChangedGoFiles,
+		getModuleDirs:   utils.GetModuleDirs,
+		runCommand:      runCommand,
+	}
+}
+
+// runCommand executes a command inside a module and streams output to stdout/stderr.
+func runCommand(ctx context.Context, modulePath string, command string, args []string) error {
+	cmd := exec.CommandContext(ctx, command, args...)
+	cmd.Dir = modulePath
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+// Run executes the configured command against changed files or directories grouped by module.
 func Run(ctx context.Context, options Options) error {
+	return runWithDeps(ctx, options, defaultRunnerDeps())
+}
+
+// runWithDeps executes Run using injected dependencies for testing.
+func runWithDeps(ctx context.Context, options Options, deps runnerDeps) error {
 	if len(options.Command) == 0 {
 		return errors.New("command must be provided")
 	}
 
-	wd, err := os.Getwd()
+	wd, err := deps.getWorkingDir()
 	if err != nil {
 		return fmt.Errorf("get working directory: %w", err)
 	}
 	workingDir := wd
 
 	// Get the list of changed Go files in the working directory.
-	changedFiles, err := utils.GetChangedGoFiles(ctx, workingDir)
+	changedFiles, err := deps.getChangedFiles(ctx, workingDir)
 	if err != nil {
 		return err
 	}
@@ -54,7 +86,7 @@ func Run(ctx context.Context, options Options) error {
 	}
 
 	// Get the list of module directories in the working directory.
-	moduleDirs, err := utils.GetModuleDirs(workingDir)
+	moduleDirs, err := deps.getModuleDirs(workingDir)
 	if err != nil {
 		return err
 	}
@@ -78,11 +110,7 @@ func Run(ctx context.Context, options Options) error {
 		}
 
 		args := append(append([]string{}, options.Command[1:]...), item.Inputs...)
-		cmd := exec.CommandContext(ctx, options.Command[0], args...)
-		cmd.Dir = modulePath
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
+		if err := deps.runCommand(ctx, modulePath, options.Command[0], args); err != nil {
 			return fmt.Errorf("run command in module %q: %w", item.ModuleDir, err)
 		}
 	}
