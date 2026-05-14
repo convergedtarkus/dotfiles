@@ -32,3 +32,11 @@ pullSubmoduleChanges: ## Pull changes for all git submodules
 .PHONY: installGoTools
 installGoTools: ## Install from this repo.
 	cd ./tools/smartgorunner && go install ./cmd/smartgorunner/
+
+.PHONY: backupSublimeConfigs
+backupSublimeConfigs: ## Backup sublime configs to this repo.
+	@cp -r $$HOME/Library/Application\ Support/Sublime\ Text/Packages/User/ ./AppConfigs/sublimeConfig/
+
+.PHONY: installSublimeConfigs
+installSublimeConfigs: ## Install sublime configs from this repo.
+	@cp -r ./AppConfigs/sublimeConfig/ $$HOME/Library/Application\ Support/Sublime\ Text/Packages/User/

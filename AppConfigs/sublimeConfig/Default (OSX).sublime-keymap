@@ -1,0 +1,6 @@
+[
+	{ "keys": ["ctrl+super+g"], "command": "find_all_under" },
+	{ "keys": ["ctrl+g"], "command": "find_under_expand" },
+	{ "keys": ["super+ctrl+f"], "command": "show_panel", "args": {"panel": "replace", "reverse": false} },
+	{ "keys": ["super+d"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Delete Line.sublime-macro"} },	
+]
