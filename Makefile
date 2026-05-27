@@ -14,7 +14,7 @@ help:
 
 .PHONY: checkAllBash
 checkAllBash: ## Check all bash scripts with shellcheck
-	@make .getAllBash | xargs -0 shellcheck
+	@make .getAllBash | xargs -0 shellcheck -e SC1090,SC1091 -o add-default-case,avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,require-double-brackets,useless-use-of-cat
 
 .PHONY: formatAllBash
 formatAllBash: ## Format all bash scripts with shfmt
