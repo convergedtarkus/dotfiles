@@ -14,6 +14,10 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
 	export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 fi
 
+if [[ -d "$HOME/.local/bin" ]]; then
+	export PATH="$HOME/.local/bin:$PATH"
+fi
+
 if [[ -d /opt/homebrew/opt/imagemagick@6/bin ]]; then
 	# Add imagemagick to path, if it exists.
 	export PATH="/opt/homebrew/opt/imagemagick@6/bin:$PATH"
