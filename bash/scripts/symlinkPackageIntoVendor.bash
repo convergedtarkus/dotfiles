@@ -196,7 +196,7 @@ echo "Found package '$_arg_symlink_package' inside GOPATH at '$localDependencyPa
 expectedVendorPath="./vendor"${localDependencyPath#"$GOPATH"/src}
 
 # path matches against the whole path name
-if [ ! -d "$expectedVendorPath" ]; then
+if [[ ! -d $expectedVendorPath ]]; then
 	echo "Package '$_arg_symlink_package' does not currently exist in vendor, will symlink using path $expectedVendorPath"
 else
 	if [[ -L $expectedVendorPath ]]; then
@@ -212,7 +212,7 @@ echo "Preparing to symlink '$_arg_symlink_package' into vendor from GOPATH"
 if [[ $_arg_dual_dev == "on" ]]; then
 	echo "ATTENTION: If you add or remove a file/directory at the root level of the package being symlinked in, you will need to re-run the symlink script!"
 else
-	if [ -d "$localDependencyPath/vendor" ]; then
+	if [[ -d "$localDependencyPath/vendor" ]]; then
 		echo
 		echo "Package '$_arg_symlink_package' has a vendor directory. This must be moved for builds in the current package to run."
 		echo "This will likely make you unable to build in '$_arg_symlink_package'. If you need to build in both, use the --dual-dev flag."
@@ -225,7 +225,7 @@ else
 	fi
 fi
 
-if [ -d "$expectedVendorPath" ]; then
+if [[ -d $expectedVendorPath ]]; then
 	rm -rf "$expectedVendorPath"
 	if [[ $_arg_dual_dev == "on" ]]; then
 		# Need to make the directory in order to symlink under it.

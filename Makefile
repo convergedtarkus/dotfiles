@@ -14,7 +14,19 @@ help:
 
 .PHONY: checkAllBash
 checkAllBash: ## Check all bash scripts with shellcheck
-	@make .getAllBash | xargs -0 shellcheck -e SC1090,SC1091 -o add-default-case,avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,require-double-brackets,useless-use-of-cat
+	@# SC1090 = Can't follow non-constant source. Use a directive to specify location
+	@#     Generally this is just noise that I have to add a directive to ignore, so ignore it by default.
+	@# SC1091 = Not following: (error message here)
+	@#     Same as above.
+	@# Pipe to sed to convert the line number format so IDEs can link to the file and line number.
+	@# This will run the shellcheck alias above.
+	@# --color=always is needed to preserve the colors when piping to sed.
+	@make .getAllBash | xargs -0 shellcheck \
+		-e SC1090,SC1091 \
+		-o avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,require-double-brackets,useless-use-of-cat \
+		--color=always \
+		| \
+		sed -E 's#^(In .*) line ([0-9]+):$$#\1:\2:#'
 
 .PHONY: formatAllBash
 formatAllBash: ## Format all bash scripts with shfmt

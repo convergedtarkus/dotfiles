@@ -4,10 +4,10 @@
 killDocker() {
 	dockerUsedSpace
 
-	if [[ $(pgrep -x Docker) ]]; then
+	if pgrep -x Docker; then
 		killall Docker
 	fi
-	if [[ $(pgrep -x "Docker Desktop") ]]; then
+	if pgrep -x "Docker Desktop"; then
 		killall Docker\ Desktop
 	fi
 }
@@ -109,7 +109,7 @@ dockerUsedSpace() {
 	maxFileSizeKB=$(du -A -k "${dockerDir}/Docker.raw" | cut -f 1 | xargs)
 	percent=$(bc <<<"scale=3; ($fileSizeKB/$maxFileSizeKB)*100")
 
-	if [ "$(bc <<<"${percent}>=75")" -ne 0 ]; then
+	if [[ "$(bc <<<"${percent}>=75")" -ne 0 ]]; then
 		spaceOk=false
 	fi
 

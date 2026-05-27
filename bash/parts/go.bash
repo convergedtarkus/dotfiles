@@ -292,13 +292,13 @@ symlinkVendorPackage() {
 
 # Helper to easily move the vendor directory. Pairs with the symlinkVendorPackage function.
 backupVendorDir() {
-	if [ ! -d ./vendor ]; then return; fi
+	if [[ ! -d ./vendor ]]; then return; fi
 	mv ./vendor ./vendor_bak
 }
 
 # Helper to undo backupVendorDir
 restoreVendorDir() {
-	if [ ! -d ./vendor_bak ]; then return; fi
+	if [[ ! -d ./vendor_bak ]]; then return; fi
 	mv ./vendor_bak ./vendor
 }
 

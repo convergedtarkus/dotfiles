@@ -2,9 +2,9 @@
 
 # Get the name of the main branch.
 mainName=""
-if [ "$(git rev-parse --verify main 2>/dev/null)" ]; then
+if git rev-parse --verify main 2>/dev/null; then
 	mainName="main"
-elif [ "$(git rev-parse --verify master 2>/dev/null)" ]; then
+elif git rev-parse --verify master 2>/dev/null; then
 	mainName="master"
 fi
 
@@ -54,7 +54,7 @@ echo ""
 echo "Should those branches be deleted (y/n)?"
 
 read -r input_variable
-if [ "$input_variable" != "y" ] && [ "$input_variable" != "Y" ]; then
+if [[ $input_variable != "y" ]] && [[ $input_variable != "Y" ]]; then
 	echo "Aborting"
 	exit 0
 else

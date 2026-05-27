@@ -163,6 +163,7 @@ update_installed_patch_versions() {
 	fi
 
 	local plugin_list
+	# shellcheck disable=SC2310 # Error code is handled explicitly
 	if ! run_asdf_capture plugin_list plugin list; then
 		log_error "Failed to list asdf plugins: $plugin_list"
 		return 1
@@ -174,6 +175,7 @@ update_installed_patch_versions() {
 		log_debug "Checking tool '$tool'"
 
 		local version_list
+		# shellcheck disable=SC2310 # Error code is handled explicitly
 		if ! run_asdf_capture version_list list "$tool"; then
 			log_warn "Skipping tool '$tool' because 'asdf list $tool' failed: $version_list"
 			continue
@@ -187,6 +189,7 @@ update_installed_patch_versions() {
 			version="$(trim "$version")"
 			[[ -z $version ]] && continue
 
+			# shellcheck disable=SC2310 # Error code is handled explicitly
 			if ! is_semver_patch "$version"; then
 				log_warn "Skipping $tool $version (not strict X.Y.Z semver)"
 				continue
@@ -196,6 +199,7 @@ update_installed_patch_versions() {
 			prefix="$(major_minor_prefix "$version")"
 
 			local latest
+			# shellcheck disable=SC2310 # Error code is handled explicitly
 			if ! run_asdf_capture latest latest "$tool" "$prefix"; then
 				log_warn "Skipping $tool $version because 'asdf latest $tool $prefix' failed with: $latest"
 				continue
@@ -205,6 +209,7 @@ update_installed_patch_versions() {
 				log_warn "Skipping $tool $version (could not find latest for $prefix.x)"
 				continue
 			fi
+			# shellcheck disable=SC2310 # Error code is handled explicitly
 			if ! is_semver_patch "$latest"; then
 				log_warn "Skipping $tool $version (latest '$latest' is not strict X.Y.Z semver)"
 				continue
@@ -220,6 +225,7 @@ update_installed_patch_versions() {
 			# seen_targets is needed in case multiple installed versions share the
 			# same latest target. This can happen when multiple patch versions are
 			# installed for the same major.minor series.
+			# shellcheck disable=SC2310 # Error code is handled explicitly
 			if ! contains_line "$seen_targets" "$key"; then
 				if [[ $dry_run == "1" ]]; then
 					log_success "[dry-run] asdf install $tool $latest"

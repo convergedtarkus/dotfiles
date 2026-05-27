@@ -145,7 +145,7 @@ __gopherjs_process_completion_results() {
 __gopherjs_handle_activeHelp() {
 	# Print the activeHelp statements
 	if ((${#activeHelp[*]} != 0)); then
-		if [ -z "$COMP_TYPE" ]; then
+		if [[ -z $COMP_TYPE ]]; then
 			# Bash v3 does not set the COMP_TYPE variable.
 			printf "\n"
 			printf "%s\n" "${activeHelp[@]}"
@@ -155,7 +155,7 @@ __gopherjs_handle_activeHelp() {
 		fi
 
 		# Only print ActiveHelp on the second TAB press
-		if [ "$COMP_TYPE" -eq 63 ]; then
+		if [[ $COMP_TYPE -eq 63 ]]; then
 			printf "\n"
 			printf "%s\n" "${activeHelp[@]}"
 
@@ -183,7 +183,7 @@ __gopherjs_handle_activeHelp() {
 				# not be doing it itself.
 				__gopherjs_reprint_commandLine
 			fi
-		elif [ "$COMP_TYPE" -eq 37 ] || [ "$COMP_TYPE" -eq 42 ]; then
+		elif [[ $COMP_TYPE -eq 37 ]] || [[ $COMP_TYPE -eq 42 ]]; then
 			# For completion type: menu-complete/menu-complete-backward and insert-completions
 			# the completions are immediately inserted into the command-line, so we first
 			# print the activeHelp message and reprint the command-line since the shell won't.
