@@ -9,12 +9,12 @@ elif [ "$(git rev-parse --verify master 2>/dev/null)" ]; then
 fi
 
 # Verify the current branch is main and fetch it.
-if [[ -z "$mainName" ]]; then
+if [[ -z $mainName ]]; then
 	echo "Could not find main branch, aborting."
 	exit 1
 else
 	currentBranch=$(git rev-parse --abbrev-ref HEAD)
-	if [[ "$mainName" != "$currentBranch" ]]; then
+	if [[ $mainName != "$currentBranch" ]]; then
 		echo -e "\033[0;33mScript is being run while not on the main branch. This works but will not delete the current branch if it is merged.\033[0m"
 	fi
 
@@ -33,7 +33,7 @@ fi
 # Gets all branches that are merged excluding the current, other worktrees and master/main/dev
 mergedBranches=$(git branch --merged "$mainName" | grep -Ev "(^\+|master|main|dev)")
 
-if [[ "$mergedBranches" == *"$currentBranch"* ]]; then
+if [[ $mergedBranches == *"$currentBranch"* ]]; then
 	echo -e "\033[0;33mThe branch you are currently on, $currentBranch, is merged into $mainName. It will not be deleted.\033[0m"
 	mergedBranches=$(echo "$mergedBranches" | grep -Ev "($currentBranch)")
 fi
@@ -41,7 +41,7 @@ fi
 # Trim leading and trailing white space from https://unix.stackexchange.com/a/205854
 mergedBranches=$(echo "$mergedBranches" | awk '{$1=$1};1')
 
-if [[ "$mergedBranches" == "" ]]; then
+if [[ $mergedBranches == "" ]]; then
 	echo "No branches to delete"
 	exit 0
 fi

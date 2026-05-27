@@ -77,7 +77,8 @@ alias shellcheck='shellcheck -e SC1090,SC1091 -o add-default-case,avoid-negated-
 
 # Format and check a script with shfmt and shellcheck.
 checkScript() {
-	shfmt -w "$1"
+	# Write and simplify.
+	shfmt -w -s "$1"
 	shellcheck "$1"
 }
 
@@ -96,11 +97,11 @@ murderTop() {
 	while ((secondsWaited < secondsToWait)); do
 		killTop &>/dev/null
 		exitCode="$?"
-		if [[ "$exitCode" == 0 ]]; then
+		if [[ $exitCode == 0 ]]; then
 			echo "top killed after waiting $secondsWaited seconds. Will wait $secondsToWait seconds more."
 			# A top process was killed, reset the waited time.
 			secondsWaited=0
-		elif [[ "$exitCode" == 1 ]]; then
+		elif [[ $exitCode == 1 ]]; then
 			# No top process was found, increment the waited time and wait one second.
 			((secondsWaited++))
 			sleep 1

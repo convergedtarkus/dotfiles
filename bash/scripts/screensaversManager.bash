@@ -16,16 +16,16 @@ deleteCopyDir=""
 # Directories to not try and read
 declare -a directoriesToSkip
 
-while [[ -n "$1" ]]; do
-	if [[ -z "$readRoot" ]]; then
+while [[ -n $1 ]]; do
+	if [[ -z $readRoot ]]; then
 		readRoot=${1%/}
-		if [[ ! -d "$readRoot" ]]; then
+		if [[ ! -d $readRoot ]]; then
 			echo "Read location '$readRoot' is not a directroy, aborting!"
 			exit 2
 		fi
-	elif [[ -z "$copyToDir" ]]; then
+	elif [[ -z $copyToDir ]]; then
 		copyToDir=${1%/}
-		if [[ ! -d "$copyToDir" ]]; then
+		if [[ ! -d $copyToDir ]]; then
 			echo "Copy location '$copyToDir' is not a directroy, aborting!"
 			exit 2
 		fi
@@ -38,7 +38,7 @@ while [[ -n "$1" ]]; do
 			deleteCopyDir="false"
 			;;
 		*)
-			if [[ ! -d "$1" ]]; then
+			if [[ ! -d $1 ]]; then
 				echo "Director to skip '$1' is not a directory, aborting!"
 				exit 2
 			fi
@@ -56,7 +56,7 @@ while [[ -n "$1" ]]; do
 done
 
 # Make sure required variables are set.
-if [[ -z "$readRoot" || -z "$copyToDir" ]]; then
+if [[ -z $readRoot || -z $copyToDir ]]; then
 	echo "Missing readRoot or copyToDir!"
 	exit 1
 fi
@@ -75,19 +75,19 @@ copyToDir=$(
 
 # Clean up the target directory.
 handleCopyDir() {
-	if [[ "$deleteCopyDir" == "false" || "$readRoot" == "$copyToDir" ]]; then
+	if [[ $deleteCopyDir == "false" || $readRoot == "$copyToDir" ]]; then
 		# Do not delete contents of copy to directory.
 		return
 	fi
 
 	if find "$copyToDir" -not -path "*/\.*" -mindepth 1 -maxdepth 1 | read -r; then
-		if [[ "$deleteCopyDir" != "true" ]]; then
+		if [[ $deleteCopyDir != "true" ]]; then
 			# Ask user if content of copy to directory should be deleted.
 			echo
 			echo
 			echo "Copy target dir ($copyToDir) is not empty, do you want to delete contents?"
 			read -r input_variable
-			if [[ "$input_variable" != "y" ]]; then
+			if [[ $input_variable != "y" ]]; then
 				# User say not to delete contents of copy directory.
 				return
 			fi
@@ -116,22 +116,22 @@ addToImagesToCopy() {
 
 findScreensavers() {
 	for f in "$1"/*; do
-		if [[ -f "$f" ]]; then
+		if [[ -f $f ]]; then
 			addToImagesToCopy "$f"
-		elif [[ -d "$f" ]]; then
-			if [[ "$f" == "$copyToDir" ]]; then
+		elif [[ -d $f ]]; then
+			if [[ $f == "$copyToDir" ]]; then
 				echo "Skipping images in copy to target of '$copyToDir'"
 				continue
 			fi
 
 			shouldSkip=""
 			for dirToSkip in "${directoriesToSkip[@]}"; do
-				if [[ "$f" == "$dirToSkip" ]]; then
+				if [[ $f == "$dirToSkip" ]]; then
 					shouldSkip="true"
 					break
 				fi
 			done
-			if [[ -z "$shouldSkip" ]]; then
+			if [[ -z $shouldSkip ]]; then
 				findScreensavers "$f"
 			else
 				echo "Skipping images in directory '$f'"

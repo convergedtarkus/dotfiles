@@ -28,7 +28,7 @@ init_colors() {
 	# Only use colors when stderr is an interactive terminal and NO_COLOR is not set.
 	# -t 2 checks whether stderr is interactive (a real terminal).
 	# NO_COLOR is a common convention to disable colored output in scripts.
-	if [[ -t 2 && -z "${NO_COLOR:-}" ]]; then
+	if [[ -t 2 && -z ${NO_COLOR:-} ]]; then
 		COLOR_RED=$'\033[31m'
 		COLOR_YELLOW=$'\033[33m'
 		COLOR_GREEN=$'\033[32m'
@@ -54,7 +54,7 @@ colorize_for_level() {
 		;;
 	esac
 
-	if [[ -n "$color" ]]; then
+	if [[ -n $color ]]; then
 		printf '%b%s%b' "$color" "$text" "$COLOR_RESET"
 		return 0
 	fi
@@ -71,7 +71,7 @@ log_line() {
 	local line="${timestamp} ${level} !!!! updateAsdfPatchVersions.bash - ${message}"
 
 	echo "$line"
-	if [[ "$VERBOSE" == "1" || "$level" != "DEBUG" ]]; then
+	if [[ $VERBOSE == "1" || $level != "DEBUG" ]]; then
 		colorize_for_level "$level" "$line" >&2
 		echo >&2
 	fi
@@ -105,7 +105,7 @@ log_success() {
 # Returns 0 when the version is strict semver (X.Y.Z), otherwise 1.
 is_semver_patch() {
 	local version="$1"
-	[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+	[[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
 }
 
 # Extracts the major.minor prefix from a strict semver (X.Y.Z).
@@ -170,7 +170,7 @@ update_installed_patch_versions() {
 
 	while IFS= read -r tool; do
 		tool="$(trim "$tool")"
-		[[ -z "$tool" ]] && continue
+		[[ -z $tool ]] && continue
 		log_debug "Checking tool '$tool'"
 
 		local version_list
@@ -185,7 +185,7 @@ update_installed_patch_versions() {
 			# `asdf list` prefixes the active version with `*`; strip it before semver parsing.
 			version="${version#\*}"
 			version="$(trim "$version")"
-			[[ -z "$version" ]] && continue
+			[[ -z $version ]] && continue
 
 			if ! is_semver_patch "$version"; then
 				log_warn "Skipping $tool $version (not strict X.Y.Z semver)"
@@ -201,7 +201,7 @@ update_installed_patch_versions() {
 				continue
 			fi
 
-			if [[ -z "$latest" ]]; then
+			if [[ -z $latest ]]; then
 				log_warn "Skipping $tool $version (could not find latest for $prefix.x)"
 				continue
 			fi
@@ -210,7 +210,7 @@ update_installed_patch_versions() {
 				continue
 			fi
 
-			if [[ "$latest" == "$version" ]]; then
+			if [[ $latest == "$version" ]]; then
 				log_debug "No patch update needed for $tool $version"
 				continue
 			fi
@@ -221,7 +221,7 @@ update_installed_patch_versions() {
 			# same latest target. This can happen when multiple patch versions are
 			# installed for the same major.minor series.
 			if ! contains_line "$seen_targets" "$key"; then
-				if [[ "$dry_run" == "1" ]]; then
+				if [[ $dry_run == "1" ]]; then
 					log_success "[dry-run] asdf install $tool $latest"
 				else
 					log_success "Installing $tool $latest"
@@ -234,7 +234,7 @@ update_installed_patch_versions() {
 				log_debug "Install already planned for $tool $latest"
 			fi
 
-			if [[ "$dry_run" == "1" ]]; then
+			if [[ $dry_run == "1" ]]; then
 				log_success "[dry-run] asdf uninstall $tool $version"
 			else
 				log_success "Removing $tool $version"
@@ -246,7 +246,7 @@ update_installed_patch_versions() {
 		done <<<"$version_list"
 	done <<<"$plugin_list"
 
-	if [[ "$changed" == "0" ]]; then
+	if [[ $changed == "0" ]]; then
 		log_info "No patch updates were available."
 	else
 		log_success "Completed update pass with changes"

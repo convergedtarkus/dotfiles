@@ -140,7 +140,7 @@ _backupVendor() {
 		done
 	fi
 
-	if [[ -n "$vendorNum" ]]; then
+	if [[ -n $vendorNum ]]; then
 		echo "The vendor_bak directory already exists, backing up vendor to vendor_bak${vendorNum}"
 	else
 		echo "Moving the nested vendor directory to 'vendor_bak'"
@@ -166,7 +166,7 @@ if [[ ! -d vendor ]]; then
 	exit 1
 fi
 
-if [[ "$_arg_dual_dev" == "on" ]]; then
+if [[ $_arg_dual_dev == "on" ]]; then
 	echo "Using dual dev approach"
 	echo
 fi
@@ -209,7 +209,7 @@ fi
 echo
 echo "Preparing to symlink '$_arg_symlink_package' into vendor from GOPATH"
 
-if [[ "$_arg_dual_dev" == "on" ]]; then
+if [[ $_arg_dual_dev == "on" ]]; then
 	echo "ATTENTION: If you add or remove a file/directory at the root level of the package being symlinked in, you will need to re-run the symlink script!"
 else
 	if [ -d "$localDependencyPath/vendor" ]; then
@@ -227,19 +227,19 @@ fi
 
 if [ -d "$expectedVendorPath" ]; then
 	rm -rf "$expectedVendorPath"
-	if [[ "$_arg_dual_dev" == "on" ]]; then
+	if [[ $_arg_dual_dev == "on" ]]; then
 		# Need to make the directory in order to symlink under it.
 		mkdir "$expectedVendorPath"
 	fi
 fi
 
-if [[ "$_arg_dual_dev" == "on" ]]; then
+if [[ $_arg_dual_dev == "on" ]]; then
 	# Loop over all files/directories under the root of the package and symlink them one by one (minus vendor).
 	# This solves the problem of nested vendor directories and also does not require deleting/renaming the vendor
 	# directory of the package being symlinked in.
 	for filename in "$localDependencyPath/"*; do
 		# Skip not-existing files and the vendor directory.
-		if [[ ! -e "$filename" || "$filename" == *vendor ]]; then
+		if [[ ! -e $filename || $filename == *vendor ]]; then
 			continue
 		fi
 		ln -s "$filename" "${expectedVendorPath%/"$_arg_symlink_package"/}"
@@ -249,7 +249,7 @@ else
 fi
 
 # touch all files in the symlinked package to ensure gopherJS and other tools see the changes correctly
-if [[ "$_arg_dual_dev" == "on" ]]; then
+if [[ $_arg_dual_dev == "on" ]]; then
 	touch "$expectedVendorPath"
 	find "$expectedVendorPath" -exec touch {} +
 else

@@ -61,7 +61,7 @@ _gitCheckoutCompletionPreferLocalBranches() {
 
 	# If no local branches match, fall back to git's checkout completion.
 	# __git_func_wrap initializes git completion internals (_git_checkout expects these).
-	if [[ -z "$candidates" ]]; then
+	if [[ -z $candidates ]]; then
 		if declare -F __git_func_wrap >/dev/null 2>&1; then
 			__git_func_wrap _git_checkout
 		else

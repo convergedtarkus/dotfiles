@@ -18,7 +18,7 @@ checkAllBash: ## Check all bash scripts with shellcheck
 
 .PHONY: formatAllBash
 formatAllBash: ## Format all bash scripts with shfmt
-	@make .getAllBash | xargs -0 shfmt -w
+	@make .getAllBash | xargs -0 shfmt -w -s
 
 .PHONY: formatAndCheckAllBash
 formatAndCheckAllBash: ## Format and check all bash scripts

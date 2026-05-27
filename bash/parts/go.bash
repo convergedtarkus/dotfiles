@@ -17,7 +17,7 @@ if [[ -d ${ASDF_DATA_DIR:-$HOME/.asdf} ]]; then
 	. "${ASDF_DATA_DIR:-$HOME/.asdf}"/plugins/golang/set-env.bash
 fi
 
-if [[ -n "$GOBIN" ]]; then
+if [[ -n $GOBIN ]]; then
 	export PATH="$GOBIN:$PATH"
 fi
 
@@ -46,13 +46,13 @@ goTestFile() {
 	filePath="$1"
 
 	# Make sure an argument is provided.
-	if [[ -z "$filePath" ]]; then
+	if [[ -z $filePath ]]; then
 		printf "\033[33mFirst argument must be provided and be the path to the file!\033[0m\n"
 		return 1
 	fi
 
 	# Make sure the file exists.
-	if [[ ! -f "$filePath" ]]; then
+	if [[ ! -f $filePath ]]; then
 		printf "\033[33mFirst argument does not point to a file!\033[0m\n"
 		return 1
 	fi
@@ -73,13 +73,13 @@ goTestFile() {
 	# add a -count=1 argument to bust test caches.
 	inputArgs=("${@:2}")
 	for i in "${inputArgs[@]}"; do
-		if [[ "$i" == "-count"* ]]; then
+		if [[ $i == "-count"* ]]; then
 			hasCount="true"
 		fi
 	done
 
 	# No -count argument provided, add it.
-	if [[ -z "$hasCount" ]]; then
+	if [[ -z $hasCount ]]; then
 		inputArgs=("${inputArgs[@]}" "-count=1")
 	fi
 
@@ -115,9 +115,9 @@ _goTestAll() {
 	eval "$oldPipefail"
 
 	echo
-	if [[ "$exitCode" == 0 ]]; then
+	if [[ $exitCode == 0 ]]; then
 		printf "\033[32mAll tests passed!\033[0m\n"
-	elif [[ "$exitCode" == 1 ]]; then
+	elif [[ $exitCode == 1 ]]; then
 		printf "\033[31mSOME TESTS FAILED!\033[0m\n"
 	else
 		printf "\033[34;1mExit code '%s'. There may be build or package structure issues.\033[0m\n" "$exitCode"
@@ -125,7 +125,7 @@ _goTestAll() {
 	fi
 
 	# If there was error output, display it at the end
-	if [[ -n "$errorOutput" ]]; then
+	if [[ -n $errorOutput ]]; then
 		echo
 		printf "\033[33m========================================\033[0m\n"
 		printf "\033[33mError Output Summary:\033[0m\n"
@@ -137,7 +137,7 @@ _goTestAll() {
 
 # install golangci-lint (https://github.com/golangci/golangci-lint)
 installGolangCiLint() {
-	if [[ -z "$1" ]]; then
+	if [[ -z $1 ]]; then
 		version="v1.51.1"
 	else
 		version="$1"

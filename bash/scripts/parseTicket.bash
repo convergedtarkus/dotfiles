@@ -18,13 +18,13 @@ input="$1"
 jiraTicket=$(echo "$input" | grep -o '^[A-Za-z]\+-[0-9]\+')
 githubIssue=$(echo "$input" | grep -o '#[0-9]\+$')
 
-if [[ -n "$jiraTicket" && -n "$githubIssue" ]]; then
+if [[ -n $jiraTicket && -n $githubIssue ]]; then
 	# both set, so don't do anything
 	exit 1
-elif [[ -n "$jiraTicket" ]]; then
+elif [[ -n $jiraTicket ]]; then
 	echo "${jiraTicket^^}" # Capatalize the characters for consistency.
 	exit 0
-elif [[ -n "$githubIssue" ]]; then
+elif [[ -n $githubIssue ]]; then
 	echo "Issue $githubIssue"
 	exit 0
 fi

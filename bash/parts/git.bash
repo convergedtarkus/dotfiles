@@ -116,7 +116,7 @@ _fetchTarget() {
 		return 1
 	fi
 	fetchTarget=$(git rev-parse --symbolic-full-name --abbrev-ref "@{upstream}" | sed 's|/| |')
-	if [[ -z "$fetchTarget" ]]; then
+	if [[ -z $fetchTarget ]]; then
 		echo "Cannot parse upstream"
 		return 1
 	fi
@@ -127,7 +127,7 @@ _fetchTarget() {
 # gfc fetches just the current branch.
 gfc() {
 	if ! fetchTarget=$(_fetchTarget); then
-		if [[ "$fetchTarget" != "No fetch target" ]]; then
+		if [[ $fetchTarget != "No fetch target" ]]; then
 			# Something went wrong with finding the target.
 			echo "Cannot find fetch target"
 			return 1
@@ -169,7 +169,7 @@ _verifyUndoCommitIsOk() {
 
 	# Confirm with the user that they want to undo a commit that has not been pushed.
 	read -rp "This content has not been pushed. Are you sure you want to undo it? [y/N] " confirm
-	if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+	if [[ $confirm != "y" && $confirm != "Y" ]]; then
 		echo "Aborting."
 		return 1
 	fi
@@ -244,7 +244,7 @@ alias gDiffHead='git diff --stat HEAD~' # Shows the changed files from the last 
 gBranch() {
 	# Get the current branch name.
 	result=$(git rev-parse --abbrev-ref HEAD)
-	if [[ "$result" != "HEAD" ]]; then
+	if [[ $result != "HEAD" ]]; then
 		echo "$result"
 		return 0
 	fi
@@ -293,7 +293,7 @@ gRebaseMain() {
 # Merges upstream main into the given branch, pushes it up and deleted the local branch.
 # Good for updating a remote branch with main that you don't need checked-out locally.
 mergeMainIntoBranch() {
-	if [[ -z "$1" ]]; then
+	if [[ -z $1 ]]; then
 		echo "Must supply a branch name!"
 		return 1
 	fi
@@ -308,7 +308,7 @@ mergeMainIntoBranch() {
 # List all tags. Use tags pulled down, consider running a fetch with tags before hand.
 # A numeric value can be passed in to limit the number of returned tags to the number.
 listTags() {
-	if [[ "$1" == "" ]]; then
+	if [[ $1 == "" ]]; then
 		git tag -l --sort=-v:refname
 		return 0
 	fi
@@ -325,7 +325,7 @@ qaMainMerge() {
 	endingHeadHash=$(git rev-parse HEAD)
 
 	logString=""
-	if [[ "$startingHeadHash" != "$endingHeadHash" ]]; then
+	if [[ $startingHeadHash != "$endingHeadHash" ]]; then
 		logString="Pulled in $(getMainBranch) at '$(git log -1 -s --format="%cd")'"
 	else
 		logString="Up to date with $(getMainBranch) as of '$(date '+%c %z')'"
@@ -341,7 +341,7 @@ addRemote() {
 	remoteName=$1
 	reproName=$(basename "$(git rev-parse --show-toplevel)")
 
-	if [[ "$remoteName" == "" ]]; then
+	if [[ $remoteName == "" ]]; then
 		echo "Must supply a remote name"
 		return 1
 	fi
@@ -437,7 +437,7 @@ commitsBehindMain() {
 	# Pipe to xargs to trim whitespace.
 	individualCommits=$(git log HEAD.."$(getOriginRemote)/$(getMainBranch)" --oneline | wc -l | xargs)
 	parentCommits=$(git log HEAD.."$(getOriginRemote)/$(getMainBranch)" --first-parent --oneline | wc -l | xargs)
-	if [[ "$individualCommits" == 0 && "$parentCommits" == 0 ]]; then
+	if [[ $individualCommits == 0 && $parentCommits == 0 ]]; then
 		echo "Branch is up to date with $(getMainBranch)"
 	else
 		echo "Branch is $parentCommits parent commits and $individualCommits total commits behind $(getMainBranch)"
@@ -467,7 +467,7 @@ highlightChangedFiles() {
 #  4. Clone repos using this command to clone with personal credentials.
 # Takes in a single parameter, the repo to clone `user/repo`.
 clonePersonalRepo() {
-	if [[ -z "$1" || $1 != *"/"* ]]; then
+	if [[ -z $1 || $1 != *"/"* ]]; then
 		echo "First argument must be user/repo"
 		return 1
 	fi
@@ -490,7 +490,7 @@ installGitHooks() {
 	fi
 
 	for file in "$MYDOTFILES"/githooks/*; do
-		if [[ -e "$file" ]]; then
+		if [[ -e $file ]]; then
 			echo "Copying '$file' to git hooks"
 			cp "$file" ./.git/hooks
 		fi
@@ -501,7 +501,7 @@ installGitHooks() {
 # If an argument is pass in, that will be parsed for the ticket to open.
 # Otherwise, the current git branch name will be parsed.
 openTicket() {
-	if [[ -z "$1" ]]; then
+	if [[ -z $1 ]]; then
 		# Get the ticket number from the current branch.
 		parseTarget="$(gBranch)"
 	else
@@ -511,7 +511,7 @@ openTicket() {
 
 	ticket=$("$MYDOTFILES"/bash/scripts/parseTicket.bash "$parseTarget")
 
-	if [[ -z "$ticket" ]]; then
+	if [[ -z $ticket ]]; then
 		echo "No ticket found in branch name/input!"
 		return 1
 	fi

@@ -18,7 +18,7 @@ fullDartCheck() {
 
 	dd format || return
 
-	if [[ "$1" == "-a" ]]; then
+	if [[ $1 == "-a" ]]; then
 		echo "###"
 		echo "### Running normal dart_dev analyze ###"
 		echo "###"

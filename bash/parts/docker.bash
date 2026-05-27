@@ -99,7 +99,7 @@ nukeDocker() {
 # Warns if the used space is over 75%.
 dockerUsedSpace() {
 	dockerDir="$HOME/Library/Containers/com.docker.docker/Data/vms/0/data/"
-	if [[ ! -d "$dockerDir" || ! -f "$dockerDir/Docker.raw" ]]; then
+	if [[ ! -d $dockerDir || ! -f "$dockerDir/Docker.raw" ]]; then
 		echo "Cannot find docker file at $dockerDir"
 		return
 	fi

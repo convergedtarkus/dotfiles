@@ -35,7 +35,7 @@ source "$MYDOTFILES/bash/parts/osx.bash"
 # This allows loading external files depending on the local machine.
 if [[ -d "$MYDOTFILES/custom" ]]; then
 	for file in "$MYDOTFILES"/custom/*; do
-		if [[ -e "$file" ]]; then
+		if [[ -e $file ]]; then
 			# shellcheck source=/dev/null
 			source "$file"
 		fi

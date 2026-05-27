@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-while [[ -n "$1" ]]; do
-	if [[ "$1" == "--stale-only" ]]; then
+while [[ -n $1 ]]; do
+	if [[ $1 == "--stale-only" ]]; then
 		staleOnly="true"
-	elif [[ "$1" == "--help" ]]; then
+	elif [[ $1 == "--help" ]]; then
 		echo "Searches all remote branches and finds any that are greater than $staleBranchAge years"
 		echo "The stateBranchAge variable in the script can be updated to whatever value you'd like"
 		echo "Arguments:"
@@ -13,12 +13,12 @@ while [[ -n "$1" ]]; do
 		echo "--remote: If you have multiple remotes, use this to specific the target (next parameter is the remote to use)"
 		echo "--no-fetch: Will not run a fetch on the remote before running the script"
 		exit 1
-	elif [[ "$1" == "-simple" ]]; then
+	elif [[ $1 == "-simple" ]]; then
 		simpleOutput="true"
-	elif [[ "$1" == "--remote" ]]; then
+	elif [[ $1 == "--remote" ]]; then
 		shift
 		targetRemote="$1"
-	elif [[ "$1" == "--no-fetch" ]]; then
+	elif [[ $1 == "--no-fetch" ]]; then
 		noFetch="true"
 	else
 		echo "Unknown input parameter of '$1'"
@@ -39,7 +39,7 @@ ageInYears() {
 	bc <<<"scale=2;$1/$year"
 }
 
-if [[ -z "$targetRemote" ]]; then
+if [[ -z $targetRemote ]]; then
 	numRemotes=$(git remote | wc -l | xargs)
 	if ((numRemotes == 0)); then
 		echo "You have no remotes, please add one"
@@ -53,17 +53,17 @@ if [[ -z "$targetRemote" ]]; then
 else
 	remoteIsValid="false"
 	while IFS= read -r curRemote; do
-		if [[ "$curRemote" == "$targetRemote" ]]; then
+		if [[ $curRemote == "$targetRemote" ]]; then
 			remoteIsValid="true"
 		fi
 	done <<<"$(git remote)"
-	if [[ "$remoteIsValid" != "true" ]]; then
+	if [[ $remoteIsValid != "true" ]]; then
 		echo "The remote you specificed ('$targetRemote') is not a valid one"
 		exit 1
 	fi
 fi
 
-if [[ -z "$noFetch" ]]; then
+if [[ -z $noFetch ]]; then
 	git fetch -q "$targetRemote"
 fi
 
@@ -98,13 +98,13 @@ while IFS= read -r branch; do
 	else
 		branchAgeYears=$(ageInYears "$branchAgeSeconds")
 
-		if [[ -z "$staleOnly" && -z "$simpleOutput" ]]; then
+		if [[ -z $staleOnly && -z $simpleOutput ]]; then
 			echo "Head: '${branchData[0]}' ref: '${branchData[1]}' author: '$branchHeadAuthorName' ($branchHeadAuthorEmail) age: $branchAgeSeconds ($branchAgeYears years)"
 		fi
 
 		if (($(echo "$branchAgeYears > $staleBranchAge" | bc -l))); then
 			((numBranchesToDelete++))
-			if [[ -n "$simpleOutput" ]]; then
+			if [[ -n $simpleOutput ]]; then
 				printf "%s\t%s\t%s\t%s\n" "${branchData[1]}" "$branchHeadAuthorName" "$branchHeadAuthorEmail" "$branchAgeYears"
 			else
 				printf "\033[1;34mBranch '%s' should be deleted, it is %s years old!' Ask '%s' (%s) to do so!\033[0m\n" "${branchData[1]}" "$branchAgeYears" "$branchHeadAuthorName" "$branchHeadAuthorEmail"
