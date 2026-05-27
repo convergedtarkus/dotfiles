@@ -65,7 +65,12 @@ copyEcho() {
 }
 
 checkScript() {
-	shfmt -w "$1" && shellcheck "$1"
+	# SC1090 = Can't follow non-constant source. Use a directive to specify location
+	#     Generally this is just noise that I have to add a directive to ignore, so ignore it by default.
+	# SC1091 = Not following: (error message here)
+	#     Same as above.
+	shfmt -w "$1"
+	shellcheck -e SC1090,SC1091 -o add-default-case,avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,require-double-brackets,useless-use-of-cat "$1"
 }
 
 checkInternet() {
