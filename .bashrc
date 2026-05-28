@@ -5,6 +5,18 @@
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 export MYDOTFILES="$scriptDir"
 
+# Need to load this right away as bash-it will try to use brew for bash completion (and potentially other things).
+if [[ -f /opt/homebrew/bin/brew ]]; then
+	# Eval this to get brew environment variables and completions working.
+	# From https://apple.stackexchange.com/a/413207
+	# Must be before adding homebrew bin/sbin as once those are added, this command will output nothing.
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+
+	# Add homebrew to path.
+	# But homebrew first so that brew installed stuff takes priority over built versions.
+	export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+fi
+
 if [ -d "$HOME/.bash-it" -a -f "$HOME/.bash-it/bash_it.sh" ]; then
 	# Path to the bash it configuration
 	export BASH_IT="$HOME/.bash-it"
