@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# -e exits the script immediately when a command returns a nonzero status.
+# -u treats use of an unset variable as an error and exits.
+# -o pipefail makes a pipeline fail if any command in it fails, not just the last command.
+set -euo pipefail # bash strict mode
+
 if [[ $# -lt 2 ]]; then
 	echo "Must have at least two parameters. Directroy to read images from and directroy to copy images to."
 	exit 1

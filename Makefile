@@ -8,6 +8,16 @@
 help:
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+.PHONY: enableBashItScripts ## Enables the alias, completion and plugin extensions for bash-it that I use.
+enableBashItScripts:
+	@# Start by disabling everything.
+	@bash-it disable alias all
+	@bash-it disable completion all
+	@bash-it disable plugin all
+	# Now enable the ones we want.
+	@bash-it enable alias personal
+	@bash-it enable completion aliases bash-it brew dart defaults docker git go makefile personal system
+
 .PHONY: .getAllBash
 .getAllBash: ## Get all bash scripts
 	@find . -type d -name ".bash-it" -prune -type d -name ".git" -prune -o -type f \( -name "*.sh" -o -name "*.bash" \) -print0

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# -e exits the script immediately when a command returns a nonzero status.
+# -u treats use of an unset variable as an error and exits.
+# -o pipefail makes a pipeline fail if any command in it fails, not just the last command.
+set -euo pipefail # bash strict mode
+
 # Finds a dependency inside the vendor folder by the repro name, removes its vendor and symlinks to to a local copy of that dependency.
 # If the dependency doesn't exit in vendor, has multiple possible options or a copy doesn't exist in the $GOPATH then nothing will happen
 # Note that the search string is case sensitive
@@ -45,14 +50,12 @@ _positionals=()
 _arg_symlink_package=""
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_dual_dev="off"
-_arg_version="off"
 
 print_help() {
 	printf '%s\n' "The general script's help msg"
 	printf 'Usage: %s [--(no-)dual-dev] [-v|--(no-)version] [-h|--help] [<symlink-package>]\n' "$0"
 	printf '\t%s\n' "<symlink-package>: The package to symlink into current project. Can be an absolute path, full import package name or a unique search string to find the package in GOPATH."
 	printf '\t%s\n' "--dual-dev, --no-dual-dev: Uses a different symlink approach that allows deving in both the current project and the project being symlinked in. (off by default)"
-	printf '\t%s\n' "-v, --version, --no-version: Print the scripts version (off by default)"
 	printf '\t%s\n' "-h, --help: Prints help"
 }
 
@@ -64,17 +67,6 @@ parse_commandline() {
 		--no-dual-dev | --dual-dev)
 			_arg_dual_dev="on"
 			test "${1:0:5}" = "--no-" && _arg_dual_dev="off"
-			;;
-		-v | --no-version | --version)
-			_arg_version="on"
-			test "${1:0:5}" = "--no-" && _arg_version="off"
-			;;
-		-v*)
-			_arg_version="on"
-			_next="${_key##-v}"
-			if test -n "$_next" -a "$_next" != "$_key"; then
-				{ begins_with_short_option "$_next" && shift && set -- "-v" "-${_next}" "$@"; } || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
-			fi
 			;;
 		-h | --help)
 			print_help
@@ -148,11 +140,6 @@ _backupVendor() {
 
 	mv "$vendorPath" "${vendorPath}_bak${vendorNum}"
 }
-
-if [[ $_arg_version == "on" ]]; then
-	echo "Version 6.2.0"
-	exit
-fi
 
 # shellcheck disable=SC2154
 # This is defined using some bash magic (I think, blame Argbash), but this variable is assigned.

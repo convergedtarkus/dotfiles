@@ -18,12 +18,7 @@ I'm using the setup from https://www.atlassian.com/git/tutorials/dotfiles which 
 4. This repo uses submodules for bash-it and vim plugins
     - `myconfig submodule update --init`
 5. At this point restart you terminal
-6. If using bash-it, enable the following things
-```
-bash-it enable alias personal
-bash-it enable plugin man
-bash-it enable completion aliases bash-it brew dart defaults docker git makefile personal system
-```
+6. If using bash-it, run the `make enableBashItScripts` command.
 7. Restart the terminal again.
 8. Run `myconfig config --local status.showUntrackedFiles no` to not show untracked files. Otherwise all files in your home directory will report when running `git status`. You will need to manually add new files to commit them to the repo.
     - Verify by running `myconfig status` and it doesn't report a ton of files.

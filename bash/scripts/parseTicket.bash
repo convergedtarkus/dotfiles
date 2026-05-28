@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# -e exits the script immediately when a command returns a nonzero status.
+# -u treats use of an unset variable as an error and exits.
+# -o pipefail makes a pipeline fail if any command in it fails, not just the last command.
+set -euo pipefail # bash strict mode
+
 # Parse the given input (branch name) to extract a jira ticket or github issue number.
 # Jira ticket follows the form [A-Z]+-[0-9]+ and be at the start of the input.
 # Github issue follows the form #[0-9]+ and must be at the end of the input.

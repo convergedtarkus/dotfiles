@@ -58,6 +58,16 @@ alias -- -='cd -'        # Go back
 # Helper to find files that are not hidden.
 alias findNotHidden='find . -not -path "*/\.*"'
 
+# Taken from the bash-it man plugin but modified so search results are more readable.
+# Colorize `man` output by setting `less` terminal capabilities for bold/underline/standout text,
+# then force `less` to pass through ANSI escape sequences so those colors render correctly.
+alias man="\
+LESS_TERMCAP_mb=$'\e[1;32m' \
+LESS_TERMCAP_md=$'\e[1;32m' LESS_TERMCAP_me=$'\e[0m' \
+LESS_TERMCAP_se=$'\e[0m'    LESS_TERMCAP_so=$'\e[7;1m' \
+LESS_TERMCAP_ue=$'\e[0m'    LESS_TERMCAP_us=$'\e[1;4;31m' \
+LESS=--RAW-CONTROL-CHARS \man"
+
 # Touch all time at a directory. Good for getting build tools to pick up changes.
 touchFiles() {
 	find "$1" -type f -exec touch {} +
