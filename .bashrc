@@ -17,7 +17,7 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
 	export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 fi
 
-if [ -d "$HOME/.bash-it" -a -f "$HOME/.bash-it/bash_it.sh" ]; then
+if [[ -d "$HOME/.bash-it" && -f "$HOME/.bash-it/bash_it.sh" ]]; then
 	# Path to the bash it configuration
 	export BASH_IT="$HOME/.bash-it"
 
@@ -42,8 +42,8 @@ else
 fi
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+[[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
 # Add asdf shims directroy to path
 if [[ -d ${ASDF_DATA_DIR:-$HOME/.asdf} ]]; then

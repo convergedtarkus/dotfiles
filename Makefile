@@ -20,7 +20,11 @@ enableBashItScripts:
 
 .PHONY: .getAllBash
 .getAllBash: ## Get all bash scripts
-	@find . -type d -name ".bash-it" -prune -type d -name ".git" -prune -o -type f \( -name "*.sh" -o -name "*.bash" \) -print0
+	@find . \
+       -type d \( -name ".bash-it" -o -name ".vim" -o -name ".git" \) -prune -o \
+       -type f \
+       -exec awk 'NR==1 { exit ($$0 ~ /^#!(\/(usr\/)?bin\/(env[[:space:]]+)?(ba)?sh([[:space:]]|$$))/ ? 0 : 1) } END { if (NR==0) exit 1 }' {} \; \
+       -print0
 
 .PHONY: checkAllBash
 checkAllBash: ## Check all bash scripts with shellcheck
@@ -36,7 +40,7 @@ checkAllBash: ## Check all bash scripts with shellcheck
 		-o avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,require-double-brackets,useless-use-of-cat \
 		--color=always \
 		| \
-		sed -E 's#^(In .*) line ([0-9]+):$$#\1:\2:#'
+		sed -E 's#In (.\/)?(.*) line ([0-9]+):#In ./\2:\3:#'
 
 .PHONY: formatAllBash
 formatAllBash: ## Format all bash scripts with shfmt

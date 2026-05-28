@@ -13,7 +13,7 @@ COMMIT_SOURCE=$2
 SHA1=$3
 
 # Do not do anything for merges or squashes or appends (SHA1 != "")
-if [[ -n "$SHA1" || "$COMMIT_SOURCE" == "merge" || "$COMMIT_SOURCE" == "squash" ]]; then
+if [[ -n $SHA1 || $COMMIT_SOURCE == "merge" || $COMMIT_SOURCE == "squash" ]]; then
 	exit 0
 fi
 
@@ -25,7 +25,7 @@ fi
 # Get the current branch name.
 branchName=$(git rev-parse --abbrev-ref HEAD)
 
-if [[ "$branchName" == "HEAD" ]]; then
+if [[ $branchName == "HEAD" ]]; then
 	# During a rebase, a different approach is needed to get the branch name.
 	# Taken from https://stackoverflow.com/a/59115583.
 	for location in rebase-merge rebase-apply; do
@@ -40,13 +40,13 @@ fi
 # Check if there is already a ticket in the commit message to avoid adding another one.
 ticketLine=$(grep -v '^#\|^$' "$COMMIT_MSG_FILE" | tail -n 1)
 existingTicket=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$ticketLine")
-if [[ -n "$existingTicket" ]]; then
+if [[ -n $existingTicket ]]; then
 	exit 0
 fi
 
 parsedTicket=$("$MYDOTFILES/bash/scripts/parseTicket.bash" "$branchName")
-if [[ -n "$parsedTicket" ]]; then
-	if [[ "$COMMIT_SOURCE" == "message" ]]; then
+if [[ -n $parsedTicket ]]; then
+	if [[ $COMMIT_SOURCE == "message" ]]; then
 		# Append parsed ticket after the -m message.
 		printf "%s\n\n%s" "$(cat "$COMMIT_MSG_FILE")" "$parsedTicket" >"$COMMIT_MSG_FILE"
 	else

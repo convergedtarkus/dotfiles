@@ -82,7 +82,7 @@ shellcheck() {
 		-o avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,require-double-brackets,useless-use-of-cat \
 		--color=always \
 		"$1" |
-		sed -E 's#(In .*) line ([0-9]+):#\1:\2:#'
+		sed -E 's#In (.\/)?(.*) line ([0-9]+):#In ./\2:\3:#'
 }
 
 # Format and check a script with shfmt and shellcheck.
