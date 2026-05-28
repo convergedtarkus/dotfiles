@@ -49,7 +49,12 @@ formatAndCheckAllBash: ## Format and check all bash scripts
 
 .PHONY: pullSubmoduleChanges
 pullSubmoduleChanges: ## Pull changes for all git submodules
-	@git --git-dir=$$HOME/.myconfig/ --work-tree=$$HOME submodule update --init --recursive
+	@# Handle if this is being used with the myconfig setup or not.
+	@ if [ -d ".myconfig" ]; then \
+		git --git-dir=$HOME/.myconfig/ --work-tree=$HOME submodule update --init --recursive; \
+	else \
+		git submodule update --init --recursive; \
+	fi
 
 .PHONY: installGoTools
 installGoTools: ## Install from this repo.
