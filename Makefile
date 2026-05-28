@@ -10,13 +10,13 @@ help:
 
 .PHONY: enableBashItScripts ## Enables the alias, completion and plugin extensions for bash-it that I use.
 enableBashItScripts:
-	@# Start by disabling everything.
-	@bash-it disable alias all
-	@bash-it disable completion all
-	@bash-it disable plugin all
-	# Now enable the ones we want.
-	@bash-it enable alias personal
-	@bash-it enable completion aliases bash-it brew dart defaults docker git go makefile personal system
+	@# Start by disabling everything in the user's interactive Bash shell.
+	@bash -i -c 'bash-it disable alias all'
+	@bash -i -c 'bash-it disable completion all'
+	@bash -i -c 'bash-it disable plugin all'
+	@# Now enable the ones we want in the user's interactive Bash shell.
+	@bash -i -c 'bash-it enable alias personal'
+	@bash -i -c 'bash-it enable completion aliases bash-it brew dart defaults docker git go makefile personal system'
 
 .PHONY: .getAllBash
 .getAllBash: ## Get all bash scripts
