@@ -81,15 +81,15 @@ shellcheck() {
 		-e SC1090,SC1091 \
 		-o avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,require-double-brackets,useless-use-of-cat \
 		--color=always \
-		"$1" |
+		"$@" |
 		sed -E 's#In (.\/)?(.*) line ([0-9]+):#In ./\2:\3:#'
 }
 
 # Format and check a script with shfmt and shellcheck.
 checkScript() {
 	# Write and simplify.
-	shfmt -w -s "$1"
-	shellcheck "$1"
+	shfmt -w -s "$@"
+	shellcheck "$@"
 }
 
 checkInternet() {
