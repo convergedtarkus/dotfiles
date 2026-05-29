@@ -8,8 +8,8 @@
 help:
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-.PHONY: enableBashItScripts ## Enables the alias, completion and plugin extensions for bash-it that I use.
-enableBashItScripts:
+.PHONY: enableBashItScripts
+enableBashItScripts: ## Enables the alias, completion and plugin extensions for bash-it that I use.
 	@# Start by disabling everything in the user's interactive Bash shell.
 	@bash -i -c 'bash-it disable alias all'
 	@bash -i -c 'bash-it disable completion all'
