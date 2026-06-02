@@ -103,6 +103,10 @@ _managedPasswords=()
 
 # Adds the given password name to the list of managed passwords for tab completion.
 _addToManagedPasswords() {
+	if [[ -z $1 ]]; then
+		echo "Password name cannot be empty"
+		return 1
+	fi
 	_managedPasswords+=("$1")
 }
 
@@ -110,6 +114,10 @@ _addToManagedPasswords() {
 # Takes in the name of the password to add.
 # This will prompt for the new password value.
 addGenericPassword() {
+	if [[ -z $1 ]]; then
+		echo "Password name cannot be empty"
+		return 1
+	fi
 	# This will prompt for the password value to add.
 	security add-generic-password -a "${USER}" -s "$1" -w
 }
@@ -140,6 +148,10 @@ doesGenericPasswordExistSilent() {
 # Takes in the name of the password to update.
 # This will prompt for the new password value.
 updateGenericPassword() {
+	if [[ -z $1 ]]; then
+		echo "Password name cannot be empty"
+		return 1
+	fi
 	security add-generic-password -a "${USER}" -s "$1" -U -w
 }
 
