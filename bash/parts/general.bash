@@ -3,13 +3,9 @@
 # Do not run homebrew clean up automatically. This will prevent old versions from being uninstalled.
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
+# Add .local/bin which is used for claude code.
 if [[ -d "$HOME/.local/bin" ]]; then
 	export PATH="$HOME/.local/bin:$PATH"
-fi
-
-if [[ -d /opt/homebrew/opt/imagemagick@6/bin ]]; then
-	# Add imagemagick to path, if it exists.
-	export PATH="/opt/homebrew/opt/imagemagick@6/bin:$PATH"
 fi
 
 # Enable completions for github CLI

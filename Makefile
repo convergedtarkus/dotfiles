@@ -20,11 +20,16 @@ enableBashItScripts: ## Enables the alias, completion and plugin extensions for 
 
 .PHONY: .getAllBash
 .getAllBash: ## Get all bash scripts
-	@find . \
-       -type d \( -name ".bash-it" -o -name ".vim" -o -name ".git" \) -prune -o \
-       -type f \
-       -exec awk 'NR==1 { exit ($$0 ~ /^#!(\/(usr\/)?bin\/(env[[:space:]]+)?(ba)?sh([[:space:]]|$$))/ ? 0 : 1) } END { if (NR==0) exit 1 }' {} \; \
-       -print0
+	@make .runGitCommand CMD='-C . ls-files -z ' \
+	| xargs -0 -n1 dirname \
+	| sort -u \
+	| while IFS= read -r d; do \
+		find "$$d" -maxdepth 1 \
+			-type d \( -name ".bash-it" -o -name ".vim" -o -name ".git" \) -prune -o \
+			-type f \
+			-exec awk 'NR==1 { exit ($$0 ~ /^#!(\/(usr\/)?bin\/(env[[:space:]]+)?(ba)?sh([[:space:]]|$$))/ ? 0 : 1) } END { if (NR==0) exit 1 }' {} \; \
+			-print0; \
+	done
 
 .PHONY: checkAllBash
 checkAllBash: ## Check all bash scripts with shellcheck
@@ -53,12 +58,7 @@ formatAndCheckAllBash: ## Format and check all bash scripts
 
 .PHONY: pullSubmoduleChanges
 pullSubmoduleChanges: ## Pull changes for all git submodules
-	@# Handle if this is being used with the myconfig setup or not.
-	@ if [ -d ".myconfig" ]; then \
-		git --git-dir=$HOME/.myconfig/ --work-tree=$HOME submodule update --init --recursive; \
-	else \
-		git submodule update --init --recursive; \
-	fi
+	@make .runGitCommand CMD='submodule update --init --recursive'
 
 .PHONY: installGoTools
 installGoTools: ## Install from this repo.
@@ -71,3 +71,12 @@ backupSublimeConfigs: ## Backup sublime configs to this repo.
 .PHONY: installSublimeConfigs
 installSublimeConfigs: ## Install sublime configs from this repo.
 	@cp -r ./AppConfigs/sublimeConfig/ $$HOME/Library/Application\ Support/Sublime\ Text/Packages/User/
+
+.PHONY: .runGitCommand
+.runGitCommand: ## Run a myconfig git command. Usage: make myconfigGit CMD='status -sb'
+	@# Handle if this is being used with the myconfig setup or not.
+	@ if [ -d ".myconfig" ]; then \
+		git --git-dir=$$HOME/.myconfig/ --work-tree=$$HOME $(CMD); \
+	else \
+		git $(CMD); \
+	fi

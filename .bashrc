@@ -10,11 +10,8 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
 	# Eval this to get brew environment variables and completions working.
 	# From https://apple.stackexchange.com/a/413207
 	# Must be before adding homebrew bin/sbin as once those are added, this command will output nothing.
+	# This handles adding homebrew to the PATH
 	eval "$(/opt/homebrew/bin/brew shellenv)"
-
-	# Add homebrew to path.
-	# But homebrew first so that brew installed stuff takes priority over built versions.
-	export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 fi
 
 if [[ -d "$HOME/.bash-it" && -f "$HOME/.bash-it/bash_it.sh" ]]; then
