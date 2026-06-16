@@ -1,6 +1,6 @@
 [submodule ".bash-it"]
 	path = .bash-it
-	url = https://convergedtarkus@github.com/convergedtarkus/bash-it.git
+	url = git@github.com:Bash-it/bash-it.git
 [submodule ".vim/pack/convergedtarkus/start/vim-monokai"]
 	path = .vim/pack/convergedtarkus/start/vim-monokai
 	url = git@github.com:crusoexia/vim-monokai.git
