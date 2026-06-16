@@ -14,7 +14,7 @@ useGoVersion() {
 if [[ -d ${ASDF_DATA_DIR:-$HOME/.asdf} ]]; then
 	# I don't own this script, so tell shellcheck to ignore it.
 	# shellcheck source=/dev/null
-	. "${ASDF_DATA_DIR:-$HOME/.asdf}"/plugins/golang/set-env.bash
+	source "${ASDF_DATA_DIR:-$HOME/.asdf}"/plugins/golang/set-env.bash
 fi
 
 if [[ -n $GOBIN ]]; then
