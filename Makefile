@@ -1,5 +1,6 @@
-# Self-Documented Makefile see https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+SHELL := /bin/bash
 
+# Self-Documented Makefile see https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 .DEFAULT_GOAL := help
 
 .PHONY: help
@@ -71,6 +72,26 @@ backupSublimeConfigs: ## Backup sublime configs to this repo.
 .PHONY: installSublimeConfigs
 installSublimeConfigs: ## Install sublime configs from this repo.
 	@cp -r ./AppConfigs/sublimeConfig/ $$HOME/Library/Application\ Support/Sublime\ Text/Packages/User/
+
+.PHONY: generateFileIgnoreConfig
+generateFileIgnoreConfig: ## Generates a string of files to ignore that can be used in IntelliJ's exclude files.
+	@shopt -s dotglob; \
+	trap "shopt -u dotglob" EXIT; \
+	output=""; \
+	for file in *; do \
+		if [[ -d $$file ]]; then \
+			continue; \
+		fi; \
+		if ! make .runGitCommand CMD="ls-files '$$file' --error-unmatch" &>/dev/null; then \
+			if [[ -z $$output ]]; then \
+				output="$$file"; \
+			else \
+				output="$$output;$$file"; \
+			fi; \
+		fi; \
+	done; \
+	echo "$$output"; \
+
 
 .PHONY: .runGitCommand
 .runGitCommand: ## Run a myconfig git command. Usage: make myconfigGit CMD='status -sb'
