@@ -92,6 +92,27 @@ generateFileIgnoreConfig: ## Generates a string of files to ignore that can be u
 	done; \
 	echo "$$output"; \
 
+.PHONY: .deleteRepository
+.deleteRepository: ## Deletes this repository and all of its contents. Use with caution. Must pass in FOR_REAL=true to actually delete. Otherwise, it is a dry run.
+	@shopt -s dotglob; \
+	trap "shopt -u dotglob" EXIT; \
+	shouldDelete="$(FOR_REAL)"; \
+	for file in *; do \
+		if make .runGitCommand CMD="ls-files '$$file' --error-unmatch" &>/dev/null; then \
+			if [[ $$shouldDelete == "true" ]]; then \
+				rm -rf "$$file"; \
+			else \
+				echo "Would delete: $$file"; \
+			fi; \
+		fi; \
+	done; \
+	if [[ -f ".myconfig" ]]; then \
+		if [[ $$shouldDelete == "true" ]]; then \
+			rm -rf ".myconfig"; \
+		else \
+			echo "Would delete: .myconfig"; \
+		fi; \
+	fi; \
 
 .PHONY: .runGitCommand
 .runGitCommand: ## Run a myconfig git command. Usage: make myconfigGit CMD='status -sb'
