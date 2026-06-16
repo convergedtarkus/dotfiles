@@ -16,8 +16,8 @@ enableBashItScripts: ## Enables the alias, completion and plugin extensions for 
 	@bash -i -c 'bash-it disable completion all'
 	@bash -i -c 'bash-it disable plugin all'
 	@# Now enable the ones we want in the user's interactive Bash shell.
-	@bash -i -c 'bash-it enable alias personal'
-	@bash -i -c 'bash-it enable completion aliases bash-it brew dart defaults docker git go makefile personal system'
+	@bash -i -c 'bash-it enable alias custom'
+	@bash -i -c 'bash-it enable completion aliases bash-it brew dart defaults docker git go makefile custom system'
 
 .PHONY: .getAllBash
 .getAllBash: ## Get all bash scripts

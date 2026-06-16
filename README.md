@@ -27,18 +27,7 @@ I'm using the setup from https://www.atlassian.com/git/tutorials/dotfiles which 
 Use the `myconfig` alias to perform git operations.
 
 # Custom Bash-it setup
-- This uses a custom fork of Bash-it to deal with some load order issues.
-- My Bash-it fork (located in .bash-it) includes aliases/available/personal.bash which loads up combinedBash.bash.
-  - Make sure to enable the personal alias and personal completion in bash-it to load this file.
-
-# Updating Bash-It submodule
-1. Checkout my [Bash-It fork](https://github.com/convergedtarkus/bash-it)
-2. Pull in upstream master (that is https://github.com/Bash-it/bash-it)
-3. Push that up.
-4. cd into .bash-it
-5. git pull master
-6. cd to root
-7. Commit the .bash-it folder
+# The .bashrc file will copy the custom alias and completion files to the bash-it custom directories when running. This ensures that everything loads properly without having to use a custom fork of bash-it.
 
 # Common Issues/Gotcha
 ## Auth issues with submodules
@@ -55,15 +44,9 @@ fatal: clone of 'git@github.com:airblade/vim-gitgutter.git' into submodule path 
 - If you are me and use the kind of setup from clonePersonalRepo in bash/parts/git.bash, you'll need to change all the 'git@github.com' urls to be 'git@github.com-personal'.
 - Make sure to add a SSH key
     - [Generate A New SSH Key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
-    - [Add A New SSH Key To Github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
 
-## Bash-It Not Loading Personal Files
-- Make ensure alias personal and completion personal are enabled in bash-it.
-- To do so manually:
-  - Add a symlink under .bash-it/enabled/ to .bash-it/aliases/available/personal.bash and name it '150--personal.bash'.
-    - This is how bash-it enables things and will enable loading the personal.bash file.
-    - `ln -s $HOME/.bash-it/aliases/available/personal.bash $HOME/.bash-it/enabled/150--personal.bash`
-      - The `$HOME` is very important as the symlink does not get created correctly otherwise.
+## Bash-It Not Loading Custom Files
+- Make ensure alias custom and completion custom are enabled in bash-it.
 
 
 # DefaultKeyBinding.dict
