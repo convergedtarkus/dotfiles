@@ -106,7 +106,7 @@ generateFileIgnoreConfig: ## Generates a string of files to ignore that can be u
 			fi; \
 		fi; \
 	done; \
-	if [[ -f ".myconfig" ]]; then \
+	if [[ -d ".myconfig" ]]; then \
 		if [[ $$shouldDelete == "true" ]]; then \
 			rm -rf ".myconfig"; \
 		else \
