@@ -1,15 +1,15 @@
 [submodule ".bash-it"]
 	path = .bash-it
-	url = git@github.com:Bash-it/bash-it.git
+	url = https://github.com/Bash-it/bash-it.git
 [submodule ".vim/pack/convergedtarkus/start/vim-monokai"]
 	path = .vim/pack/convergedtarkus/start/vim-monokai
-	url = git@github.com:crusoexia/vim-monokai.git
+	url = https://github.com/crusoexia/vim-monokai.git
 [submodule ".vim/pack/convergedtarkus/start/vim-gitgutter"]
 	path = .vim/pack/convergedtarkus/start/vim-gitgutter
-	url = git@github.com:airblade/vim-gitgutter.git
+	url = https://github.com/airblade/vim-gitgutter.git
 [submodule ".vim/pack/convergedtarkus/start/vim-go"]
 	path = .vim/pack/convergedtarkus/start/vim-go
-	url = git@github.com:fatih/vim-go.git
+	url = https://github.com/fatih/vim-go.git
 [submodule ".vim/pack/convergedtarkus/start/dart-vim-plugin"]
 	path = .vim/pack/convergedtarkus/start/dart-vim-plugin
 	url = https://github.com/dart-lang/dart-vim-plugin.git
