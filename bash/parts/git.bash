@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Function to define the "upstream" repo alias name. Needs to be first for use below
 # Uses the first matching remote in git config upstream > origin
 # Can define a custom _getOriginRemotePreHook for using a non-standard alias
@@ -267,9 +269,12 @@ gBranch() {
 openBranch() { gh browse -b "$(gBranch)"; }
 
 # Clean commands
-alias safeClean='git clean -xdf -e .idea -e "*.iml" -e .atom -e .vscode -e .tool-versions' # will remove ignored files and untracked files (git add anything you want to keep). Keeps IDE files/settings.
-alias testSafeClean='safeClean -n'                                                         # safeClean but only list what would be removed (do not delete anything).
-alias gpristine='git reset --hard && safeClean'                                            # safeClean + reset to HEAD
+# will remove ignored files (but not untracked files). Keeps IDE files/settings.
+alias safeClean='git clean -Xdf -e "!.idea" -e "!.atom" -e "!.vscode" -e "!.tool-versions"'
+# safeClean but only list what would be removed (do not delete anything).
+alias testSafeClean='safeClean -n'
+# safeClean + reset to HEAD
+alias gpristine='git reset --hard && safeClean'
 
 # Get the base commit between the current branch and main.
 mainBase() {

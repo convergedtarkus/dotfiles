@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # bash completion V2 for gopherjs                             -*- shell-script -*-
 
 __gopherjs_debug() {
