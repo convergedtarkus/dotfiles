@@ -10,17 +10,6 @@ useGoVersion() {
 	fi
 }
 
-# Source the asdf golang script
-if [[ -d ${ASDF_DATA_DIR:-$HOME/.asdf} ]]; then
-	# I don't own this script, so tell shellcheck to ignore it.
-	# shellcheck source=/dev/null
-	source "${ASDF_DATA_DIR:-$HOME/.asdf}"/plugins/golang/set-env.bash
-fi
-
-if [[ -n $GOBIN ]]; then
-	export PATH="$GOBIN:$PATH"
-fi
-
 # Alias for easily generating or removing vendor folder.
 alias gmv='go mod vendor'
 alias gmvr='rm -rf ./vendor'

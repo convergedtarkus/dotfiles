@@ -27,6 +27,10 @@ source "$MYDOTFILES/bash/parts/dartAndPub.bash"
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/go.bash"
 
+# Java
+# shellcheck source=/dev/null
+source "$MYDOTFILES/bash/parts/java.bash"
+
 # No support for linux yet, should at least not source this if on linux
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/osx.bash"
