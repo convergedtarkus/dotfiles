@@ -136,6 +136,28 @@ installGolangCiLint() {
 		go install -ldflags "-X 'main.version=$(git describe --tags)' -X 'main.commit=$(git rev-parse --short HEAD)' -X 'main.date=$(date)'")
 }
 
+# Installs shfmt through go.
+installShfmt() {
+	local -r shfmtInstallPath="mvdan.cc/sh/v3/cmd/shfmt"
+	if command -v smartGoInstall >/dev/null; then
+		echo "Installing shfmt via smartGoInstall."
+		smartGoInstall "$shfmtInstallPath"
+	else
+		echo "Installing shfmt via normal go install."
+		go install "$shfmtInstallPath@latest"
+	fi
+
+	# Reshim to ensure it is picked up by asdf.
+	if command -v asdf >/dev/null; then
+		asdf reshim golang
+	fi
+
+	if ! command -v shfmt >/dev/null || ! shfmt --version >/dev/null 2>&1; then
+		echo "Failed to install shfmt"
+		return 1
+	fi
+}
+
 # install goimports which is like gofmt, but does a lot more.
 installGoimports() {
 	go get -u golang.org/x/tools/cmd/goimports
