@@ -83,6 +83,31 @@ shellcheck() {
 
 # Format and check a script with shfmt and shellcheck.
 checkScript() {
+	# Iterate over arguments and verify a file is found.
+	local foundFiles=()
+	for arg in "$@"; do
+		if [[ $arg != ^- ]]; then
+			foundFiles+=("$arg")
+		fi
+	done
+
+	if [[ ${#foundFiles[@]} -eq 0 ]]; then
+		echo "No files found to check."
+		return 1
+	fi
+
+	local returnCode
+	for file in "${foundFiles[@]}"; do
+		if [[ ! -f $file ]]; then
+			echo "'$file' cannot be found."
+			returnCode=1
+		fi
+	done
+
+	if [[ -n $returnCode ]]; then
+		return "$returnCode"
+	fi
+
 	# Write and simplify.
 	shfmt -w -s "$@"
 	shellcheck "$@"
