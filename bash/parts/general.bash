@@ -53,6 +53,90 @@ LESS_TERMCAP_se=$'\e[0m'    LESS_TERMCAP_so=$'\e[7;1m' \
 LESS_TERMCAP_ue=$'\e[0m'    LESS_TERMCAP_us=$'\e[1;4;31m' \
 LESS=--RAW-CONTROL-CHARS \man"
 
+# Resolves the path to a command. Takes asdf into account.
+# Commands that do not resolve echo nothing (not even a newline)
+resolveCommand() {
+	local commandToCheck
+	for commandToCheck in "$@"; do
+		if asdfPath=$(asdfPath "$commandToCheck"); then
+			echo "$asdfPath"
+		else
+			command -v "$commandToCheck"
+		fi
+	done
+}
+
+# Returns the path to a command if it is installed via asdf.
+# Will return a non-zero exit code for either a command not installed through asdf
+# or a command installed through asdf but with no version set.
+# Commands that do not resolve echo nothing (not even a newline)
+asdfPath() {
+	if ! command -v asdf >/dev/null; then
+		# asdf does not exist
+		return
+	fi
+
+	local commandToCheck
+	for commandToCheck in "$@"; do
+		# Reroute standard error to null so only the path is echoed, not the error.
+		asdf which "$commandToCheck" 2>/dev/null
+	done
+}
+
+# Removes the given command. Takes asdf into account.
+# Will echo information about the command being removed (if removing, if not found, if protected etc)
+deleteCommand() {
+	for commandToDelete in "$@"; do
+		_deleteNormalCommand "$commandToDelete"
+
+		local asdfCommandPath
+		if asdfCommandPath="$(asdfPath "$commandToDelete")" && [[ -n $asdfCommandPath ]]; then
+			echo "Removing command '$commandToDelete' installed through asdf at '$asdfCommandPath'"
+			rm "$asdfCommandPath"
+		fi
+
+	done
+}
+
+# Removes the given command. Does not account for asdf. Protects system directories and brew.
+# Will echo information about the command being removed (if removing, if not found, if protected etc)
+_deleteNormalCommand() {
+	local -r commandToDelete="$1"
+	local commandPath
+	if ! commandPath="$(command -v "$commandToDelete")" || [[ -z $commandPath ]]; then
+		echo "Not deleting $commandToDelete as it does not exist."
+		return
+	fi
+
+	local commandDir
+	if ! commandDir=$(dirname "$commandPath") || [[ ! -d $commandDir ]]; then
+		echo "Not removing command '$commandToDelete' at '$commandPath' as command directory cannot be resolved."
+		return
+	fi
+
+	local brewLocation
+	if command -v brew >/dev/null; then
+		brewLocation=$(brew --prefix)
+	fi
+
+	case "$commandDir" in
+	"$brewLocation"*)
+		echo "Not removing command '$commandToDelete' at '$commandPath' as command is installed through homebrew."
+		;;
+	"/usr"* | "/bin"* | "/sbin"* | "/System"* | "/Applications"* | "/opt"* | "/var"*)
+		# Technically, /usr/local/bin might be safe to remove from but protect it for now.
+		echo "Not removing command '$commandToDelete' at '$commandPath' as command is a system command."
+		;;
+	"$HOME/"*)
+		echo "Removing command '$commandToDelete' at '$commandPath'"
+		rm "$commandPath"
+		;;
+	*)
+		echo "Not removing command '$commandToDelete' at '$commandPath' as it is in an unknown location."
+		;;
+	esac
+}
+
 # Touch all time at a directory. Good for getting build tools to pick up changes.
 touchFiles() {
 	find "$1" -type f -exec touch {} +
