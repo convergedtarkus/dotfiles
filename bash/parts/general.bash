@@ -83,6 +83,91 @@ asdfPath() {
 	done
 }
 
+deleteAsdfCommands() {
+	if ! command -v asdf >/dev/null; then
+		# asdf does not exist, nothing to do.
+		return
+	fi
+
+	asdfShimPath="${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
+	if [[ ! -d $asdfShimPath ]]; then
+		echo "Cannot find asdf shim path"
+		return
+	fi
+
+	for commandToDelete in "$@"; do
+		local commandPath
+		if ! commandPath=$(command -v "$commandToDelete"); then
+			echo "Not deleting '$commandToDelete' as it does not exist."
+			continue
+		fi
+
+		if [[ ! $commandPath =~ $asdfShimPath ]]; then
+			echo "Command '$commandToDelete' is not shimmed through asdf"
+			continue
+		fi
+
+		if ! shimVersions=$(asdf shimversions "$commandToDelete"); then
+			echo "Cannot determine shim versions for '$commandToDelete"
+			continue
+		fi
+
+		# Try to determine if the command to delete is a core plugin command.
+		if ! plugins=$(asdf plugin list); then
+			echo "Command '$commandToDelete' cannot resolve plugin names"
+			continue
+		fi
+
+		if echo "$plugins" | grep -q "^$(_asdfCommandNameToPluginName "$commandToDelete")$"; then
+			echo "Command '$commandToDelete' is a core plugin command. It will not be deleted from the plugin bin."
+			continue
+		fi
+
+		while IFS= read -r shimLine; do
+			if ! toolPath=$(eval "asdf where $shimLine") || [[ ! -d $toolPath ]]; then
+				echo "For command '$commandToDelete' from '$shimLine', cannot determine tool path for shim version"
+				continue
+			fi
+
+			toolBin="$toolPath/bin"
+			if [[ ! -d $toolBin ]]; then
+				echo "For command '$commandToDelete' from '$shimLine', cannot find tool bin for shim version"
+			fi
+
+			deletePath="$toolBin/$commandToDelete"
+			if [[ ! -f $deletePath ]]; then
+				echo "For command '$commandToDelete' from '$shimLine', command is not in bin at '$deletePath'"
+				continue
+			fi
+
+			echo "For command '$commandToDelete' from '$shimLine', deleting command from bin at '$deletePath'"
+			rm "$deletePath"
+		done <<<"$shimVersions"
+
+		echo "For command '$commandToDelete', deleting root shim command at '$deletePath'"
+		rm "$commandPath"
+	done
+}
+
+# Takes in a command name and attempts to determine the plugin name.
+# Echos the input if no conversion is found or known.
+_asdfCommandNameToPluginName() {
+	case "$1" in
+	"go")
+		echo "golang"
+		;;
+	"mvn")
+		echo "maven"
+		;;
+	"node")
+		echo "nodejs"
+		;;
+	*)
+		echo "$1"
+		;;
+	esac
+}
+
 # Removes the given command. Takes asdf into account.
 # Will echo information about the command being removed (if removing, if not found, if protected etc)
 deleteCommand() {
