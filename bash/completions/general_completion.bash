@@ -16,4 +16,4 @@ _completeKnownCommand() {
 }
 
 # `complete -F` tells Bash to call the named function to generate completions.
-complete -F _completeKnownCommand resolveCommand asdfPath deleteCommand _deleteNormalCommand
+complete -F _completeKnownCommand resolveCommand _deleteNormalCommand asdfPath deleteAllCommand deleteAsdfCommand deleteCommand
