@@ -232,7 +232,7 @@ deleteAsdfCommand() {
 		done <<<"$shimVersions"
 
 		if [[ -f $commandPath ]]; then
-			echo "For command '$commandToDelete', deleting root shim command at '$deletePath'"
+			echo "For command '$commandToDelete', deleting root shim command at '$commandPath'"
 			rm "$commandPath"
 		fi
 	done
@@ -264,7 +264,7 @@ deleteCommand() {
 		_deleteNormalCommand "$commandToDelete"
 
 		local asdfCommandPath
-		if asdfCommandPath="$(asdfPath "$commandToDelete")" && [[ -n $asdfCommandPath ]]; then
+		if asdfCommandPath="$(asdfPath "$commandToDelete")" && [[ -n $asdfCommandPath && -f $asdfCommandPath ]]; then
 			echo "Removing command '$commandToDelete' installed through asdf at '$asdfCommandPath'"
 			rm "$asdfCommandPath"
 		fi
@@ -277,7 +277,7 @@ deleteCommand() {
 _deleteNormalCommand() {
 	local -r commandToDelete="$1"
 	local commandPath
-	if ! commandPath="$(command -v "$commandToDelete")" || [[ -z $commandPath ]] || [[ $(type -t "$commandToDelete") != "file" ]]; then
+	if ! commandPath="$(command -v "$commandToDelete")" || [[ -z $commandPath || ! -f $commandPath || $(type -t "$commandToDelete") != "file" ]]; then
 		return
 	fi
 
