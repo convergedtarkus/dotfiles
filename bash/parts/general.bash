@@ -189,13 +189,11 @@ deleteAsdfCommand() {
 
 	for commandToDelete in "$@"; do
 		local commandPath
-		if ! commandPath=$(command -v "$commandToDelete"); then
-			echo "Not deleting '$commandToDelete' as it does not exist."
+		if ! commandPath=$(command -v "$commandToDelete") || [[ -z $commandPath ]] || [[ $(type -t "$commandToDelete") != "file" ]]; then
 			continue
 		fi
 
 		if [[ ! $commandPath =~ $asdfShimPath ]]; then
-			echo "Command '$commandToDelete' is not shimmed through asdf"
 			continue
 		fi
 
@@ -227,17 +225,16 @@ deleteAsdfCommand() {
 			fi
 
 			deletePath="$toolBin/$commandToDelete"
-			if [[ ! -f $deletePath ]]; then
-				echo "For command '$commandToDelete' from '$shimLine', command is not in bin at '$deletePath'"
-				continue
+			if [[ -f $deletePath ]]; then
+				echo "For command '$commandToDelete' from '$shimLine', deleting command from bin at '$deletePath'"
+				rm "$deletePath"
 			fi
-
-			echo "For command '$commandToDelete' from '$shimLine', deleting command from bin at '$deletePath'"
-			rm "$deletePath"
 		done <<<"$shimVersions"
 
-		echo "For command '$commandToDelete', deleting root shim command at '$deletePath'"
-		rm "$commandPath"
+		if [[ -f $commandPath ]]; then
+			echo "For command '$commandToDelete', deleting root shim command at '$deletePath'"
+			rm "$commandPath"
+		fi
 	done
 }
 
@@ -280,8 +277,7 @@ deleteCommand() {
 _deleteNormalCommand() {
 	local -r commandToDelete="$1"
 	local commandPath
-	if ! commandPath="$(command -v "$commandToDelete")" || [[ -z $commandPath ]]; then
-		echo "Not deleting $commandToDelete as it does not exist."
+	if ! commandPath="$(command -v "$commandToDelete")" || [[ -z $commandPath ]] || [[ $(type -t "$commandToDelete") != "file" ]]; then
 		return
 	fi
 
