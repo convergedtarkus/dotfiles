@@ -46,12 +46,29 @@ alias findNotHidden='find . -not -path "*/\.*"'
 # Taken from the bash-it man plugin but modified so search results are more readable.
 # Colorize `man` output by setting `less` terminal capabilities for bold/underline/standout text,
 # then force `less` to pass through ANSI escape sequences so those colors render correctly.
-alias man="\
-LESS_TERMCAP_mb=$'\e[1;32m' \
-LESS_TERMCAP_md=$'\e[1;32m' LESS_TERMCAP_me=$'\e[0m' \
-LESS_TERMCAP_se=$'\e[0m'    LESS_TERMCAP_so=$'\e[7;1m' \
-LESS_TERMCAP_ue=$'\e[0m'    LESS_TERMCAP_us=$'\e[1;4;31m' \
-LESS=--RAW-CONTROL-CHARS \man"
+export LESS_TERMCAP_mb=$'\e[1;32m'
+export LESS_TERMCAP_md=$'\e[1;32m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[7;1m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[1;4;31m'
+export LESS="--RAW-CONTROL-CHARS"
+
+# Redirect man to _findManPage
+alias man="_findManPage"
+
+# Routes to man or help for shell built-in commands.
+_findManPage() {
+	if manPage=$(command man -w "$1"); then
+		if [[ $manPage == *builtin* ]]; then
+			help "$1" | less
+			return
+		fi
+	fi
+
+	command man "$1"
+}
 
 # Touch all time at a directory. Good for getting build tools to pick up changes.
 touchFiles() {

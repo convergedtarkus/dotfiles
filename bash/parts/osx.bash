@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Ensure the locale is set correctly. Appears to be a macOS issue.
+# See
+export LANG="en_US.UTF-8"
+export LC_CTYPE="en_US.UTF-8"
+
 # Each two letters define the colors.
 #     First is foreground
 #     Second is background
