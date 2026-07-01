@@ -33,7 +33,9 @@ source "$MYDOTFILES/bash/parts/java.bash"
 
 # No support for linux yet, should at least not source this if on linux
 # shellcheck source=/dev/null
-source "$MYDOTFILES/bash/parts/osx.bash"
+if [[ "$(uname)" == "Darwin" ]]; then
+	source "$MYDOTFILES/bash/parts/osx.bash"
+fi
 
 # Find any custom files under ./custom (other than .keep) and source them
 # This allows loading external files depending on the local machine.

@@ -40,9 +40,11 @@ export LC_CTYPE="en_US.UTF-8"
 # x = default foreground or background
 export LSCOLORS="Exfxcxdxbxegedabagacad"
 
-# Check if we're on Mac OS X before defining any of these aliases or functions.
-if [[ "$(uname)" != "Darwin" ]]; then
-	return
+# Needed to make go versions greater than 1.20 but lower than 1.24 to work on modern Mac systems.
+if [[ -n ${GOFLAGS:-} ]]; then
+	export GOFLAGS="$GOFLAGS -ldflags=-linkmode=external"
+else
+	export GOFLAGS="-ldflags=-linkmode=external"
 fi
 
 # Desktop Programs
