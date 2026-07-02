@@ -62,3 +62,8 @@ if [[ -d ${ASDF_DATA_DIR:-$HOME/.asdf} ]]; then
 	# Add asdf completions
 	. <(asdf completion bash)
 fi
+
+# Clean the path as the final action.
+if command -v cleanPath >/dev/null; then
+	cleanPath
+fi
