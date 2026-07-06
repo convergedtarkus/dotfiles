@@ -8,6 +8,3 @@
 
 # Mac folder attributes files
 .DS_Store
-
-# asdf tool versions file
-.tool-versions

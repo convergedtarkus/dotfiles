@@ -270,7 +270,8 @@ openBranch() { gh browse -b "$(gBranch)"; }
 
 # Clean commands
 # will remove ignored and untracked files. Git add untracked files to keep them. Keeps IDE files/settings.
-alias safeClean='git clean -xdf -e "/.idea" -e "!.atom" -e "!.vscode" -e ".tool-versions"'
+# The double f will remove nested repositories.
+alias safeClean='git clean -xdff -e "/.idea" -e "!.atom" -e "!.vscode" -e ".tool-versions"'
 # safeClean but only list what would be removed (do not delete anything).
 alias testSafeClean='safeClean -n'
 # safeClean + reset to HEAD
