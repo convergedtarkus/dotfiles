@@ -20,9 +20,6 @@ export DIRENV_LOG_FORMAT=""
 # reload everything
 alias reload='source ~/.bash_profile'
 
-# Clear terminal lines.
-alias c='clear'
-
 # Compact view, show colors, display symbols for ls.
 alias ls='ls -GF'
 
@@ -68,11 +65,6 @@ _findManPage() {
 	fi
 
 	command man "$1"
-}
-
-# Touch all time at a directory. Good for getting build tools to pick up changes.
-touchFiles() {
-	find "$1" -type f -exec touch {} +
 }
 
 # Takes piped in input and echos to stdout and copies to clipboard

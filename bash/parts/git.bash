@@ -149,7 +149,6 @@ alias gl='git pull'
 # glum must be a function. If its an alias, the $(getOriginRemote) is evaluated right away, defeating the purpose of the _getOriginRemotePreHook
 # shellcheck disable=SC2120 # Disabled since arguments are optional.
 glum() { git pull "$(getOriginRemote)" "$(getMainBranch)" --no-edit ${1:+"$1"}; } # pull in upstream main, $1 allows passing extra args to the pull (like -r)
-alias glumri='glum --rebase=interactive'
 
 # git stash
 alias gst='git stash'
@@ -320,26 +319,6 @@ listTags() {
 	fi
 
 	git tag -l --sort=-v:refname | head -n "$1"
-}
-
-# Merges main and produces a string to say when the merge was done. Produce the same format of string if up to date with main.
-qaMainMerge() {
-	startingHeadHash=$(git rev-parse HEAD)
-
-	git pull "$(getOriginRemote)" "$(getMainBranch)" &>/dev/null
-
-	endingHeadHash=$(git rev-parse HEAD)
-
-	logString=""
-	if [[ $startingHeadHash != "$endingHeadHash" ]]; then
-		logString="Pulled in $(getMainBranch) at '$(git log -1 -s --format="%cd")'"
-	else
-		logString="Up to date with $(getMainBranch) as of '$(date '+%c %z')'"
-	fi
-
-	gfm &>/dev/null # fetch origin so origin/main is up to date
-
-	echo "$logString, $(getMainBranch) commit: $(mainBase), head commit: $(git rev-parse HEAD)"
 }
 
 # Add a remote to the current repo. `addRemote someone`. Fetches after to ensure everything is up to date.

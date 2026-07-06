@@ -1,19 +1,5 @@
 #!/usr/bin/env bash
 
-# Wrapper to use the latest version of a given go version.
-# E.X. useGoVersion 1.18
-useGoVersion() {
-	if asdf global golang latest:"$1"; then
-		echo "New go version '$(go version)'"
-	else
-		echo "Failed to switch go version. Version is '$(go version)'"
-	fi
-}
-
-# Alias for easily generating or removing vendor folder.
-alias gmv='go mod vendor'
-alias gmvr='rm -rf ./vendor'
-
 # clear go test cache
 alias goClearTestCache='go clean -testcache'
 
@@ -254,15 +240,6 @@ goLint() {
 	fi
 
 	golint "${input[@]}"
-}
-
-# populate these two variables with options for paths to not delete when running cleanGoPath. These will be given to a find command.
-export cleanGoPathDomainProtected=""                            # E.X '! -name github.com' to ignore all go packages coming from the 'github.com' domain
-export cleanGoPathGithubUserProtected="! -name convergedtarkus" # Of course I protect my repos, they are just too awesome to delete
-
-cleanGoPath() {
-	# The "$@" passes all arguments to the symlink script.
-	"$MYDOTFILES/bash/scripts/cleanGoPath.bash" "$@"
 }
 
 # Resets a lot of go environment files to fix build issues.
