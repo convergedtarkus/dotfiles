@@ -255,20 +255,13 @@ goResetEnv() {
 		fi
 	fi
 
-	echo "Removing gopherjs from go bin"
-	rm -rf "$GOPATH/bin/gopherjs"
-
-	echo "Removing gopherjs from src"
-	rm -rf "$GOPATH/src/github.com/gopherjs/"
-
 	echo "Removing go pkg directory (FYI, this is running with sudo)"
 	sudo rm -rf "$GOPATH/pkg/"
 
 	echo "Using go clear to clean cache, mod cache and all binaries"
-	go clean -cache -i -r
 	# i = removes installed binaries
 	# r = Applies recursively to import paths.
-	go clean -modcache -i -r
+	go clean -cache -modcache -testcache -fuzzcache -i -r
 
 	echo "Done resetting go environment!"
 }
