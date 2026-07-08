@@ -92,11 +92,11 @@ shellcheck() {
 
 # Format and check a script with shfmt and shellcheck.
 checkScript() {
-	if ! command -v shfmt >/dev/null; then
+	if ! command -v shfmt >/dev/null || ! shfmt --help &>/dev/null; then
 		if command -v installShfmt; then
 			installShfmt
 		fi
-		if ! command -v shfmt >/dev/null; then
+		if ! command -v shfmt >/dev/null || ! shfmt --help &>/dev/null; then
 			printf "\033[31mshfmt is not installed!\033[0m\n"
 			return 1
 		fi
