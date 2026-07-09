@@ -57,14 +57,23 @@ alias man="_findManPage"
 
 # Routes to man or help for shell built-in commands.
 _findManPage() {
-	if manPage=$(command man -w "$1"); then
-		if [[ $manPage == *builtin* ]]; then
-			help "$1" | less
-			return
-		fi
+	if [[ -z $1 ]]; then
+		# Matches the behavior of calling man with no arguments.
+		return
 	fi
 
-	command man "$1"
+	# See if a man page exists and if it does not point to shell builtins.
+	if manPage=$(command man -w "$1" 2>/dev/null) && [[ -n $manPage && $manPage != *builtin* ]]; then
+		command man "$1"
+		return
+	fi
+
+	if help "$1" &>/dev/null; then
+		# Reroute to the shell help page for this command.
+		help "$1" | less
+	else
+		echo "Cannot find a man or help page for '$1'"
+	fi
 }
 
 # Takes piped in input and echos to stdout and copies to clipboard
