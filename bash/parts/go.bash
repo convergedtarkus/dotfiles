@@ -14,6 +14,21 @@ alias goTestBuildOnly='go test ./... -count=1 -run="^$"'
 # run all go tests without any caching busting.
 alias goTestAllCache='_goTestAll'
 
+# Helps to use my goInstall.bash script which is asdf aware and
+alias goInstall='_goInstall'
+alias goInstallAll='_goInstall --all'
+alias goInstallSmart='_goInstall --smart'
+alias goInstallSmartAll='_goInstall --smart --all'
+alias goInstallAllSmart='_goInstall --all --smart'
+_goInstall() {
+	if SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" && [[ -f "$SCRIPT_DIR/../scripts/goInstall.bash" ]]; then
+		"$SCRIPT_DIR/../scripts/goInstall.bash" "$@"
+	else
+		echo "Cannot find goInstall.bash"
+		return 1
+	fi
+}
+
 # Allows running all the test in a single go file (given as the first argument to this function)
 # Any additional arguments are passed directly to the go test command (-v --count etc).
 goTestFile() {
@@ -117,36 +132,14 @@ installGolangCiLint() {
 	else
 		version="$1"
 	fi
-	GO111MODULE=off go get -d github.com/golangci/golangci-lint
-	(cd "$(go env GOPATH)"/src/github.com/golangci/golangci-lint/ && git fetch --all --prune --tags && git checkout "$version" && cd cmd/golangci-lint &&
-		go install -ldflags "-X 'main.version=$(git describe --tags)' -X 'main.commit=$(git rev-parse --short HEAD)' -X 'main.date=$(date)'")
+	# Pass along extra arguments as well (expect the first).
+	goInstall "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$version" "${@:1}"
 }
 
 # Installs shfmt through go.
 installShfmt() {
-	local -r shfmtInstallPath="mvdan.cc/sh/v3/cmd/shfmt"
-	if command -v smartGoInstall >/dev/null; then
-		echo "Installing shfmt via smartGoInstall."
-		smartGoInstall "$shfmtInstallPath"
-	else
-		echo "Installing shfmt via normal go install."
-		go install "$shfmtInstallPath@latest"
-	fi
-
-	# Reshim to ensure it is picked up by asdf.
-	if command -v asdf >/dev/null; then
-		asdf reshim golang
-	fi
-
-	if ! command -v shfmt >/dev/null || ! shfmt --version >/dev/null 2>&1; then
-		echo "Failed to install shfmt"
-		return 1
-	fi
-}
-
-# install goimports which is like gofmt, but does a lot more.
-installGoimports() {
-	go get -u golang.org/x/tools/cmd/goimports
+	# Pass along extra arguments as well (expect the first).
+	goInstall "mvdan.cc/sh/v3/cmd/shfmt" "${@:1}"
 }
 
 # Identifies all directories with changed go files and runs `goFormat` in all those directories
