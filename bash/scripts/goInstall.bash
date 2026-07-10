@@ -37,7 +37,6 @@ customInstallCommand() {
 		echoRed "Failed to install '$commandInstallString'"
 		return 1
 	fi
-	echo "Installed '$installCommand' successfully for current go version"
 }
 
 # Handles installing the given program. Handles --customInstall as well.
@@ -71,8 +70,6 @@ installCommand() {
 		echoRed "Failed to install '$commandInstallString'"
 		return 1
 	fi
-
-	echo "Installed '$commandInstallString' successfully for current go version"
 }
 
 # Ensures the command to install has a version (or one is not needed).
@@ -104,13 +101,19 @@ ensureVersion() {
 }
 
 installForAllGoVersions() {
-	declare -r commandInstallString="$1"
+	declare commandInstallString="$1"
 	if [[ -z $1 ]]; then
 		echoRed "No command passed to install"
 		return 1
 	fi
 
 	installCommand "$commandInstallString"
+	# Second argument is used with customInstall to get the command name.
+	if [[ -n $2 ]]; then
+		commandInstallString="$2"
+	fi
+	readonly commandInstallString
+	echo "Installed '$commandInstallString' successfully for current go version"
 
 	# Nothing more to do if asdf is not installed or not installing for all.
 	if [[ -z $installForAll ]] || ! command asdf >/dev/null; then
@@ -133,7 +136,7 @@ installForAllGoVersions() {
 
 	declare commandLocation
 	if ! commandLocation=$(asdf which "${commandName}") || [[ -z $commandLocation ]]; then
-		echoRed "Cannot determine where program was installed to"
+		echoRed "Cannot determine where program '$commandName' was installed to"
 		return 1
 	fi
 	readonly commandLocation
@@ -195,6 +198,7 @@ done
 
 for toInstall in "${programsToInstall[@]}"; do
 	# Support some shortcut common installs.
+	declare commandName=""
 	case "$toInstall" in
 	shfmt)
 		toInstall="mvdan.cc/sh/v3/cmd/shfmt"
@@ -210,7 +214,8 @@ for toInstall in "${programsToInstall[@]}"; do
 		;;
 	smartGoInstall)
 		toInstall="--customInstall='(cd $SCRIPT_DIR/../../tools/smartGoInstall/ && go install .)'"
+		commandName="smartGoInstall"
 		;;
 	esac
-	installForAllGoVersions "$toInstall"
+	installForAllGoVersions "$toInstall" "$commandName"
 done
