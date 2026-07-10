@@ -63,7 +63,15 @@ pullSubmoduleChanges: ## Pull changes for all git submodules
 
 .PHONY: installGoTools
 installGoTools: ## Install from this repo.
+	@if command -v asdf > /dev/null; then asdf install; fi
+	@if ! command -v go > /dev/null || ! go version > /dev/null; then \
+		echo "Go is not installed."; \
+		exit 1; \
+	fi
 	cd ./tools/smartgorunner && go install ./cmd/smartgorunner/
+	cd ./tools/smartGoInstall && go install .
+	cd ./tools/pubCacheClean && go install .
+	cd ./tools/diskHog && go install .
 
 .PHONY: backupSublimeConfigs
 backupSublimeConfigs: ## Backup sublime configs to this repo.
