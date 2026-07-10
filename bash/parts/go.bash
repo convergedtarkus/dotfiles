@@ -28,7 +28,12 @@ alias goInstallSmart='_goInstall --smart'
 alias goInstallSmartAll='_goInstall --smart --all'
 alias goInstallAllSmart='_goInstall --all --smart'
 _goInstall() {
-	if SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" && [[ -f "$SCRIPT_DIR/../scripts/goInstall.bash" ]]; then
+	if ! SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || [[ -z $SCRIPT_DIR ]]; then
+		echo "Cannot resolve script directory"
+		return 1
+	fi
+
+	if [[ -f "$SCRIPT_DIR/../scripts/goInstall.bash" ]]; then
 		"$SCRIPT_DIR/../scripts/goInstall.bash" "$@"
 	else
 		echo "Cannot find goInstall.bash"
