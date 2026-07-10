@@ -25,7 +25,7 @@ duhog() {
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
 		-d)
-			if [[ -z "$2" || "$2" == -* ]]; then
+			if [[ -z $2 || $2 == -* ]]; then
 				echo "Error: -d requires a numeric depth value." >&2
 				return 1
 			fi
@@ -33,7 +33,7 @@ duhog() {
 			shift 2
 			;;
 		-m)
-			if [[ -z "$2" || "$2" == -* ]]; then
+			if [[ -z $2 || $2 == -* ]]; then
 				echo "Error: -m requires a size value (e.g. 100M, 1G, 500K)." >&2
 				return 1
 			fi
@@ -46,7 +46,7 @@ duhog() {
 			return 1
 			;;
 		*)
-			if [[ -z "$dir" ]]; then
+			if [[ -z $dir ]]; then
 				dir="$1"
 			else
 				echo "Error: unexpected argument '$1'. Only one directory is allowed." >&2
@@ -57,13 +57,13 @@ duhog() {
 		esac
 	done
 
-	if [[ -z "$dir" ]]; then
+	if [[ -z $dir ]]; then
 		echo "Error: a directory argument is required." >&2
 		echo "Usage: duhog <directory> [-d depth] [-m min_size]" >&2
 		return 1
 	fi
 
-	if [[ ! -d "$dir" ]]; then
+	if [[ ! -d $dir ]]; then
 		echo "Error: '$dir' is not a directory or does not exist." >&2
 		return 1
 	fi
