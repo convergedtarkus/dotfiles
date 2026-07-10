@@ -31,7 +31,7 @@ func main() {
 		if errors.Is(err, flag.ErrHelp) {
 			os.Exit(0)
 		}
-		slog.Error("invalid arguments", "error", err)
+		slog.Error("invalid arguments", "error", err.Error())
 		os.Exit(1)
 	}
 
@@ -43,7 +43,7 @@ func main() {
 	slog.SetDefault(sharedUtils.NewMinimalHandlerLogger(logLevel))
 
 	if err := run(cfg, sharedUtils.ExecRunner{}); err != nil {
-		slog.Error("fatal error", "error", err)
+		slog.Error("fatal error", "error", err.Error())
 		os.Exit(1)
 	}
 }
@@ -122,7 +122,7 @@ func run(cfg commandConfig, runner sharedUtils.CommandRunner) error {
 		return fmt.Errorf("getting module versions: %w", err)
 	}
 	if len(versions) == 0 {
-		slog.Warn("Did not find any versions of the pacakge", "module", modulePath, "error", err)
+		slog.Warn("Did not find any versions of the pacakge", "module", modulePath)
 		return installLatestOrFail(cfg, runner)
 	}
 
@@ -132,7 +132,7 @@ func run(cfg commandConfig, runner sharedUtils.CommandRunner) error {
 
 		packageRequiredGo, err := getRequiredGoVersionForPackage(runner, modulePath, version)
 		if err != nil {
-			slog.Debug("Could not determine required Go version for this module version; skipping", "version", version, "error", err)
+			slog.Debug("Could not determine required Go version for this module version; skipping", "version", version, "error", err.Error())
 			continue
 		}
 
@@ -184,7 +184,7 @@ func getSystemGoVersion(runner sharedUtils.CommandRunner) (semverVersion, error)
 func getModuleGoVersions(runner sharedUtils.CommandRunner, modulePath string) ([]string, error) {
 	out, err := runner.Output("go", "list", "-mod=readonly", "-m", "-versions", modulePath)
 	if err != nil {
-		return nil, fmt.Errorf("running 'go list -m -versions': %w", err)
+		return nil, fmt.Errorf("running 'go list -m -versions %s': %w", modulePath, err)
 	}
 
 	fields := strings.Fields(string(out))
