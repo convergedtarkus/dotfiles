@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Unset these to stop the IntelliJ terminal from being different than a normal one.
+unset _INTELLIJ_FORCE_SET_GOROOT
+unset _INTELLIJ_FORCE_PREPEND_PATH
+unset _INTELLIJ_FORCE_SET_GOFLAGS
+unset _INTELLIJ_FORCE_SET_GO111MODULE
+unset _INTELLIJ_FORCE_SET_GOPATH
+
 # clear go test cache
 alias goClearTestCache='go clean -testcache'
 
