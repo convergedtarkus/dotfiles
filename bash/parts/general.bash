@@ -153,14 +153,11 @@ checkInternet() {
 # Resolves the path to a command. Takes asdf into account.
 # Commands that do not resolve echo nothing (not even a newline)
 resolveCommand() {
-	local commandToCheck
-	for commandToCheck in "$@"; do
-		if asdfPath=$(asdfPath "$commandToCheck"); then
-			echo "$asdfPath"
-		else
-			command -v "$commandToCheck"
-		fi
-	done
+	if SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" && [[ -f "$SCRIPT_DIR/../scripts/resolveCommand.bash" ]]; then
+		"$SCRIPT_DIR/../scripts/resolveCommand.bash" "$@"
+	else
+		echo "Cannot find resolveCommand.bash script."
+	fi
 }
 
 # Deletes the given commands. Will remove all asdf shim versions.
