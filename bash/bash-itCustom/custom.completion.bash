@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Load after aliases so custom.aliases is loaded first.
+# BASH_IT_LOAD_PRIORITY: 751
+
 if [[ -z $MYDOTFILES ]]; then
 	return
 fi
