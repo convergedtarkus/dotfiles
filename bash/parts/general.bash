@@ -153,12 +153,7 @@ checkInternet() {
 # Resolves the path to a command. Takes asdf into account.
 # Commands that do not resolve echo nothing (not even a newline)
 resolveCommand() {
-	# TODO Shared command to run a script
-	if SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" && [[ -f "$SCRIPT_DIR/../scripts/resolveCommand.bash" ]]; then
-		"$SCRIPT_DIR/../scripts/resolveCommand.bash" "$@"
-	else
-		echoRed "Cannot find resolveCommand.bash script."
-	fi
+	_runScript "../scripts/resolveCommand.bash" "$@"
 }
 
 # Deletes the given commands. Will remove all asdf shim versions.

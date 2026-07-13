@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 
-if [[ -z $MYDOTFILES ]]; then
-	return
-fi
-
-if [[ -d "$MYDOTFILES/bash/completions/" ]]; then
+if completionsDir="$(_dotFilesPath "./completions")" && [[ -d $completionsDir ]]; then
 	# Iterate over all bash files in the completions directory and source them.
-	for file in "$MYDOTFILES/bash/completions/"*.bash; do
+	for file in "$completionsDir/"*.bash; do
 		if [[ -f $file ]]; then
 			if [[ $file == "osx_completion.bash" && "$(uname)" != "Darwin" ]]; then
 				continue

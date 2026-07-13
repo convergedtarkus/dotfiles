@@ -28,17 +28,7 @@ alias goInstallSmart='_goInstall --smart'
 alias goInstallSmartAll='_goInstall --smart --all'
 alias goInstallAllSmart='_goInstall --all --smart'
 _goInstall() {
-	if ! SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || [[ -z $SCRIPT_DIR ]]; then
-		echoRed "Cannot resolve script directory"
-		return 1
-	fi
-
-	if [[ -f "$SCRIPT_DIR/../scripts/goInstall.bash" ]]; then
-		"$SCRIPT_DIR/../scripts/goInstall.bash" "$@"
-	else
-		echoRed "Cannot find goInstall.bash"
-		return 1
-	fi
+	_runScript "../scripts/goInstall.bash" "$@"
 }
 
 # Allows running all the test in a single go file (given as the first argument to this function)
@@ -162,7 +152,7 @@ smartGoImports() { smartgorunner --on-files goimports -w; }
 
 # Identifies all directories with changed go files and runs `goCiLint` in all those directories
 # Passes all arguments along, use -n for only new issues.
-smartGoCiLint() { smartgorunner golangci-lint run -c "$MYDOTFILES/.golangci.yml" "$@"; }
+smartGoCiLint() { smartgorunner golangci-lint run -c "$(_dotFilesPath '../../.golangci.yml')" "$@"; }
 
 # Identifies all directories with changed go files and runs `go test` in all those directories
 smartGoTest() { smartgorunner go test "$@"; }
@@ -214,7 +204,7 @@ smartGoAllAll() {
 # Passes arguments to the command so `goCiLint -n` or `goCiLint ./path` etc work.
 goCiLint() {
 	# $@ will keep each passed in parameter quotes vs $* that will not
-	golangci-lint run -c "$MYDOTFILES/.golangci.yml" "$@"
+	golangci-lint run -c "$(_dotFilesPath '../../.golangci.yml')" "$@"
 }
 
 # runs `gofmt -w` in the given directory. If no input, assume the current ('.') directory
@@ -272,8 +262,7 @@ goResetEnv() {
 }
 
 symlinkVendorPackage() {
-	# The "$@" passes all arguments to the symlink script.
-	"$MYDOTFILES/bash/scripts/symlinkPackageIntoVendor.bash" "$@"
+	_runScript "../scripts/symlinkPackageIntoVendor.bash" "$@"
 }
 
 # Helper to easily move the vendor directory. Pairs with the symlinkVendorPackage function.

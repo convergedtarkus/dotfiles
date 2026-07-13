@@ -80,6 +80,7 @@ echoYellow() {
 }
 
 # Commonly used for errors.
+# Outputs to standard error.
 echoRed() {
-	colorEcho "red" "$*"
+	colorEcho "red" "$*" >&2
 }
