@@ -30,7 +30,6 @@ _completePrograms() {
 	local dir
 	for dir in "${pathDirs[@]}"; do
 		[[ -d $dir ]] || continue
-		readonly dir
 
 		# `compgen -f` generates file path completions under the given directory prefix.
 		local matches
