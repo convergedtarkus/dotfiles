@@ -38,7 +38,6 @@ _completePrograms() {
 
 		local curMatch
 		for curMatch in "${matches[@]}"; do
-			readonly curMatch
 			local name="${curMatch##*/}"
 			# `-x` checks the file is executable; skip names already seen from earlier PATH dirs.
 			if [[ -x $curMatch && -z ${seen[$name]+x} ]]; then
