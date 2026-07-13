@@ -72,7 +72,7 @@ _findManPage() {
 		# Reroute to the shell help page for this command.
 		help "$1" | less
 	else
-		echo "Cannot find a man or help page for '$1'"
+		echoYellow "Cannot find a man or help page for '$1'"
 	fi
 }
 
@@ -106,13 +106,13 @@ checkScript() {
 			installShfmt
 		fi
 		if ! command -v shfmt >/dev/null || ! shfmt --help &>/dev/null; then
-			printf "\033[31mshfmt is not installed!\033[0m\n"
+			echoRed "shfmt is not installed!"
 			return 1
 		fi
 	fi
 
 	if ! command -v shellcheck >/dev/null; then
-		printf "\033[31mshellcheck is not installed!\033[0m\n"
+		echoRed "shellcheck is not installed!"
 		return 1
 	fi
 
@@ -125,14 +125,14 @@ checkScript() {
 	done
 
 	if [[ ${#foundFiles[@]} -eq 0 ]]; then
-		echo "No files found to check."
+		echoBlue "No files found to check."
 		return 1
 	fi
 
 	local returnCode
 	for file in "${foundFiles[@]}"; do
 		if [[ ! -f $file ]]; then
-			echo "'$file' cannot be found."
+			echoYellow "'$file' cannot be found."
 			returnCode=1
 		fi
 	done
@@ -153,10 +153,11 @@ checkInternet() {
 # Resolves the path to a command. Takes asdf into account.
 # Commands that do not resolve echo nothing (not even a newline)
 resolveCommand() {
+	# TODO Shared command to run a script
 	if SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" && [[ -f "$SCRIPT_DIR/../scripts/resolveCommand.bash" ]]; then
 		"$SCRIPT_DIR/../scripts/resolveCommand.bash" "$@"
 	else
-		echo "Cannot find resolveCommand.bash script."
+		echoRed "Cannot find resolveCommand.bash script."
 	fi
 }
 
@@ -196,7 +197,7 @@ deleteAsdfCommand() {
 
 	asdfShimPath="${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
 	if [[ ! -d $asdfShimPath ]]; then
-		echo "Cannot find asdf shim path"
+		echoRed "Cannot find asdf shim path"
 		return
 	fi
 
@@ -211,30 +212,30 @@ deleteAsdfCommand() {
 		fi
 
 		if ! shimVersions=$(asdf shimversions "$commandToDelete"); then
-			echo "Cannot determine shim versions for '$commandToDelete"
+			echoRed "Cannot determine shim versions for '$commandToDelete"
 			continue
 		fi
 
 		# Try to determine if the command to delete is a core plugin command.
 		if ! plugins=$(asdf plugin list); then
-			echo "Command '$commandToDelete' cannot resolve plugin names"
+			echoRed "Command '$commandToDelete' cannot resolve plugin names"
 			continue
 		fi
 
 		if echo "$plugins" | grep -q "^$(_asdfCommandNameToPluginName "$commandToDelete")$"; then
-			echo "Command '$commandToDelete' is a core plugin command. It will not be deleted from the plugin bin."
+			echoYellow "Command '$commandToDelete' is a core plugin command. It will not be deleted from the plugin bin."
 			continue
 		fi
 
 		while IFS= read -r shimLine; do
 			if ! toolPath=$(eval "asdf where $shimLine") || [[ ! -d $toolPath ]]; then
-				echo "For command '$commandToDelete' from '$shimLine', cannot determine tool path for shim version"
+				echoRed "For command '$commandToDelete' from '$shimLine', cannot determine tool path for shim version"
 				continue
 			fi
 
 			toolBin="$toolPath/bin"
 			if [[ ! -d $toolBin ]]; then
-				echo "For command '$commandToDelete' from '$shimLine', cannot find tool bin for shim version"
+				echoRed "For command '$commandToDelete' from '$shimLine', cannot find tool bin for shim version"
 			fi
 
 			deletePath="$toolBin/$commandToDelete"
@@ -296,7 +297,7 @@ _deleteNormalCommand() {
 
 	local commandDir
 	if ! commandDir=$(dirname "$commandPath") || [[ ! -d $commandDir ]]; then
-		echo "Not removing command '$commandToDelete' at '$commandPath' as command directory cannot be resolved."
+		echoRed "Not removing command '$commandToDelete' at '$commandPath' as command directory cannot be resolved."
 		return
 	fi
 
@@ -307,18 +308,18 @@ _deleteNormalCommand() {
 
 	case "$commandDir" in
 	"$brewLocation"*)
-		echo "Not removing command '$commandToDelete' at '$commandPath' as command is installed through homebrew."
+		echoYellow "Not removing command '$commandToDelete' at '$commandPath' as command is installed through homebrew."
 		;;
 	"/usr"* | "/bin"* | "/sbin"* | "/System"* | "/Applications"* | "/opt"* | "/var"*)
 		# Technically, /usr/local/bin might be safe to remove from but protect it for now.
-		echo "Not removing command '$commandToDelete' at '$commandPath' as command is a system command."
+		echoYellow "Not removing command '$commandToDelete' at '$commandPath' as command is a system command."
 		;;
 	"$HOME/"*)
 		echo "Removing command '$commandToDelete' at '$commandPath'"
 		rm "$commandPath"
 		;;
 	*)
-		echo "Not removing command '$commandToDelete' at '$commandPath' as it is in an unknown location."
+		echoYellow "Not removing command '$commandToDelete' at '$commandPath' as it is in an unknown location."
 		;;
 	esac
 }

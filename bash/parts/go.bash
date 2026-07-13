@@ -29,14 +29,14 @@ alias goInstallSmartAll='_goInstall --smart --all'
 alias goInstallAllSmart='_goInstall --all --smart'
 _goInstall() {
 	if ! SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || [[ -z $SCRIPT_DIR ]]; then
-		echo "Cannot resolve script directory"
+		echoRed "Cannot resolve script directory"
 		return 1
 	fi
 
 	if [[ -f "$SCRIPT_DIR/../scripts/goInstall.bash" ]]; then
 		"$SCRIPT_DIR/../scripts/goInstall.bash" "$@"
 	else
-		echo "Cannot find goInstall.bash"
+		echoRed "Cannot find goInstall.bash"
 		return 1
 	fi
 }
@@ -49,13 +49,13 @@ goTestFile() {
 
 	# Make sure an argument is provided.
 	if [[ -z $filePath ]]; then
-		printf "\033[33mFirst argument must be provided and be the path to the file!\033[0m\n"
+		echoRed "First argument must be provided and be the path to the file!"
 		return 1
 	fi
 
 	# Make sure the file exists.
 	if [[ ! -f $filePath ]]; then
-		printf "\033[33mFirst argument does not point to a file!\033[0m\n"
+		echoRed "First argument does not point to a file!"
 		return 1
 	fi
 
@@ -118,22 +118,22 @@ _goTestAll() {
 
 	echo
 	if [[ $exitCode == 0 ]]; then
-		printf "\033[32mAll tests passed!\033[0m\n"
+		echoGreen "All tests passed!"
 	elif [[ $exitCode == 1 ]]; then
-		printf "\033[31mSOME TESTS FAILED!\033[0m\n"
+		printfRed "SOME TESTS FAILED!"
 	else
-		printf "\033[34;1mExit code '%s'. There may be build or package structure issues.\033[0m\n" "$exitCode"
-		printf "\033[34;1mThis does not necessarily mean any tests failed though.\033[0m\n"
+		echoBlue "Exit code '%s'. There may be build or package structure issues." "$exitCode"
+		echoBlue "This does not necessarily mean any tests failed though."
 	fi
 
 	# If there was error output, display it at the end
 	if [[ -n $errorOutput ]]; then
 		echo
-		printf "\033[33m========================================\033[0m\n"
-		printf "\033[33mError Output Summary:\033[0m\n"
-		printf "\033[33m========================================\033[0m\n"
+		echoRed "========================================"
+		echoRed "Error Output Summary:"
+		echoRed "========================================"
 		printf '%s\n' "$errorOutput"
-		printf "\033[33m========================================\033[0m\n"
+		echoRed "========================================"
 	fi
 }
 
@@ -256,7 +256,7 @@ goResetEnv() {
 			echo "Running git reset and clean"
 			git reset --hard && safeClean
 		else
-			echo "There are local changes in the repo, not running git reset or clean"
+			echoYellow "There are local changes in the repo, not running git reset or clean"
 		fi
 	fi
 

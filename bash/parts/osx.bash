@@ -85,7 +85,7 @@ openIntellijCopilotConfig() {
 	local latestVersion
 	latestVersion=$(find "$basePath" -maxdepth 1 -name "IntelliJIdea*" 2>/dev/null | sort -V | tail -n 1)
 	if [[ -z $latestVersion ]]; then
-		echo "No IntelliJ IDEA versions found in $basePath"
+		echoRed "No IntelliJ IDEA versions found in $basePath"
 		return 1
 	else
 		echo "Latest IntelliJ IDEA version found: $latestVersion"
@@ -104,7 +104,7 @@ _managedPasswords=()
 # Adds the given password name to the list of managed passwords for tab completion.
 _addToManagedPasswords() {
 	if [[ -z $1 ]]; then
-		echo "Password name cannot be empty"
+		echoRed "Password name cannot be empty"
 		return 1
 	fi
 	_managedPasswords+=("$1")
@@ -115,7 +115,7 @@ _addToManagedPasswords() {
 # This will prompt for the new password value.
 addGenericPassword() {
 	if [[ -z $1 ]]; then
-		echo "Password name cannot be empty"
+		echoRed "Password name cannot be empty"
 		return 1
 	fi
 	# This will prompt for the password value to add.
@@ -149,7 +149,7 @@ doesGenericPasswordExistSilent() {
 # This will prompt for the new password value.
 updateGenericPassword() {
 	if [[ -z $1 ]]; then
-		echo "Password name cannot be empty"
+		echoRed "Password name cannot be empty"
 		return 1
 	fi
 	security add-generic-password -a "${USER}" -s "$1" -U -w

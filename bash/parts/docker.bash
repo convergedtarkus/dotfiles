@@ -92,7 +92,7 @@ nukeDocker() {
 
 	echo
 	echo
-	printf "\033[1;32mFinished nuking!\033[0m\n"
+	echoGreen "Finished nuking!"
 }
 
 # Prints the amount of used and available space for docker.
@@ -122,6 +122,6 @@ dockerUsedSpace() {
 	echo "Docker is using $fileSizeHuman out of $maxFileSizeHuman max (${percent}%)"
 
 	if [[ $spaceOk == "false" ]]; then
-		printf "\033[0;31mDocker has exceeded safe used space. This may cause build failures!\033[0m\n"
+		echoRed "Docker has exceeded safe used space. This may cause build failures!"
 	fi
 }

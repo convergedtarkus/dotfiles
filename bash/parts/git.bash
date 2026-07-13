@@ -131,7 +131,7 @@ gfc() {
 	if ! fetchTarget=$(_fetchTarget); then
 		if [[ $fetchTarget != "No fetch target" ]]; then
 			# Something went wrong with finding the target.
-			echo "Cannot find fetch target"
+			echoRed "Cannot find fetch target"
 			return 1
 		fi
 
@@ -171,7 +171,7 @@ _verifyUndoCommitIsOk() {
 	# Confirm with the user that they want to undo a commit that has not been pushed.
 	read -rp "This content has not been pushed. Are you sure you want to undo it? [y/N] " confirm
 	if [[ $confirm != "y" && $confirm != "Y" ]]; then
-		echo "Aborting."
+		echoYellow "Aborting."
 		return 1
 	fi
 	return 0
@@ -299,7 +299,7 @@ gRebaseMain() {
 # Good for updating a remote branch with main that you don't need checked-out locally.
 mergeMainIntoBranch() {
 	if [[ -z $1 ]]; then
-		echo "Must supply a branch name!"
+		echoRed "Must supply a branch name!"
 		return 1
 	fi
 	gf       # Fetch everything (not tags though)
@@ -327,7 +327,7 @@ addRemote() {
 	reproName=$(basename "$(git rev-parse --show-toplevel)")
 
 	if [[ $remoteName == "" ]]; then
-		echo "Must supply a remote name"
+		echoRed "Must supply a remote name"
 		return 1
 	fi
 
@@ -453,12 +453,12 @@ highlightChangedFiles() {
 # Takes in a single parameter, the repo to clone `user/repo`.
 clonePersonalRepo() {
 	if [[ -z $1 || $1 != *"/"* ]]; then
-		echo "First argument must be user/repo"
+		echoRed "First argument must be user/repo"
 		return 1
 	fi
 
 	if ! git clone "git@github.com-personal:$1.git" "$@"; then
-		echo "Clone failed!"
+		echoRed "Clone failed!"
 		return 2
 	fi
 	path=${1##*/}
@@ -470,7 +470,7 @@ clonePersonalRepo() {
 
 installGitHooks() {
 	if [[ ! -d ./.git/hooks ]]; then
-		echo "No .git/hooks under current location, aborting."
+		echoRed "No .git/hooks under current location, aborting."
 		return
 	fi
 
@@ -497,7 +497,7 @@ openTicket() {
 	ticket=$("$MYDOTFILES"/bash/scripts/parseTicket.bash "$parseTarget")
 
 	if [[ -z $ticket ]]; then
-		echo "No ticket found in branch name/input!"
+		echoRed "No ticket found in branch name/input!"
 		return 1
 	fi
 

@@ -7,13 +7,17 @@ alias myconfig='git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/bashCompability.bash"
 
+# Color printing and echo for logging. Used by other scripts.
+# shellcheck source=/dev/null
+source "$MYDOTFILES/bash/parts/colorPrint.bash"
+
+# General aliases/functions. This also includes things shared by other scripts.
+# shellcheck source=/dev/null
+source "$MYDOTFILES/bash/parts/general.bash"
+
 # Docker
 # shellcheck source=/dev/null
 source "$MYDOTFILES/bash/parts/docker.bash"
-
-# General aliases/functions
-# shellcheck source=/dev/null
-source "$MYDOTFILES/bash/parts/general.bash"
 
 # Git
 # shellcheck source=/dev/null

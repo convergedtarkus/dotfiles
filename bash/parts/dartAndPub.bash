@@ -25,7 +25,7 @@ dartResetEnv() {
 			echo "Running git reset and clean"
 			git reset --hard && safeClean
 		else
-			echo "There are local changes in the repo, not running git reset or clean"
+			echoYellow "There are local changes in the repo, not running git reset or clean"
 		fi
 	fi
 

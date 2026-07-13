@@ -32,6 +32,7 @@ resolveCommand() {
 	declare asdfCommandLocation
 
 	if commandLocation=$(command -v "$commandToCheck"); then
+		# shellcheck disable=SC2310
 		if ! shimPath=$(hasShimFor "$commandToCheck"); then
 			if [[ -n $verbose ]]; then
 				echo "'$commandToCheck' exists at '$commandLocation' and is not shimmed."
@@ -98,6 +99,7 @@ fi
 
 declare exitCode=0
 for curCommandToCheck in "${commandsToCheck[@]}"; do
+	# shellcheck disable=SC2310
 	resolveCommand "$curCommandToCheck" || exitCode=1
 done
 
