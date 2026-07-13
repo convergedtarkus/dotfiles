@@ -128,7 +128,7 @@ _fetchTarget() {
 
 # gfc fetches just the current branch.
 gfc() {
-	if ! fetchTarget=$(_fetchTarget); then
+	if ! fetchTarget=$(_fetchTarget) 2>/dev/null; then
 		if [[ $fetchTarget != "No fetch target" ]]; then
 			# Something went wrong with finding the target.
 			echoRed "Cannot find fetch target"
@@ -163,7 +163,10 @@ alias gus='git reset'
 
 _verifyUndoCommitIsOk() {
 	# Before doing this, check if this commit has been pushed.
-	if [[ -z $(logAgainstRemote --oneline) ]]; then
+	if ! logOutput=$(logAgainstRemote --oneline 2>/dev/null); then
+		echoRed "Cannot perform log against remote, proceed with caution."
+		return # Don't treat as en error.
+	elif [[ -z $logOutput ]]; then
 		# No difference between local and remote, so this commit has been pushed.
 		return 0
 	fi
@@ -373,7 +376,10 @@ logAgainstBase() {
 # E.X. logAgainstRemote -n 1
 logAgainstRemote() {
 	gfc &>/dev/null # fetch the remote of this branch
-	remote=$(_fetchTarget)
+	if ! remote=$(_fetchTarget) || [[ -z $remote ]]; then
+		echoRed "Cannot determine remote"
+		return 1
+	fi
 	remote=$(echo "$remote" | tr " " "/") # Replace the space between the remote name and branch name with a '/'.
 	git log "$remote"..HEAD "$@"
 }
@@ -403,7 +409,10 @@ diffAgainstBase() {
 # E.X. diffAgainstRemote --stat
 diffAgainstRemote() {
 	gfc &>/dev/null # fetch the remote of this branch
-	remote=$(_fetchTarget)
+	if ! remote=$(_fetchTarget) || [[ -z $remote ]]; then
+		echoRed "Cannot determine remote"
+		return 1
+	fi
 	remote=$(echo "$remote" | tr " " "/") # Replace the space between the remote name and branch name with a '/'.
 	git diff "$remote"..HEAD "$@"
 }
