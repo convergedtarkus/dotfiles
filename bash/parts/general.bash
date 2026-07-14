@@ -153,7 +153,7 @@ checkInternet() {
 # Resolves the path to a command. Takes asdf into account.
 # Commands that do not resolve echo nothing (not even a newline)
 resolveCommand() {
-	_runScript "../scripts/resolveCommand.bash" "$@"
+	_runScript "./scripts/resolveCommand.bash" "$@"
 }
 
 # Deletes the given commands. Will remove all asdf shim versions.

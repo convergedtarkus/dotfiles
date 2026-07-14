@@ -58,7 +58,7 @@ alias gbm='git branch -m'
 alias gbd='git branch -d'
 alias gbD='git branch -D'
 alias gbDPrev='git branch -D @{-1}' # Delete the previous branch you were on.
-alias deleteMergedBranches='_runScript ../scripts/deleteMergedBranches.sh'
+alias deleteMergedBranches='_runScript ./scripts/deleteMergedBranches.sh'
 
 # git checkout
 alias gco='git checkout'
@@ -483,7 +483,7 @@ installGitHooks() {
 		return
 	fi
 
-	if ! gitHooksDir=$(_dotFilesPath "../../githooks/"); then
+	if ! gitHooksDir=$(_dotFilesPath "../githooks/"); then
 		echoRed "Cannot find githooks directory"
 		return 1
 	fi
@@ -508,7 +508,7 @@ openTicket() {
 		parseTarget="$1"
 	fi
 
-	if ! ticket=$(_runScript "../scripts/parseTicket.bash" "$parseTarget") || [[ -z $ticket ]]; then
+	if ! ticket=$(_runScript "./scripts/parseTicket.bash" "$parseTarget") || [[ -z $ticket ]]; then
 		echoRed "Cannot find ticket branch name/input!"
 		return 1
 	fi

@@ -4,8 +4,7 @@
 alias myconfig='git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
 
 # Returns the path to a file in the current dotfiles repo.
-# The given path should be relative to the directory this command is run in.
-#
+# The given path should be relative to the directory _dotFilesPath exists in.
 _dotFilesPath() {
 	if [[ -z $1 ]]; then
 		echoRed "No script name given"
@@ -19,11 +18,12 @@ _dotFilesPath() {
 	fi
 	readonly curDir
 
-	local targetPath="$curDir/$1"
-	if ! targetPath="$(realpath "$targetPath" 2>/dev/null)" || [[ -z $targetPath ]]; then
-		echoRed "Cannot resolve input relative path of '$1'"
+	local -r localPath="$curDir/$1"
+	if ! targetPath="$(realpath "$localPath" 2>/dev/null)" || [[ -z $targetPath ]]; then
+		echoRed "Cannot resolve input relative path of '$1' localPath '$localPath' targetPath '$targetPath'"
 		return 1
 	fi
+	readonly targetPath
 
 	if [[ -e $targetPath ]]; then
 		echo "$targetPath"
@@ -74,36 +74,36 @@ _sourceScript() {
 
 # Bash modifications
 # shellcheck source=/dev/null
-_sourceScript "/parts/bashCompability.bash"
+_sourceScript "./parts/bashCompability.bash"
 
 # Color printing and echo for logging. Used by other scripts.
 # shellcheck source=/dev/null
-_sourceScript "/parts/colorPrint.bash"
+_sourceScript "./parts/colorPrint.bash"
 
 # General aliases/functions. This also includes things shared by other scripts.
 # shellcheck source=/dev/null
-_sourceScript "/parts/general.bash"
+_sourceScript "./parts/general.bash"
 
 # Docker
 # shellcheck source=/dev/null
-_sourceScript "/parts/docker.bash"
+_sourceScript "./parts/docker.bash"
 
 # Git
 # shellcheck source=/dev/null
-_sourceScript "/parts/git.bash"
+_sourceScript "./parts/git.bash"
 
 # Dartlang and pub
 # shellcheck source=/dev/null
-_sourceScript "/parts/dartAndPub.bash"
+_sourceScript "./parts/dartAndPub.bash"
 
 # Golang
 # shellcheck source=/dev/null
-_sourceScript "/parts/go.bash"
+_sourceScript "./parts/go.bash"
 
 # No support for linux yet, should at least not source this if on linux
 # shellcheck source=/dev/null
 if [[ "$(uname)" == "Darwin" ]]; then
-	_sourceScript "/parts/osx.bash"
+	_sourceScript "./parts/osx.bash"
 fi
 
 # Find any custom files under ./custom (other than .keep) and source them

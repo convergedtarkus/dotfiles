@@ -28,7 +28,7 @@ alias goInstallSmart='_goInstall --smart'
 alias goInstallSmartAll='_goInstall --smart --all'
 alias goInstallAllSmart='_goInstall --all --smart'
 _goInstall() {
-	_runScript "../scripts/goInstall.bash" "$@"
+	_runScript "./scripts/goInstall.bash" "$@"
 }
 
 # Allows running all the test in a single go file (given as the first argument to this function)
@@ -152,7 +152,7 @@ smartGoImports() { smartgorunner --on-files goimports -w; }
 
 # Identifies all directories with changed go files and runs `goCiLint` in all those directories
 # Passes all arguments along, use -n for only new issues.
-smartGoCiLint() { smartgorunner golangci-lint run -c "$(_dotFilesPath '../../.golangci.yml')" "$@"; }
+smartGoCiLint() { smartgorunner golangci-lint run -c "$(_dotFilesPath '../.golangci.yml')" "$@"; }
 
 # Identifies all directories with changed go files and runs `go test` in all those directories
 smartGoTest() { smartgorunner go test "$@"; }
@@ -204,7 +204,7 @@ smartGoAllAll() {
 # Passes arguments to the command so `goCiLint -n` or `goCiLint ./path` etc work.
 goCiLint() {
 	# $@ will keep each passed in parameter quotes vs $* that will not
-	golangci-lint run -c "$(_dotFilesPath '../../.golangci.yml')" "$@"
+	golangci-lint run -c "$(_dotFilesPath '../.golangci.yml')" "$@"
 }
 
 # runs `gofmt -w` in the given directory. If no input, assume the current ('.') directory
@@ -262,7 +262,7 @@ goResetEnv() {
 }
 
 symlinkVendorPackage() {
-	_runScript "../scripts/symlinkPackageIntoVendor.bash" "$@"
+	_runScript "./scripts/symlinkPackageIntoVendor.bash" "$@"
 }
 
 # Helper to easily move the vendor directory. Pairs with the symlinkVendorPackage function.
