@@ -115,13 +115,17 @@ installForAllGoVersions() {
 	readonly commandInstallString
 	echo "Installed '$commandInstallString' successfully for current go version"
 
-	# Nothing more to do if asdf is not installed or not installing for all.
-	if [[ -z $installForAll ]] || ! command asdf >/dev/null; then
+	# Nothing more to do if asdf is not installed.
+	if ! command asdf >/dev/null; then
 		return
 	fi
 
 	# Reshim to ensure the shim exists.
 	asdf reshim golang
+
+	if [[ -z $installForAll ]]; then
+		return
+	fi
 
 	declare -r asdfGoInstallsPath="${ASDF_DATA_DIR:-$HOME/.asdf}/installs/golang/"
 	if [[ ! -d $asdfGoInstallsPath ]]; then
