@@ -101,29 +101,40 @@ ensureVersion() {
 }
 
 installForAllGoVersions() {
-	declare commandInstallString="$1"
+	declare -r commandInstallString="$1"
 	if [[ -z $1 ]]; then
 		echoRed "No command passed to install"
 		return 1
 	fi
 
+	# Use the commandName given, otherwise extract it.
+	declare commandName="$2"
+	if [[ -z $commandName ]]; then
+		# Remove the @version suffix and any prefix slashes
+		commandName="${commandInstallString%@*}"
+		commandName="${commandName##*/}"
+	fi
+	readonly commandName
+
+	# Install the program.
 	installCommand "$commandInstallString"
-	# Second argument is used with customInstall to get the command name.
-	if [[ -n $2 ]]; then
-		commandInstallString="$2"
+
+	# Ensure the command exists
+	if ! command -v "$commandName" &>/dev/null; then
+		# If asdf exists, reshim to see if that makes the command available.
+		if command asdf &>/dev/null; then
+			asdf reshim golang
+		fi
+
+		if ! command -v "$commandName" &>/dev/null; then
+			echoRed "Installed '$commandName' but cannot find the command in PATH"
+			return 1
+		fi
 	fi
-	readonly commandInstallString
-	echo "Installed '$commandInstallString' successfully for current go version"
+	echo "Installed '$commandName' successfully for current go version"
 
-	# Nothing more to do if asdf is not installed.
-	if ! command asdf >/dev/null; then
-		return
-	fi
-
-	# Reshim to ensure the shim exists.
-	asdf reshim golang
-
-	if [[ -z $installForAll ]]; then
+	# Nothing more to do if asdf is not installed or not installing for all (which is asdf specific).
+	if ! command asdf >/dev/null || [[ -z $installForAll ]]; then
 		return
 	fi
 
@@ -132,11 +143,6 @@ installForAllGoVersions() {
 		echoRed "Cannot determine where asdf go installs are. Tried '$asdfGoInstallsPath'"
 		return 1
 	fi
-
-	# Remove the @version suffix and any prefix slashes
-	declare commandName="${commandInstallString%@*}"
-	commandName="${commandName##*/}"
-	readonly commandName
 
 	declare commandLocation
 	if ! commandLocation=$(asdf which "${commandName}") || [[ -z $commandLocation ]]; then
