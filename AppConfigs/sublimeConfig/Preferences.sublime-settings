@@ -1,0 +1,17 @@
+// Settings in here override those in "Default/Preferences.sublime-settings",
+// and are overridden in turn by syntax-specific settings.
+{
+	// This determines whether the find panel is closed when the "Find All"
+	// or "Replace All" buttons are pressed. Note this does not change the
+	// keybinding behavior.
+	"close_find_after_find_all": false,
+	"close_find_after_replace_all": false,
+	"ignored_packages":
+	[
+		"Vintage",
+	],
+	"font_size": 16,
+	"index_files": true,
+	"hot_exit": false,
+	"remember_open_files": false
+}
