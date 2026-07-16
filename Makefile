@@ -17,7 +17,7 @@ enableBashItScripts: ## Enables the alias, completion and plugin extensions for 
 	@bash -i -c 'bash-it disable plugin all'
 	@# Now enable the ones we want in the user's interactive Bash shell.
 	@bash -i -c 'bash-it enable alias custom'
-	@bash -i -c 'bash-it enable completion aliases bash-it brew dart defaults docker git go makefile custom system'
+	@bash -i -c 'bash-it enable completion aliases bash-it brew custom dart defaults docker git go makefile system'
 
 .PHONY: .getAllBash
 .getAllBash: ## Get all bash scripts
@@ -33,7 +33,7 @@ enableBashItScripts: ## Enables the alias, completion and plugin extensions for 
 	done
 
 .PHONY: checkAllBash
-checkAllBash: ## Check all bash scripts with shellcheck
+checkAllBash: formatAllBash ## Check all bash scripts with shellcheck
 	@# SC1090 = Can't follow non-constant source. Use a directive to specify location
 	@#     Generally this is just noise that I have to add a directive to ignore, so ignore it by default.
 	@# SC1091 = Not following: (error message here)
@@ -51,11 +51,6 @@ checkAllBash: ## Check all bash scripts with shellcheck
 .PHONY: formatAllBash
 formatAllBash: ## Format all bash scripts with shfmt
 	@make .getAllBash | xargs -0 shfmt -w -s
-
-.PHONY: formatAndCheckAllBash
-formatAndCheckAllBash: ## Format and check all bash scripts
-	@make formatAllBash
-	@make checkAllBash
 
 .PHONY: pullSubmoduleChanges
 pullSubmoduleChanges: ## Pull changes for all git submodules
@@ -75,14 +70,14 @@ installGoTools: ## Install from this repo.
 
 .PHONY: backupSublimeConfigs
 backupSublimeConfigs: ## Backup sublime configs to this repo.
-	@cp -r $$HOME/Library/Application\ Support/Sublime\ Text/Packages/User/ ./AppConfigs/sublimeConfig/
+	@cp -Rv $$HOME/Library/Application\ Support/Sublime\ Text/Packages/User/ ./AppConfigs/sublimeConfig/
 
 .PHONY: installSublimeConfigs
 installSublimeConfigs: ## Install sublime configs from this repo.
-	@cp -r ./AppConfigs/sublimeConfig/ $$HOME/Library/Application\ Support/Sublime\ Text/Packages/User/
+	@cp -Rv "./AppConfigs/sublimeConfig/" "$$HOME/Library/Application Support/Sublime Text/Packages/User/"
 
 .PHONY: generateFileIgnoreConfig
-generateFileIgnoreConfig: ## Generates a string of files to ignore that can be used in IntelliJ's exclude files.
+generateFileIgnoreConfig: ## Generates a string of files to ignore for IntelliJ's exclude files option. Helpful when this repo is installed at roo.
 	@shopt -s dotglob; \
 	trap "shopt -u dotglob" EXIT; \
 	output=""; \
