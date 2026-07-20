@@ -65,7 +65,7 @@ installCommand() {
 	readonly commandInstallString
 	readonly installCommand
 
-	echo "Running '$installCommand $commandInstallString'"
+	echoBlue "Running '$installCommand $commandInstallString'"
 	if ! eval "$installCommand $commandInstallString"; then
 		echoRed "Failed to install '$commandInstallString'"
 		return 1
@@ -131,7 +131,7 @@ installForAllGoVersions() {
 			return 1
 		fi
 	fi
-	echo "Installed '$commandName' successfully for current go version"
+	echoGreen "Installed '$commandName' successfully for current go version"
 
 	# Nothing more to do if asdf is not installed or not installing for all (which is asdf specific).
 	if ! command asdf >/dev/null || [[ -z $installForAll ]]; then
@@ -175,7 +175,7 @@ installForAllGoVersions() {
 		if [[ ! -d $targetGoBin ]]; then
 			echoYellow "Skipping '$goInstall' because bin path '$targetGoBin' does not exist"
 		else
-			echo "Copying binary for '$commandName' from '$commandLocation' to '$targetGoBin'"
+			echoBlue "Copying binary for '$commandName' from '$commandLocation' to '$targetGoBin'"
 			cp "$commandLocation" "$targetGoBin"
 		fi
 	done

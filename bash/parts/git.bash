@@ -79,7 +79,7 @@ gcoClean() {
 gResolveGenConflicts() {
 	mapfile -t generatedFiles < <(git ls-files "*go.sum" "*vendor/modules.txt" "*vendor/sums.hashdeep" | uniq)
 	if [[ ${#generatedFiles[@]} -eq 0 ]]; then
-		echo "No generated conflict files found"
+		echoBlue "No generated conflict files found"
 		return 0
 	fi
 	git checkout --ours -- "${generatedFiles[@]}"
@@ -138,7 +138,7 @@ gfc() {
 		# Head is disconnected, so there is nothing to fetch.
 		return 0
 	fi
-	echo "Fetch target is '$fetchTarget'"
+	echoBlue "Fetch target is '$fetchTarget'"
 	# fetchTarget contains "remote branch" separated by space; read into array for safe execution
 	read -r -a fetchArgs <<<"$fetchTarget"
 	git fetch "${fetchArgs[@]}"
@@ -432,9 +432,9 @@ commitsBehindMain() {
 	individualCommits=$(git log HEAD.."$(getOriginRemote)/$(getMainBranch)" --oneline | wc -l | xargs)
 	parentCommits=$(git log HEAD.."$(getOriginRemote)/$(getMainBranch)" --first-parent --oneline | wc -l | xargs)
 	if [[ $individualCommits == 0 && $parentCommits == 0 ]]; then
-		echo "Branch is up to date with $(getMainBranch)"
+		echoGreen "Branch is up to date with $(getMainBranch)"
 	else
-		echo "Branch is $parentCommits parent commits and $individualCommits total commits behind $(getMainBranch)"
+		echoYellow "Branch is $parentCommits parent commits and $individualCommits total commits behind $(getMainBranch)"
 	fi
 }
 
@@ -490,7 +490,7 @@ installGitHooks() {
 
 	for file in "$gitHooksDir/"*; do
 		if [[ -e $file ]]; then
-			echo "Copying '$file' to git hooks"
+			echoBlue "Copying '$file' to git hooks"
 			cp "$file" ./.git/hooks
 		fi
 	done

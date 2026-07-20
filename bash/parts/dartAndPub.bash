@@ -17,12 +17,12 @@ alias gcoPubspecs='git checkout "*pubspec.lock" "*pubspec.yaml"'
 alias gusPubspecs='git reset "*pubspec.lock" "*pubspec.yaml"'
 alias gaPubspecs='git add "*pubspec.lock" "*pubspec.yaml"'
 
-# Resets a lot of dart enviroment files and directories to fix build issues.
+# Resets a lot of dart environment files and directories to fix build issues.
 dartResetEnv() {
 	if command -v git >/dev/null; then
 		# This ensures there are not local changes (and this is a git repo).
 		if git diff-index --quiet HEAD --; then
-			echo "Running git reset and clean"
+			echoBlue "Running git reset and clean"
 			git reset --hard && safeClean
 		else
 			echoYellow "There are local changes in the repo, not running git reset or clean"

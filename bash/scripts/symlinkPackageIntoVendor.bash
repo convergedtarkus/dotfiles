@@ -5,6 +5,12 @@
 # -o pipefail makes a pipeline fail if any command in it fails, not just the last command.
 set -euo pipefail # bash strict mode
 
+if ! SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || [[ -z $SCRIPT_DIR || ! -f "$SCRIPT_DIR/../parts/colorPrint.bash" ]]; then
+	echo "Cannot find colorPrint.bash relative to script dir '$SCRIPT_DIR'"
+	exit 1
+fi
+source "$SCRIPT_DIR/../parts/colorPrint.bash"
+
 # Finds a dependency inside the vendor folder by the repro name, removes its vendor and symlinks to to a local copy of that dependency.
 # If the dependency doesn't exit in vendor, has multiple possible options or a copy doesn't exist in the $GOPATH then nothing will happen
 # Note that the search string is case sensitive
@@ -133,9 +139,9 @@ _backupVendor() {
 	fi
 
 	if [[ -n $vendorNum ]]; then
-		echo "The vendor_bak directory already exists, backing up vendor to vendor_bak${vendorNum}"
+		echoYellow "The vendor_bak directory already exists, backing up vendor to vendor_bak${vendorNum}"
 	else
-		echo "Moving the nested vendor directory to 'vendor_bak'"
+		echoBlue "Moving the nested vendor directory to 'vendor_bak'"
 	fi
 
 	mv "$vendorPath" "${vendorPath}_bak${vendorNum}"
@@ -144,17 +150,17 @@ _backupVendor() {
 # shellcheck disable=SC2154
 # This is defined using some bash magic (I think, blame Argbash), but this variable is assigned.
 if [[ -z $_arg_symlink_package ]]; then
-	echo "FAILURE: No input for target package, please provide a package to symlink"
+	echoRed "FAILURE: No input for target package, please provide a package to symlink"
 	exit 1
 fi
 
 if [[ ! -d vendor ]]; then
-	echo "FAILURE: No vendor directory at current location, aborting"
+	echoRed "FAILURE: No vendor directory at current location, aborting"
 	exit 1
 fi
 
 if [[ $_arg_dual_dev == "on" ]]; then
-	echo "Using dual dev approach"
+	echoBlue "Using dual dev approach"
 	echo
 fi
 
@@ -169,10 +175,10 @@ localDependencyPath=$(find "$GOPATH/src" -mindepth 3 -maxdepth 3 -d -path "*$_ar
 numResults=$(_countLines "$localDependencyPath")
 
 if ((numResults == 0)); then
-	echo "FAILURE: Package '$_arg_symlink_package' does not exist in GOPATH, aborting"
+	echoRed "FAILURE: Package '$_arg_symlink_package' does not exist in GOPATH, aborting"
 	exit 1
 elif ((numResults != 1)); then
-	echo "FAILURE: Found $numResults possible dependency hits in GOPATH, aborting"
+	echoRed "FAILURE: Found $numResults possible dependency hits in GOPATH, aborting"
 	echo "Possible dependencies:"
 	echo "$localDependencyPath"
 	exit 1
@@ -184,10 +190,10 @@ expectedVendorPath="./vendor"${localDependencyPath#"$GOPATH"/src}
 
 # path matches against the whole path name
 if [[ ! -d $expectedVendorPath ]]; then
-	echo "Package '$_arg_symlink_package' does not currently exist in vendor, will symlink using path $expectedVendorPath"
+	echoBlue "Package '$_arg_symlink_package' does not currently exist in vendor, will symlink using path $expectedVendorPath"
 else
 	if [[ -L $expectedVendorPath ]]; then
-		echo "Package '$_arg_symlink_package' is in vendor and appears to already be a symlink"
+		echoYellow "Package '$_arg_symlink_package' is in vendor and appears to already be a symlink"
 	else
 		echo "Package '$_arg_symlink_package' is in vendor at $expectedVendorPath"
 	fi
@@ -197,12 +203,12 @@ echo
 echo "Preparing to symlink '$_arg_symlink_package' into vendor from GOPATH"
 
 if [[ $_arg_dual_dev == "on" ]]; then
-	echo "ATTENTION: If you add or remove a file/directory at the root level of the package being symlinked in, you will need to re-run the symlink script!"
+	echoYellow "ATTENTION: If you add or remove a file/directory at the root level of the package being symlinked in, you will need to re-run the symlink script!"
 else
 	if [[ -d "$localDependencyPath/vendor" ]]; then
 		echo
-		echo "Package '$_arg_symlink_package' has a vendor directory. This must be moved for builds in the current package to run."
-		echo "This will likely make you unable to build in '$_arg_symlink_package'. If you need to build in both, use the --dual-dev flag."
+		echoYellow "Package '$_arg_symlink_package' has a vendor directory. This must be moved for builds in the current package to run."
+		echoYellow "This will likely make you unable to build in '$_arg_symlink_package'. If you need to build in both, use the --dual-dev flag."
 
 		_backupVendor "$localDependencyPath/vendor"
 
@@ -255,7 +261,7 @@ find "$GOPATH/pkg" \( -name mod -o -name vendor \) -prune -o -path "*$targetPack
 
 if command -v goSymlinkVendorPostOpHook &>/dev/null; then
 	echo
-	echo "Running post operation hook function."
+	echoBlue "Running post operation hook function."
 	goSymlinkVendorPostOpHook "$expectedVendorPath/$_arg_symlink_package" "${localDependencyPath#"$GOPATH"/src/}" "$_arg_dual_dev"
 else
 	echo

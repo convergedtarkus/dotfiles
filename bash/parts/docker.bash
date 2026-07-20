@@ -21,7 +21,7 @@ restartDocker() {
 	if killDocker >/dev/null 2>&1; then
 		echo "Docker was killed"
 	else
-		echo "Docker was not running"
+		echoYellow "Docker was not running"
 	fi
 
 	echo "Starting Docker"
@@ -41,7 +41,7 @@ dockerStop() {
 		docker stop "$(docker ps -a -q)"
 		echo "All containers stopped."
 	else
-		echo "No docker containers running"
+		echoBlue "No docker containers running"
 	fi
 }
 
@@ -51,7 +51,7 @@ dockerKill() {
 		docker rm -f "$(docker ps -aq)" >/dev/null 2>&1 || true
 		echo "All containers dead."
 	else
-		echo "No docker containers to kill."
+		echoBlue "No docker containers to kill."
 	fi
 }
 
@@ -70,7 +70,7 @@ nukeDocker() {
 		echo "Deleting all docker images."
 		docker rmi "$(docker images -q)"
 	else
-		echo "No docker images to delete."
+		echoBlue "No docker images to delete."
 	fi
 
 	echo
@@ -87,7 +87,7 @@ nukeDocker() {
 		echo "Delete Library/Containers/ docker stuff."
 		rm "$HOME/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2"
 	else
-		echo "No docker stuff under Library/Containers/"
+		echoBlue "No docker stuff under Library/Containers/"
 	fi
 
 	echo
@@ -100,7 +100,7 @@ nukeDocker() {
 dockerUsedSpace() {
 	dockerDir="$HOME/Library/Containers/com.docker.docker/Data/vms/0/data/"
 	if [[ ! -d $dockerDir || ! -f "$dockerDir/Docker.raw" ]]; then
-		echo "Cannot find docker file at $dockerDir"
+		echoRed "Cannot find docker file at $dockerDir"
 		return
 	fi
 
@@ -119,7 +119,7 @@ dockerUsedSpace() {
 	fileSizeHuman=$(du -sh "${dockerDir}/Docker.raw" | cut -f 1 | xargs)
 	maxFileSizeHuman=$(du -A -sh "${dockerDir}/Docker.raw" | cut -f 1 | xargs)
 
-	echo "Docker is using $fileSizeHuman out of $maxFileSizeHuman max (${percent}%)"
+	echoBlue "Docker is using $fileSizeHuman out of $maxFileSizeHuman max (${percent}%)"
 
 	if [[ $spaceOk == "false" ]]; then
 		echoRed "Docker has exceeded safe used space. This may cause build failures!"

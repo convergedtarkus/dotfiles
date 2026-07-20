@@ -110,9 +110,9 @@ _goTestAll() {
 	if [[ $exitCode == 0 ]]; then
 		echoGreen "All tests passed!"
 	elif [[ $exitCode == 1 ]]; then
-		printfRed "SOME TESTS FAILED!"
+		echoRed "SOME TESTS FAILED!"
 	else
-		echoBlue "Exit code '%s'. There may be build or package structure issues." "$exitCode"
+		echoBlue "Exit code '$exitCode'. There may be build or package structure issues."
 		echoBlue "This does not necessarily mean any tests failed though."
 	fi
 
@@ -243,14 +243,14 @@ goResetEnv() {
 	if command -v git >/dev/null; then
 		# This ensures there are not local changes (and this is a git repo).
 		if git diff-index --quiet HEAD --; then
-			echo "Running git reset and clean"
+			echoBlue "Running git reset and clean"
 			git reset --hard && safeClean
 		else
 			echoYellow "There are local changes in the repo, not running git reset or clean"
 		fi
 	fi
 
-	echo "Removing go pkg directory (FYI, this is running with sudo)"
+	echoBlue "Removing go pkg directory (FYI, this is running with sudo)"
 	sudo rm -rf "$GOPATH/pkg/"
 
 	echo "Using go clear to clean cache, mod cache and all binaries"

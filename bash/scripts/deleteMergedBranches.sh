@@ -5,6 +5,12 @@
 # -o pipefail makes a pipeline fail if any command in it fails, not just the last command.
 set -euo pipefail # bash strict mode
 
+if ! SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || [[ -z $SCRIPT_DIR || ! -f "$SCRIPT_DIR/../parts/colorPrint.bash" ]]; then
+	echo "Cannot find colorPrint.bash relative to script dir '$SCRIPT_DIR'"
+	exit 1
+fi
+source "$SCRIPT_DIR/../parts/colorPrint.bash"
+
 # Get the name of the main branch.
 mainName=""
 if git rev-parse --verify main 2>/dev/null; then
@@ -15,21 +21,21 @@ fi
 
 # Verify the current branch is main and fetch it.
 if [[ -z $mainName ]]; then
-	echo "Could not find main branch, aborting."
+	echoRed "Could not find main branch, aborting."
 	exit 1
 else
 	currentBranch=$(git rev-parse --abbrev-ref HEAD)
 	if [[ $mainName != "$currentBranch" ]]; then
-		echo -e "\033[0;33mScript is being run while not on the main branch. This works but will not delete the current branch if it is merged.\033[0m"
+		echoYellow "Script is being run while not on the main branch. This works but will not delete the current branch if it is merged."
 	fi
 
 	mainName=$(git rev-parse --symbolic-full-name --abbrev-ref "${mainName}@{upstream}")
 	remoteName=$(echo "$mainName" | cut -d "/" -f 1)
 	mainBranchMain=$(echo "$mainName" | cut -d "/" -f 2-)
 
-	echo "Fetching $remoteName $mainBranchMain"
+	echoBlue "Fetching $remoteName $mainBranchMain"
 	git fetch "$remoteName" "$mainBranchMain" 2>/dev/null || {
-		echo -e "\033[0;31mFetch failed\033[0m"
+		echoRed "Fetch failed"
 		exit 1
 	}
 fi
@@ -39,7 +45,7 @@ fi
 mergedBranches=$(git branch --merged "$mainName" | grep -Ev "(^\+|master|main|dev)")
 
 if [[ $mergedBranches == *"$currentBranch"* ]]; then
-	echo -e "\033[0;33mThe branch you are currently on, $currentBranch, is merged into $mainName. It will not be deleted.\033[0m"
+	echoYellow "The branch you are currently on, $currentBranch, is merged into $mainName. It will not be deleted."
 	mergedBranches=$(echo "$mergedBranches" | grep -Ev "($currentBranch)")
 fi
 
@@ -47,7 +53,7 @@ fi
 mergedBranches=$(echo "$mergedBranches" | awk '{$1=$1};1')
 
 if [[ $mergedBranches == "" ]]; then
-	echo "No branches to delete"
+	echoGreen "No branches to delete"
 	exit 0
 fi
 
@@ -60,7 +66,7 @@ echo "Should those branches be deleted (y/n)?"
 
 read -r input_variable
 if [[ $input_variable != "y" ]] && [[ $input_variable != "Y" ]]; then
-	echo "Aborting"
+	echoYellow "Aborting"
 	exit 0
 else
 	echo "Deleting all requested branches"
