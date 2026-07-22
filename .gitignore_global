@@ -8,3 +8,5 @@
 
 # Mac folder attributes files
 .DS_Store
+
+**/.claude/settings.local.json
