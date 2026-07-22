@@ -322,6 +322,12 @@ _deleteNormalCommand() {
 # Removes duplicate and nonexistent entries in the user's PATH. Maintains order.
 # For duplicate entries, the first is kept.
 cleanPath() {
+	if ((BASH_VERSINFO[0] < 4)); then
+		# TODO Switch to a bash 3 compatible version?
+		# This function uses associative arrays which require bash 4+
+		echoRed "Not running cleanPath as it requires bash 4+"
+		return
+	fi
 	declare newPath=()
 	declare -A uniquePaths
 
