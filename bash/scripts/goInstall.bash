@@ -136,17 +136,7 @@ installForAllGoVersions() {
 	installCommand "$commandInstallString"
 
 	# Ensure the command exists
-	if ! command -v "$commandName" &>/dev/null; then
-		# If asdf exists, reshim to see if that makes the command available.
-		if command asdf &>/dev/null; then
-			asdf reshim golang
-		fi
-
-		if ! command -v "$commandName" &>/dev/null; then
-			echoRed "Installed '$commandName' but cannot find the command in PATH"
-			return 1
-		fi
-	fi
+	ensureCommandExists "$commandName"
 	echoGreen "Installed '$commandName' successfully for current go version ($(getGoVersion))"
 
 	# Nothing more to do if asdf is not installed or not installing for all (which is asdf specific).
@@ -195,6 +185,40 @@ installForAllGoVersions() {
 			cp "$commandLocation" "$targetGoBin"
 		fi
 	done
+}
+
+# This will make sure the installed command exists.
+# If if does not exist (and asdf is installed), `asdf reshim golang` will be called and
+# then the command will be again checked for.
+# Even if the command exists, this may call `asdf reshim golang` if the command
+# appears to be a shim to ensure the shims are up to date.
+ensureCommandExists() {
+	declare commandName="$1"
+
+	# See if the command exists
+	if commandLocation=$(command -v "$commandName") && [[ -n $commandLocation ]]; then
+		# See if asdf exists and if the command is pointing to a shim.
+		local -r asdfShimPath="${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
+		if command -v asdf &>/dev/null && [[ -n $asdfShimPath && -f "$asdfShimPath/$commandName" ]]; then
+			# There is a shim for this command but that does not guarantee the
+			# shim points to the version that was just installed. Reshim
+			# for safety to ensure it exists and runs.
+			echoBlue "Calling asdf reshim golang to ensure command is available"
+			asdf reshim golang
+		fi
+		return
+	fi
+
+	# If asdf exists, reshim to see if that makes the command available.
+	if command asdf &>/dev/null; then
+		echoBlue "Calling asdf reshim golang to ensure command is available"
+		asdf reshim golang
+	fi
+
+	if command -v "$commandName" &>/dev/null; then
+		echoRed "Installed '$commandName' but cannot find the command in PATH"
+		return 1
+	fi
 }
 
 programsToInstall=()
