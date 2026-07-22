@@ -94,10 +94,26 @@ ensureVersion() {
 		echo "$commandInstallString@latest"
 		;;
 	*)
-		# No version while in a go module is fine, it will use the version from the go.mod
-		echo "$commandInstallString"
+		# Determine if the go.mod contains this dependency.
+		if [[ ! -f $goMod ]]; then
+			echoRed "Cannot resolve go.mod location at '$goMod'"
+			return 1
+		fi
+
+		if grep -q "\b$commandInstallString\b" "$goMod"; then
+			# The command is in the go.mod, go install will use the version from the go.mod
+			return 0
+		fi
+
+		# The command is not in the go.mod so install at latest.
+		echo "$commandInstallString@latest"
 		;;
 	esac
+}
+
+# echos the go version (only the major.minor.patch)
+getGoVersion() {
+	go version | sed "s/go version go//" | cut -d" " -f1
 }
 
 installForAllGoVersions() {
@@ -131,7 +147,7 @@ installForAllGoVersions() {
 			return 1
 		fi
 	fi
-	echoGreen "Installed '$commandName' successfully for current go version"
+	echoGreen "Installed '$commandName' successfully for current go version ($(getGoVersion))"
 
 	# Nothing more to do if asdf is not installed or not installing for all (which is asdf specific).
 	if ! command asdf >/dev/null || [[ -z $installForAll ]]; then
