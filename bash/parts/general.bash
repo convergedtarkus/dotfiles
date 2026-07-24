@@ -117,28 +117,23 @@ checkScript() {
 	fi
 
 	# Iterate over arguments and verify a file is found.
-	local foundFiles=()
-	for arg in "$@"; do
-		if [[ $arg != ^- ]]; then
-			foundFiles+=("$arg")
-		fi
-	done
-
-	if [[ ${#foundFiles[@]} -eq 0 ]]; then
-		echoBlue "No files found to check."
-		return 1
-	fi
-
 	local returnCode
-	for file in "${foundFiles[@]}"; do
-		if [[ ! -f $file ]]; then
-			echoYellow "'$file' cannot be found."
+	local foundFile
+	for arg in "$@"; do
+		if [[ $arg == ^- ]]; then
+			continue
+		fi
+		if [[ ! -f $arg ]]; then
+			echoYellow "'$arg' cannot be found."
 			returnCode=1
+		else
+			foundFile="yes"
 		fi
 	done
 
-	if [[ -n $returnCode ]]; then
-		return "$returnCode"
+	if [[ -z $foundFile || -n $returnCode ]]; then
+		echoRed "No valid files passed in."
+		return 1
 	fi
 
 	# Write and simplify.
@@ -158,25 +153,12 @@ resolveCommand() {
 
 # Deletes the given commands. Will remove all asdf shim versions.
 deleteAllCommand() {
+	if [[ ${#@} == 0 ]]; then
+		echoRed "No commands given to deleteAllCommand"
+		return 1
+	fi
 	deleteAsdfCommand "$@"
 	deleteCommand "$@"
-}
-
-# Returns the path to a command if it is installed via asdf.
-# Will return a non-zero exit code for either a command not installed through asdf
-# or a command installed through asdf but with no version set.
-# Commands that do not resolve echo nothing (not even a newline)
-asdfPath() {
-	if ! command -v asdf >/dev/null; then
-		# asdf does not exist
-		return
-	fi
-
-	local commandToCheck
-	for commandToCheck in "$@"; do
-		# Reroute standard error to null so only the path is echoed, not the error.
-		asdf which "$commandToCheck" 2>/dev/null
-	done
 }
 
 # Deletes all the versions of the given command that are in asdf installed tools.
@@ -185,9 +167,31 @@ asdfPath() {
 # Note, this uses asdf commands to find what to delete so if shims are out of date,
 # not all binaries will be removed.
 deleteAsdfCommand() {
+	if [[ ${#@} == 0 ]]; then
+		echoRed "No commands given to deleteAsdfCommand"
+		return 1
+	fi
 	if ! command -v asdf >/dev/null; then
 		# asdf does not exist, nothing to do.
 		return
+	fi
+
+	for commandToDelete in "$@"; do
+		# Delete the command using asdf tooling.
+		_deleteSingleAsdfCommand "$commandToDelete"
+
+		# Do a brute force look up as well to look for missing commands.
+		_bruteDeleteAsdfCommand "$commandToDelete"
+	done
+}
+
+# Takes in a command to delete, and deletes it from asdf.
+# Will attempt to remove both the shim, and all installed versions of the command
+# in the tools asdf has.
+_deleteSingleAsdfCommand() {
+	local -r commandToDelete="$1"
+	if [[ -z $commandToDelete ]]; then
+		return 0
 	fi
 
 	asdfShimPath="${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
@@ -196,55 +200,71 @@ deleteAsdfCommand() {
 		return
 	fi
 
-	for commandToDelete in "$@"; do
-		local commandPath
-		if ! commandPath=$(command -v "$commandToDelete") || [[ -z $commandPath ]] || [[ $(type -t "$commandToDelete") != "file" ]]; then
-			continue
+	# Determine where the command is and make sure it is a shim.What?
+	local commandPath
+	if ! commandPath=$(command -v "$commandToDelete") || [[ -z $commandPath || $(type -t "$commandToDelete") != "file" || ! $commandPath =~ $asdfShimPath ]]; then
+		return 0
+	fi
+	readonly commandPath
+
+	# Determine what versions have this command installed.
+	if ! shimVersions=$(asdf shimversions "$commandToDelete"); then
+		# This really shouldn't happen since we verified there is a shim.
+		echoRed "Cannot determine shim versions for '$commandToDelete'"
+		return 0
+	fi
+
+	# Try to determine if the command to delete is a core plugin command.
+	if ! plugins=$(asdf plugin list); then
+		echoRed "Command '$commandToDelete' cannot resolve plugin names"
+		return 0
+	fi
+
+	if echo "$plugins" | grep -q "^$(_asdfCommandNameToPluginName "$commandToDelete")$"; then
+		echoYellow "Command '$commandToDelete' is a core plugin command. It will not be deleted from the plugin bin."
+		return 0
+	fi
+
+	while IFS= read -r shimLine; do
+		if ! toolPath=$(eval "asdf where $shimLine") || [[ ! -d $toolPath ]]; then
+			echoRed "For command '$commandToDelete' from '$shimLine', cannot determine tool path"
+			return 0
 		fi
 
-		if [[ ! $commandPath =~ $asdfShimPath ]]; then
-			continue
+		deletePath="$toolPath/bin/$commandToDelete"
+		if [[ -f $deletePath ]]; then
+			echo "For command '$commandToDelete' from '$shimLine', deleting command from bin at '$deletePath'"
+			rm "$deletePath" || echoRed "Failed to delete '$deletePath'"
 		fi
+	done <<<"$shimVersions"
 
-		if ! shimVersions=$(asdf shimversions "$commandToDelete"); then
-			echoRed "Cannot determine shim versions for '$commandToDelete"
-			continue
-		fi
+	# Finally, delete the shim.
+	if [[ -f $commandPath ]]; then
+		echo "For command '$commandToDelete', deleting root shim command at '$commandPath'"
+		rm "$commandPath"
+	fi
+}
 
-		# Try to determine if the command to delete is a core plugin command.
-		if ! plugins=$(asdf plugin list); then
-			echoRed "Command '$commandToDelete' cannot resolve plugin names"
-			continue
-		fi
+# Similar to deleteAsdfCommand but rather than using asdf tooling, it searches asdf
+# for the program in a bin directory.
+# Works when the shim has already been deleted.
+_bruteDeleteAsdfCommand() {
+	local -r commandToDelete="$1"
+	if [[ -z $commandToDelete ]]; then
+		return 0
+	fi
 
-		if echo "$plugins" | grep -q "^$(_asdfCommandNameToPluginName "$commandToDelete")$"; then
-			echoYellow "Command '$commandToDelete' is a core plugin command. It will not be deleted from the plugin bin."
-			continue
-		fi
+	declare -r asdfInstallsPath="${ASDF_DATA_DIR:-$HOME/.asdf}/installs"
+	if ! command -v asdf >/dev/null || [[ ! -d $asdfInstallsPath ]]; then
+		# No asdf found.
+		return 0
+	fi
 
-		while IFS= read -r shimLine; do
-			if ! toolPath=$(eval "asdf where $shimLine") || [[ ! -d $toolPath ]]; then
-				echoRed "For command '$commandToDelete' from '$shimLine', cannot determine tool path for shim version"
-				continue
-			fi
-
-			toolBin="$toolPath/bin"
-			if [[ ! -d $toolBin ]]; then
-				echoRed "For command '$commandToDelete' from '$shimLine', cannot find tool bin for shim version"
-			fi
-
-			deletePath="$toolBin/$commandToDelete"
-			if [[ -f $deletePath ]]; then
-				echo "For command '$commandToDelete' from '$shimLine', deleting command from bin at '$deletePath'"
-				rm "$deletePath"
-			fi
-		done <<<"$shimVersions"
-
-		if [[ -f $commandPath ]]; then
-			echo "For command '$commandToDelete', deleting root shim command at '$commandPath'"
-			rm "$commandPath"
-		fi
-	done
+	# Searching the entire asdf installs directory can be slow, so only look for
+	# the base bin directory, not nested one.
+	find "$asdfInstallsPath" -mindepth 4 -maxdepth 4 -type f -path "*bin/$commandToDelete" \
+		-exec echo "For command '$commandToDelete', deleting command from bin at '{}'" \; \
+		-exec rm {} \;
 }
 
 # Takes in a command name and attempts to determine the plugin name.
@@ -269,15 +289,12 @@ _asdfCommandNameToPluginName() {
 # Removes the given command. Takes asdf into account.
 # Will echo information about the command being removed (if removing, if not found, if protected etc)
 deleteCommand() {
+	if [[ ${#@} == 0 ]]; then
+		echoRed "No commands given to deleteCommand"
+		return 1
+	fi
 	for commandToDelete in "$@"; do
 		_deleteNormalCommand "$commandToDelete"
-
-		local asdfCommandPath
-		if asdfCommandPath="$(asdfPath "$commandToDelete")" && [[ -n $asdfCommandPath && -f $asdfCommandPath ]]; then
-			echo "Removing command '$commandToDelete' installed through asdf at '$asdfCommandPath'"
-			rm "$asdfCommandPath"
-		fi
-
 	done
 }
 

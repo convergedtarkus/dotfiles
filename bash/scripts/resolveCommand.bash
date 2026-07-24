@@ -25,6 +25,7 @@ hasShimFor() {
 	return 1
 }
 
+# Main logic to resolve the command location.
 resolveCommand() {
 	declare commandToCheck="$1"
 	declare commandLocation
@@ -74,6 +75,14 @@ resolveCommand() {
 	fi
 }
 
+# Print the scripts help logic.
+printHelp() {
+	echo "Resolve the path to the given command(s). Is aware of shims from asdf (if installed)."
+	echo "--verbose, -v  Print verbose, human readable, output for how and where a command resolves to."
+	echo "--line, -l     Print a line for each command given. Without this, non-existant or invalid commands output nothing."
+	echo "--help         Show this help output."
+}
+
 # Look for a -v flag for verbose.
 declare commandsToCheck=()
 for curArg in "$@"; do
@@ -82,10 +91,7 @@ for curArg in "$@"; do
 	elif [[ $curArg == "-l" || $curArg == "--line" ]]; then
 		alwaysOutputLine=1
 	elif [[ $curArg == "--help" ]]; then
-		echo "Resolve the path to the given command(s). Is aware of shims from asdf (if installed)."
-		echo "--verbose, -v  Print verbose, human readable, output for how and where a command resolves to."
-		echo "--line, -l     Print a line for each command given. Without this, non-existant or invalid commands output nothing."
-		echo "--help         Show this help output."
+		printHelp
 		exit
 	else
 		commandsToCheck+=("$curArg")
@@ -93,7 +99,8 @@ for curArg in "$@"; do
 done
 
 if [[ ${#commandsToCheck[@]} -eq 0 ]]; then
-	echo "No commands given"
+	echoRed "No commands given"
+	printHelp
 	exit 1
 fi
 
