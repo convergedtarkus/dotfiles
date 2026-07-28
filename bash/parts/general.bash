@@ -101,21 +101,6 @@ shellcheck() {
 
 # Format and check a script with shfmt and shellcheck.
 checkScript() {
-	if ! command -v shfmt >/dev/null || ! shfmt --help &>/dev/null; then
-		if command -v installShfmt; then
-			installShfmt
-		fi
-		if ! command -v shfmt >/dev/null || ! shfmt --help &>/dev/null; then
-			echoRed "shfmt is not installed!"
-			return 1
-		fi
-	fi
-
-	if ! command -v shellcheck >/dev/null; then
-		echoRed "shellcheck is not installed!"
-		return 1
-	fi
-
 	# Iterate over arguments and verify a file is found.
 	local returnCode
 	local foundFile
@@ -133,6 +118,21 @@ checkScript() {
 
 	if [[ -z $foundFile || -n $returnCode ]]; then
 		echoRed "No valid files passed in."
+		return 1
+	fi
+
+	if ! command -v shfmt >/dev/null || ! shfmt --help &>/dev/null; then
+		if command -v installShfmt; then
+			installShfmt
+		fi
+		if ! command -v shfmt >/dev/null || ! shfmt --help &>/dev/null; then
+			echoRed "shfmt is not installed!"
+			return 1
+		fi
+	fi
+
+	if ! command -v shellcheck >/dev/null; then
+		echoRed "shellcheck is not installed!"
 		return 1
 	fi
 
