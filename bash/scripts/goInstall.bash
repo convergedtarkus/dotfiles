@@ -57,7 +57,7 @@ installCommand() {
 		installCommand="smartGoInstall"
 	else
 		# Ensure the commandInstallString has a version if needed.
-		commandInstallString=$(ensureVersion "$1")
+		commandInstallString=$(ensureVersion "$commandInstallString")
 		if [[ $commandInstallString != "$1" ]]; then
 			echoBlue "Added @latest version to the install command"
 		fi
@@ -102,6 +102,7 @@ ensureVersion() {
 
 		if grep -q "\b$commandInstallString\b" "$goMod"; then
 			# The command is in the go.mod, go install will use the version from the go.mod
+			echo "$commandInstallString"
 			return 0
 		fi
 
@@ -118,7 +119,7 @@ getGoVersion() {
 
 installForAllGoVersions() {
 	declare -r commandInstallString="$1"
-	if [[ -z $1 ]]; then
+	if [[ -z $commandInstallString ]]; then
 		echoRed "No command passed to install"
 		return 1
 	fi
