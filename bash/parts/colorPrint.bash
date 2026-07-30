@@ -12,8 +12,10 @@ colorEcho() {
 		# Print the single argument as a string, no color.
 	1) printf "%s\n" "$1" ;;
 	*)
-		if [[ ! -t 2 || -n ${NO_COLOR:-} ]]; then
-			# Terminal asks for no color, respect it. Remove first arg and print.
+		if [[ ! -t 1 || -n ${NO_COLOR:-} ]]; then
+			# Terminal is non-interactive (-t 1 means if standard out is to an
+			# interactive terminal) or asks for no color, respect it.
+			# Remove first arg and print.
 			shift
 			printf "%s\n" "$*"
 			return
