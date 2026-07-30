@@ -222,6 +222,15 @@ ensureCommandExists() {
 	fi
 }
 
+if ! command -v go &>/dev/null; then
+	echoRed "Go is not installed."
+	exit 1
+fi
+if ! go version &>/dev/null; then
+	echoRed "Go is not configured correctly (go version failed) (If you are using asdf, you may not have a go version set)."
+	exit 1
+fi
+
 programsToInstall=()
 for arg in "$@"; do
 	case "$arg" in
