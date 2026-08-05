@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"dotfiles/tools/smartgorunner/internal/utils"
+	"github.com/convergedtarkus/randomUtils/smartgorunner/internal/utils"
 )
 
 var errNoChangedGoFiles = errors.New("no changed go files found")

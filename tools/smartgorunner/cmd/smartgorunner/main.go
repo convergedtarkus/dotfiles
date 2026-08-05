@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"dotfiles/tools/smartgorunner/internal"
+	"github.com/convergedtarkus/randomUtils/smartgorunner/internal"
 )
 
 // Main entry point for the smartgorunner command line tool.
