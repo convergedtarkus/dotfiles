@@ -272,6 +272,9 @@ for toInstall in "${programsToInstall[@]}"; do
 	gopherjs)
 		toInstall="github.com/gopherjs/gopherjs"
 		;;
+	goimports)
+		toInstall="golang.org/x/tools/cmd/goimports"
+		;;
 	smartGoInstall)
 		toInstall="--customInstall='(cd $SCRIPT_DIR/../../tools/smartGoInstall/ && go install .)'"
 		commandName="smartGoInstall"
