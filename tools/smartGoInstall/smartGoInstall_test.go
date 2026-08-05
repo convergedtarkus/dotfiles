@@ -21,7 +21,8 @@ func TestParseFlags(t *testing.T) {
 		"Installs a Go package at the newest version compatible with the current Go toolchain.\n\n" +
 		"Example:\n  smartGoInstall github.com/golangci/golangci-lint/cmd/golangci-lint\n\n" +
 		"Flags:\n  " +
-		"-install-latest\n    \tinstall latest version if no compatible version is found\n  -l\tshorthand for --install-latest\n  -" +
+		"-go-version string\n    \tIf set, this will be used for the go version rather than the current go version.\n" +
+		"  -install-latest\n    \tinstall latest version if no compatible version is found\n  -l\tshorthand for --install-latest\n  -" +
 		"p\tshorthand for --print-version-only\n  -print-version-only\n    \tprint the compatible version without installing\n  -" +
 		"v\tshorthand for --verbose\n  -verbose\n    \tenable verbose output\n\n" +
 		"If --install-latest is not provided, the command will fail when it cannot determine a compatible version.\n"
@@ -280,7 +281,7 @@ func Test_getModuleGoVersions(t *testing.T) {
 		{
 			testName:      "command failure",
 			fakeError:     fmt.Errorf("network error"),
-			expectedError: "running 'go list -m -versions': network error",
+			expectedError: "running 'go list -m -versions github.com/example/pkg': network error",
 		},
 	}
 

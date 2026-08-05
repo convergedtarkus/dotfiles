@@ -22,6 +22,7 @@ type commandConfig struct {
 	packageToInstall string
 	printVersionOnly bool
 	verbose          bool
+	forcedGoVersion  string
 }
 
 func main() {
@@ -78,6 +79,9 @@ func parseFlags(args []string, output io.Writer) (commandConfig, error) {
 	fs.BoolVar(&cfg.verbose, "verbose", false, "enable verbose output")
 	fs.BoolVar(&cfg.verbose, "v", false, "shorthand for --verbose")
 
+	// --go-version: for the go version used for checking for dependencies.
+	fs.StringVar(&cfg.forcedGoVersion, "go-version", "", "If set, this will be used for the go version rather than the current go version.")
+
 	// Parse the args.
 	if err := fs.Parse(args); err != nil {
 		// The err should be a flag.ErrHelp which will just terminate the program..
@@ -105,8 +109,8 @@ func run(cfg commandConfig, runner sharedUtils.CommandRunner) error {
 	// Extract the module path (without /cmd/... suffix)
 	modulePath := extractModulePath(cfg.packageToInstall)
 
-	// Get the current Go version (major.minor) to compare against module requirements.
-	systemGoVersion, err := getSystemGoVersion(runner)
+	// Get the target Go version (major.minor) to compare against module requirements.
+	systemGoVersion, err := getGoVersionToCheck(cfg, runner)
 	if err != nil {
 		return fmt.Errorf("getting current Go version: %w", err)
 	}
@@ -149,6 +153,16 @@ func run(cfg commandConfig, runner sharedUtils.CommandRunner) error {
 	}
 
 	return installLatestOrFail(cfg, runner)
+}
+
+// Returns the go version that should be used to check against.
+func getGoVersionToCheck(cfg commandConfig, runner sharedUtils.CommandRunner) (semverVersion, error) {
+	// Get the current Go version (major.minor) to compare against module requirements.
+	if cfg.forcedGoVersion != "" {
+		return parseVersion(cfg.forcedGoVersion)
+	}
+
+	return getSystemGoVersion(runner)
 }
 
 // extractModulePath strips any /cmd/... suffix from a package path to get the module root.
