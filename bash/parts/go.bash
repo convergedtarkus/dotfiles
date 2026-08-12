@@ -250,9 +250,6 @@ goResetEnv() {
 		fi
 	fi
 
-	echoBlue "Removing go pkg directory (FYI, this is running with sudo)"
-	sudo rm -rf "$GOPATH/pkg/"
-
 	echo "Using go clear to clean cache, mod cache and all binaries"
 	# i = removes installed binaries
 	# r = Applies recursively to import paths.
