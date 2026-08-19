@@ -27,15 +27,26 @@ customInstallCommand() {
 	# Isolate the command by removing the --customInstall=' and trailing '
 	declare installCommand="${commandInstallString#--customInstall=\'}"
 	installCommand="${installCommand%\'}"
-	readonly installCommand
 	if [[ -z $installCommand ]]; then
 		echoRed "Custom install command is empty"
 		return 1
 	fi
 
+	if [[ -n $installToDotfilesBin ]]; then
+		# No need to verify the directory exists, go will handle that.
+		echoYellow "Installing to $HOME/dotfilesbin"
+		if [[ $installCommand =~ (.+)" go install "(.+) ]]; then
+			installCommand="${BASH_REMATCH[1]} GOBIN=$HOME/dotfilesbin go install ${BASH_REMATCH[2]}"
+		else
+			echoRed "Cannot configure custom install string of $installCommand to support a custom GOBIN"
+			return 1
+		fi
+	fi
+	readonly installCommand
+
 	echoBlue "Running custom install command '$installCommand'"
 	if ! eval "$installCommand"; then
-		echoRed "Failed to install '$commandInstallString'"
+		echoRed "Failed to install '$installCommand'"
 		return 1
 	fi
 }
@@ -293,6 +304,10 @@ for toInstall in "${programsToInstall[@]}"; do
 	smartGoInstall)
 		toInstall="--customInstall='(cd $SCRIPT_DIR/../../tools/smartGoInstall/ && go install .)'"
 		commandName="smartGoInstall"
+		;;
+	smartgorunner)
+		toInstall="--customInstall='(cd $SCRIPT_DIR/../../tools/smartgorunner/ && go install ./cmd/smartgorunner/)'"
+		commandName="smartgorunner"
 		;;
 	esac
 	installForAllGoVersions "$toInstall" "$commandName"
