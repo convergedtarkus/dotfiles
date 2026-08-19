@@ -14,6 +14,7 @@ source "$SCRIPT_DIR/../parts/colorPrint.bash"
 # Argument variables.
 declare smartInstall=""
 declare installForAll=""
+declare installToDotfilesBin=""
 
 # Handles installing via a custom command.
 customInstallCommand() {
@@ -63,6 +64,12 @@ installCommand() {
 		fi
 	fi
 	readonly commandInstallString
+
+	if [[ -n $installToDotfilesBin ]]; then
+		# No need to verify the directory exists, go will handle that.
+		echoYellow "Installing to $HOME/dotfilesbin"
+		installCommand="GOBIN=$HOME/dotfilesbin $installCommand"
+	fi
 	readonly installCommand
 
 	echoBlue "Running '$installCommand $commandInstallString'"
@@ -240,6 +247,9 @@ for arg in "$@"; do
 	"-a" | "--all" | "-all")
 		installForAll=1
 		;;
+	"--dotfilesbin")
+		installToDotfilesBin=1
+		;;
 	"-s" | "--smart" | "-smart")
 		# Make sure the command exists and works.
 		if ! command -v smartGoInstall >/dev/null; then
@@ -255,6 +265,11 @@ for arg in "$@"; do
 		;;
 	esac
 done
+
+if [[ -n $installToDotfilesBin && -n $installForAll ]]; then
+	echoRed "--dotfilesbin and --all (-a, -all) cannot be used together"
+	exit 1
+fi
 
 for toInstall in "${programsToInstall[@]}"; do
 	# Support some shortcut common installs.
