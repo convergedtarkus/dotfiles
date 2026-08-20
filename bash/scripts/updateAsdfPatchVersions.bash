@@ -5,7 +5,12 @@
 # -o pipefail makes a pipeline fail if any command in it fails, not just the last command.
 set -euo pipefail # bash strict mode
 
-set -euo pipefail
+if ! SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || [[ -z $SCRIPT_DIR || ! -f "$SCRIPT_DIR/../parts/colorPrint.bash" ]]; then
+	echo "Cannot find colorPrint.bash script dir '$SCRIPT_DIR"
+	exit 1
+fi
+source "$SCRIPT_DIR/../parts/colorPrint.bash"
+
 IFS=$'\n\t'
 
 # Prints script usage.
@@ -282,7 +287,7 @@ main() {
 			exit 0
 			;;
 		*)
-			echo "Unknown argument: $1" >&2
+			echoRed "Unknown argument: $1" >&2
 			usage >&2
 			exit 1
 			;;

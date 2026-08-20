@@ -179,7 +179,7 @@ if ((numResults == 0)); then
 	exit 1
 elif ((numResults != 1)); then
 	echoRed "FAILURE: Found $numResults possible dependency hits in GOPATH, aborting"
-	echo "Possible dependencies:"
+	echoBlue "Possible dependencies:"
 	echo "$localDependencyPath"
 	exit 1
 fi
@@ -269,4 +269,4 @@ else
 fi
 
 echo
-echo "Success! Package '$_arg_symlink_package' was symlinked into vendor from GOPATH correctly!"
+echoGreen "Success! Package '$_arg_symlink_package' was symlinked into vendor from GOPATH correctly!"

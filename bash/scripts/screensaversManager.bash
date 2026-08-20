@@ -5,8 +5,14 @@
 # -o pipefail makes a pipeline fail if any command in it fails, not just the last command.
 set -euo pipefail # bash strict mode
 
+if ! SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || [[ -z $SCRIPT_DIR || ! -f "$SCRIPT_DIR/../parts/colorPrint.bash" ]]; then
+	echo "Cannot find colorPrint.bash script dir '$SCRIPT_DIR"
+	exit 1
+fi
+source "$SCRIPT_DIR/../parts/colorPrint.bash"
+
 if [[ $# -lt 2 ]]; then
-	echo "Must have at least two parameters. Directroy to read images from and directroy to copy images to."
+	echoRed "Must have at least two parameters. Directroy to read images from and directroy to copy images to."
 	exit 1
 fi
 
@@ -25,13 +31,13 @@ while [[ -n $1 ]]; do
 	if [[ -z $readRoot ]]; then
 		readRoot=${1%/}
 		if [[ ! -d $readRoot ]]; then
-			echo "Read location '$readRoot' is not a directroy, aborting!"
+			echoRed "Read location '$readRoot' is not a directory, aborting!"
 			exit 2
 		fi
 	elif [[ -z $copyToDir ]]; then
 		copyToDir=${1%/}
 		if [[ ! -d $copyToDir ]]; then
-			echo "Copy location '$copyToDir' is not a directroy, aborting!"
+			echoRed "Copy location '$copyToDir' is not a directory, aborting!"
 			exit 2
 		fi
 	else
@@ -44,7 +50,7 @@ while [[ -n $1 ]]; do
 			;;
 		*)
 			if [[ ! -d $1 ]]; then
-				echo "Director to skip '$1' is not a directory, aborting!"
+				echoRed "Director to skip '$1' is not a directory, aborting!"
 				exit 2
 			fi
 
@@ -62,11 +68,11 @@ done
 
 # Make sure required variables are set.
 if [[ -z $readRoot || -z $copyToDir ]]; then
-	echo "Missing readRoot or copyToDir!"
+	echoRed "Missing readRoot or copyToDir!"
 	exit 1
 fi
 
-echo "There are ${#directoriesToSkip[@]} directories to skip. They are ${directoriesToSkip[*]}"
+echoBlue "There are ${#directoriesToSkip[@]} directories to skip. They are ${directoriesToSkip[*]}"
 
 # Convert input directories to absolute paths.
 readRoot=$(
@@ -90,7 +96,7 @@ handleCopyDir() {
 			# Ask user if content of copy to directory should be deleted.
 			echo
 			echo
-			echo "Copy target dir ($copyToDir) is not empty, do you want to delete contents?"
+			echoYellow "Copy target dir ($copyToDir) is not empty, do you want to delete contents?"
 			read -r input_variable
 			if [[ $input_variable != "y" ]]; then
 				# User say not to delete contents of copy directory.
@@ -114,7 +120,7 @@ addToImagesToCopy() {
 		imagesToCopy+=("$1")
 		;;
 	*)
-		echo "$1 is not an image"
+		echoYellow "$1 is not an image"
 		;;
 	esac
 }
@@ -125,7 +131,7 @@ findScreensavers() {
 			addToImagesToCopy "$f"
 		elif [[ -d $f ]]; then
 			if [[ $f == "$copyToDir" ]]; then
-				echo "Skipping images in copy to target of '$copyToDir'"
+				echoBlue "Skipping images in copy to target of '$copyToDir'"
 				continue
 			fi
 
@@ -139,7 +145,7 @@ findScreensavers() {
 			if [[ -z $shouldSkip ]]; then
 				findScreensavers "$f"
 			else
-				echo "Skipping images in directory '$f'"
+				echoBlue "Skipping images in directory '$f'"
 			fi
 		fi
 	done

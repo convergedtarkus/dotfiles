@@ -253,6 +253,7 @@ programsToInstall=()
 for arg in "$@"; do
 	case "$arg" in
 	"--help" | "-help")
+		# TODO
 		echo "Help"
 		;;
 	"-a" | "--all" | "-all")

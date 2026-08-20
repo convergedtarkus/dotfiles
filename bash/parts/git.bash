@@ -111,16 +111,19 @@ gdv() { git diff -w "$@" | vim -R -; } # git diff, ignore whitespace, in vim
 alias gf='git fetch --all --prune'
 alias gft='git fetch --all --prune --tags'
 gfm() { git fetch "$(getOriginRemote)" "$(getMainBranch)"; } # fetch remote main
+
+# Returns the remote information to fetch this branch.
+# If the HEAD cannot be found, exit code 2 is returned.
+# If the upstream cannot be parsed, exit code 3 is returned.
 _fetchTarget() {
 	if ! git symbolic-ref -q HEAD >/dev/null 2>&1; then
-		# This echo value is used in gfc, make sure to chance both.
-		echo "No fetch target"
-		return 1
+		echoRed "No fetch target"
+		return 2
 	fi
 	fetchTarget=$(git rev-parse --symbolic-full-name --abbrev-ref "@{upstream}" | sed 's|/| |')
 	if [[ -z $fetchTarget ]]; then
-		echo "Cannot parse upstream"
-		return 1
+		echoRed "Cannot parse upstream"
+		return 3
 	fi
 	echo "$fetchTarget"
 	return 0
@@ -128,8 +131,12 @@ _fetchTarget() {
 
 # gfc fetches just the current branch.
 gfc() {
-	if ! fetchTarget=$(_fetchTarget) 2>/dev/null; then
-		if [[ $fetchTarget != "No fetch target" ]]; then
+	if
+		fetchTarget=$(_fetchTarget 2>&1)
+		exitCode="$?"
+		[[ $exitCode -ne 0 ]]
+	then
+		if [[ $exitCode -eq 2 ]]; then
 			# Something went wrong with finding the target.
 			echoRed "Cannot find fetch target"
 			return 1
@@ -377,7 +384,6 @@ logAgainstBase() {
 logAgainstRemote() {
 	gfc &>/dev/null # fetch the remote of this branch
 	if ! remote=$(_fetchTarget) || [[ -z $remote ]]; then
-		echoRed "Cannot determine remote"
 		return 1
 	fi
 	remote=$(echo "$remote" | tr " " "/") # Replace the space between the remote name and branch name with a '/'.
@@ -410,7 +416,6 @@ diffAgainstBase() {
 diffAgainstRemote() {
 	gfc &>/dev/null # fetch the remote of this branch
 	if ! remote=$(_fetchTarget) || [[ -z $remote ]]; then
-		echoRed "Cannot determine remote"
 		return 1
 	fi
 	remote=$(echo "$remote" | tr " " "/") # Replace the space between the remote name and branch name with a '/'.
