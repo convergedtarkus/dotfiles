@@ -5,6 +5,18 @@
 # Clears any echo text coloring
 _noColor='\033[0m'
 
+# The main printing function.
+# The first argument should be the color to output.
+# The second argument is either the first thing to print or --force.
+# Special cases:
+#    - No arguments will print just a newline (just like an empty echo)
+#    - One argument will just print the argument
+#    - Argument two is --force. The check to see if the terminal output is connected
+#      to standard output and NO_COLOR is not set is ignored. This can be helpful to
+#      capture color output to a variable.
+#    - The color argument is an unknown color. The arguments are printed literally.
+#      Note, if --force is given with an invalid color, the --force will be printed
+#      literally.
 colorEcho() {
 	case ${#@} in
 	# Print just an empty line.
@@ -12,7 +24,10 @@ colorEcho() {
 		# Print the single argument as a string, no color.
 	1) printf "%s\n" "$1" ;;
 	*)
-		if [[ ! -t 1 || -n ${NO_COLOR:-} ]]; then
+		if [[ $2 == "--force" ]]; then
+			force="true"
+		fi
+		if [[ -z $force && (! -t 1 || -n ${NO_COLOR:-}) ]]; then
 			# Terminal is non-interactive (-t 1 means if standard out is to an
 			# interactive terminal) or asks for no color, respect it.
 			# Remove first arg and print.
@@ -55,11 +70,21 @@ colorEcho() {
 		lightgray | light_gray) color='\033[0;37m' ;;
 		white) color='\033[1;37m' ;;
 		faintwhite) color='\033[2;37m' ;;
+		*)
+			# Unknown color, print all the input literally.
+			printf "%s\n" "$*"
+			return
+			;;
 		esac
 		readonly color
 
 		# Remove the color argument.
 		shift
+
+		if [[ -n $force ]]; then
+			# Remove the force argument.
+			shift
+		fi
 
 		printf "%b%s%b\n" "$color" "$*" "$_noColor"
 		;;
@@ -68,17 +93,17 @@ colorEcho() {
 
 # Commonly used for information or to standout a little.
 echoBlue() {
-	colorEcho "blue" "$*"
+	colorEcho "blue" "$@"
 }
 
 # Commonly used for success
 echoGreen() {
-	colorEcho "green" "$*"
+	colorEcho "green" "$@"
 }
 
 # Commonly used for important information.
 echoYellow() {
-	colorEcho "yellow" "$*"
+	colorEcho "yellow" "$@"
 }
 
 # Commonly used for errors.

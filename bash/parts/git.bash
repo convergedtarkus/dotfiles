@@ -172,7 +172,7 @@ _verifyUndoCommitIsOk() {
 	fi
 
 	# Confirm with the user that they want to undo a commit that has not been pushed.
-	read -rp "This content has not been pushed. Are you sure you want to undo it? [y/N] " confirm
+	read -rp "$(echoYellow "--force" "This content has not been pushed. Are you sure you want to undo it? [y/N] ")" confirm
 	if [[ $confirm != "y" && $confirm != "Y" ]]; then
 		echoYellow "Aborting."
 		return 1

@@ -43,7 +43,7 @@ checkAllBash: formatAllBash ## Check all bash scripts with shellcheck
 	@# --color=always is needed to preserve the colors when piping to sed.
 	@make .getAllBash | xargs -0 shellcheck \
 		-e SC1090,SC1091 \
-		-o avoid-negated-conditions,avoid-nullary-conditions,check-set-e-suppressed,deprecate-which,require-double-brackets,useless-use-of-cat \
+		-o avoid-negated-conditions,avoid-nullary-conditions,deprecate-which,require-double-brackets,useless-use-of-cat \
 		--color=always \
 		| \
 		sed -E 's#In (.\/)?(.*) line ([0-9]+):#In ./\2:\3:#'
