@@ -13,7 +13,29 @@ deleteAllCommand() {
 		return 1
 	fi
 	deleteAsdfCommand "$@"
-	deleteCommand "$@"
+
+	for commandToDelete in "$@"; do
+		# Run the first command and allow anything it outputs to be output as normal.
+		deleteCommand "$@"
+		exitCode="$?"
+
+		# Keep running the delete to ensure other locations of this command are
+		# also fully deleted.
+		while [[ $exitCode -eq 0 ]]; do
+			output=$(deleteCommand "$@" 2>&1)
+			exitCode="$?"
+			case "$exitCode" in
+			3) ;; # This means the command did not exist. That should only output for the first run.
+			4)    # This is an error case, allow it to be output
+				echo "$output" >&2
+				;;
+			*)
+				# Allow all other output to be output as normal (warnings and information).
+				echo "$output"
+				;;
+			esac
+		done
+	done
 }
 
 # Deletes all the versions of the given command that are in asdf installed tools.
@@ -155,31 +177,46 @@ deleteCommand() {
 
 # Removes the given command. Does not account for asdf. Protects system directories and brew.
 # Will echo information about the command being removed (if removing, if not found, if protected etc)
+# Returns an exit code to indicate the result.
+# 0: Command was deleted.
+# 3: Command does not exist (or is not a file).
+# 4: Cannot determine command directory.
+# 5: Command is through brew and should be deleted through brew.
+# 6: Command is a system command and should not be deleted.
+# 7: Command is from an unknown location and will not be deleted.
 _deleteNormalCommand() {
 	local -r commandToDelete="$1"
 	local commandPath
-	if ! commandPath="$(command -v "$commandToDelete")" || [[ -z $commandPath || ! -f $commandPath || $(type -t "$commandToDelete") != "file" ]]; then
-		return
+	if ! commandPath="$(command -v "$commandToDelete")" || [[ -z $commandPath ]]; then
+		echoRed "# Command $commandToDelete does not exist."
+		return 3
+	fi
+
+	if [[ ! -f $commandPath || $(type -t "$commandToDelete") != "file" ]]; then
+		echoRed "# Command $commandToDelete is not a file (it is a type -t $commandToDelete)."
+		return 3
 	fi
 
 	local commandDir
 	if ! commandDir=$(dirname "$commandPath") || [[ ! -d $commandDir ]]; then
 		echoRed "Not removing command '$commandToDelete' at '$commandPath' as command directory cannot be resolved."
-		return
+		return 4
 	fi
 
 	local brewLocation
 	if command -v brew >/dev/null; then
 		brewLocation=$(brew --prefix)
+		if [[ $commandDir =~ "$brewLocation"* ]]; then
+			echoYellow "Not removing command '$commandToDelete' at '$commandPath' as command is installed through homebrew!!!!!!"
+			return 5
+		fi
 	fi
 
 	case "$commandDir" in
-	"$brewLocation"*)
-		echoYellow "Not removing command '$commandToDelete' at '$commandPath' as command is installed through homebrew."
-		;;
 	"/usr"* | "/bin"* | "/sbin"* | "/System"* | "/Applications"* | "/opt"* | "/var"*)
 		# Technically, /usr/local/bin might be safe to remove from but protect it for now.
 		echoYellow "Not removing command '$commandToDelete' at '$commandPath' as command is a system command."
+		return 6
 		;;
 	"$HOME/"*)
 		echo "Removing command '$commandToDelete' at '$commandPath'"
@@ -187,6 +224,7 @@ _deleteNormalCommand() {
 		;;
 	*)
 		echoYellow "Not removing command '$commandToDelete' at '$commandPath' as it is in an unknown location."
+		return 7
 		;;
 	esac
 }
