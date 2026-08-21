@@ -8,12 +8,6 @@ if [[ -d "$HOME/.local/bin" ]]; then
 	export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Add the dotfilesbin to the PATH. It is added as the last option so it is the
-# fallback option.
-if [[ -d "$HOME/dotfilesbin/" ]]; then
-	export PATH="$PATH:"$HOME/dotfilesbin/""
-fi
-
 # Enable completions for github CLI
 if command -v gh >/dev/null; then
 	eval "$(gh completion -s bash)"
@@ -350,6 +344,12 @@ echoPATH() {
 # Removes duplicate and nonexistent entries in the user's PATH. Maintains order.
 # For duplicate entries, the first is kept.
 cleanPath() {
+	# Add the dotfilesbin to the PATH. It is added as the last option so it is the
+	# fallback option. Adding it in cleanPath ensures it is always last.
+	if [[ -d "$HOME/dotfilesbin/" ]]; then
+		export PATH="$PATH:"$HOME/dotfilesbin/""
+	fi
+
 	declare newPath=()
 
 	while IFS= read -r pathLine; do
