@@ -3,6 +3,11 @@
 # Do not run homebrew clean up automatically. This will prevent old versions from being uninstalled.
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
+# Add .local/bin which is used for cursor.
+if [[ -d "$HOME/.local/bin" ]]; then
+	export PATH="$HOME/.local/bin:$PATH"
+fi
+
 # Add the dotfilesbin to the PATH. It is added as the last option so it is the
 # fallback option.
 if [[ -d "$HOME/dotfilesbin/" ]]; then

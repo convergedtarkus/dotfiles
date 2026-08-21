@@ -24,6 +24,7 @@ colorEcho() {
 		# Print the single argument as a string, no color.
 	1) printf "%s\n" "$1" ;;
 	*)
+		declare force=""
 		if [[ $2 == "--force" ]]; then
 			force="true"
 		fi
