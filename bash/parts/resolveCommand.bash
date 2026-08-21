@@ -16,22 +16,22 @@ deleteAllCommand() {
 
 	for commandToDelete in "$@"; do
 		# Run the first command and allow anything it outputs to be output as normal.
-		deleteCommand "$@"
+		deleteCommand "$commandToDelete"
 		exitCode="$?"
 
 		# Keep running the delete to ensure other locations of this command are
 		# also fully deleted.
 		while [[ $exitCode -eq 0 ]]; do
-			output=$(deleteCommand "$@" 2>&1)
+			output=$(deleteCommand "$commandToDelete" 2>&1)
 			exitCode="$?"
 			case "$exitCode" in
-			3) ;; # This means the command did not exist. That should only output for the first run.
-			4)    # This is an error case, allow it to be output
-				echo "$output" >&2
-				;;
-			*)
-				# Allow all other output to be output as normal (warnings and information).
+			3) ;;  # This means the command did not exist. Only output this for the initial run.
+			0 | 5) # 0 is that the command was deleted. 5 would be sometime of warning, allow it to output.
 				echo "$output"
+				;;
+			*) # 4 would be a caught error. Anything else is unexpected and should be output.
+				echo "$output" >&2
+				return "$exitCode"
 				;;
 			esac
 		done
@@ -180,7 +180,9 @@ _bruteDeleteAsdfCommand() {
 
 	# Searching the entire asdf installs directory can be slow, so only look for
 	# the base bin directory, not nested ones.
+	# Do not delete the command directly from a plugin (that's what the `-not -path` does)
 	find "$asdfInstallsPath" -mindepth 4 -maxdepth 4 -type f -path "*bin/$commandToDelete" \
+		-not -path "$asdfInstallsPath/$commandToDelete/*" \
 		-exec echo "For command '$commandToDelete', deleting command from bin at '{}'" \; \
 		-exec rm {} \;
 }
@@ -206,14 +208,32 @@ _asdfCommandNameToPluginName() {
 
 # Removes the given command. Takes asdf into account.
 # Will echo information about the command being removed (if removing, if not found, if protected etc)
+# 0: Command was deleted.
+# 3: Command does not exist (or is not a file).
+# 4: Cannot determine command directory. Also if brew exists, but cannot be resolved.
+# 5: Command is from brew, asdf, a system command or unknown location and will not be deleted.
 deleteCommand() {
 	if [[ ${#@} == 0 ]]; then
 		echoRed "No commands given to deleteCommand"
 		return 1
 	fi
+	local exitCode
 	for commandToDelete in "$@"; do
 		_deleteNormalCommand "$commandToDelete"
+		exitCode="$?"
+		case "$exitCode" in
+		0 | 3 | 5) # 0 = command deleted. 3 = command didn't exist. 5 = a warning.
+			[[ -n $output ]] && echo "$output"
+			;;
+		*) # 4 would be a caught error. Anything else is unexpected and should be output.
+			echo "$output" >&2
+			return "$exitCode"
+			;;
+		esac
 	done
+
+	# This will only be fully accurate for the last command.
+	return "$exitCode"
 }
 
 # Removes the given command. Does not account for asdf. Protects system directories and brew.
@@ -221,10 +241,8 @@ deleteCommand() {
 # Returns an exit code to indicate the result.
 # 0: Command was deleted.
 # 3: Command does not exist (or is not a file).
-# 4: Cannot determine command directory.
-# 5: Command is through brew and should be deleted through brew.
-# 6: Command is a system command and should not be deleted.
-# 7: Command is from an unknown location and will not be deleted.
+# 4: Cannot determine command directory. Also if brew exists, but cannot be resolved.
+# 5: Command is from brew, asdf, a system command or unknown location and will not be deleted.
 _deleteNormalCommand() {
 	local -r commandToDelete="$1"
 	local commandPath
@@ -246,18 +264,26 @@ _deleteNormalCommand() {
 
 	local brewLocation
 	if command -v brew >/dev/null; then
-		brewLocation=$(brew --prefix)
+		if ! brewLocation=$(brew --prefix) || [[ ! -d $brewLocation ]]; then
+			echoRed "Brew is installed at '$(command -v brew)' but the location prefix cannot be resolved."
+			return 4
+		fi
 		if [[ $commandDir =~ "$brewLocation"* ]]; then
 			echoYellow "Not removing command '$commandToDelete' at '$commandPath' as command is installed through homebrew!!!!!!"
 			return 5
 		fi
 	fi
 
+	if command -v asdf >/dev/null && _isAsdfPlugin "$commandToDelete"; then
+		echoYellow "Command '$commandToDelete' is from an ASDF plugin. It should be removed through 'asdf plugin remove $commandToDelete'"
+		return 5
+	fi
+
 	case "$commandDir" in
 	"/usr"* | "/bin"* | "/sbin"* | "/System"* | "/Applications"* | "/opt"* | "/var"*)
 		# Technically, /usr/local/bin might be safe to remove from but protect it for now.
 		echoYellow "Not removing command '$commandToDelete' at '$commandPath' as command is a system command."
-		return 6
+		return 5
 		;;
 	"$HOME/"*)
 		echo "Removing command '$commandToDelete' at '$commandPath'"
@@ -265,7 +291,7 @@ _deleteNormalCommand() {
 		;;
 	*)
 		echoYellow "Not removing command '$commandToDelete' at '$commandPath' as it is in an unknown location."
-		return 7
+		return 5
 		;;
 	esac
 }
