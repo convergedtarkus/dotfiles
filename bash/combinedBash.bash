@@ -84,6 +84,10 @@ _sourceScript "./parts/colorPrint.bash"
 # shellcheck source=/dev/null
 _sourceScript "./parts/general.bash"
 
+# resolveCommand and related functions.
+# shellcheck source=/dev/null
+_sourceScript "./parts/resolveCommand.bash"
+
 # Docker
 # shellcheck source=/dev/null
 _sourceScript "./parts/docker.bash"
