@@ -70,7 +70,7 @@ _deleteSingleAsdfCommand() {
 		return 0
 	fi
 
-	asdfShimPath="${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
+	local -r asdfShimPath="${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
 	if [[ ! -d $asdfShimPath ]]; then
 		echoRed "Cannot find asdf shim path"
 		return
@@ -84,33 +84,39 @@ _deleteSingleAsdfCommand() {
 	readonly commandPath
 
 	# Determine what versions have this command installed.
+	local shimVersions
 	if ! shimVersions=$(asdf shimversions "$commandToDelete"); then
 		# This really shouldn't happen since we verified there is a shim.
 		echoRed "Cannot determine shim versions for '$commandToDelete'"
 		return 1
 	fi
+	readonly shimVersions
 
 	# Get the list of plugins
+	local plugins
 	if ! plugins=$(asdf plugin list 2>/dev/null); then
 		echoRed "Command '$commandToDelete' cannot resolve plugin names"
 		return 1
 	fi
+	readonly plugins
 
 	local asdfCommandName
 	asdfCommandName=$(_asdfCommandNameToPluginName "$commandToDelete")
 	readonly asdfCommandName
 
 	local isDirectPluginCommand=""
+	local didDelete=""
 	while IFS= read -r shimLine; do
 		# This is eval because shimLine contains a space and using a $() would produce
 		# `asdf where "go 1.26.5"` where the command needs to be `asdf where go 1.26.5`
+		local toolPath
 		if ! toolPath=$(eval "asdf where $shimLine") || [[ ! -d $toolPath ]]; then
 			echoRed "For command '$commandToDelete' from '$shimLine', cannot determine tool path"
 			return 0
 		fi
 
 		# The asdf plugin that this command comes from (like shfmt is from golang)
-		asdfPluginProvidingCommand="${shimLine%% *}"
+		local asdfPluginProvidingCommand="${shimLine%% *}"
 
 		# Determine if this command is from an ASDF plugin. If so, do not remove it.
 		if echo "$plugins" | grep -q "^$asdfPluginProvidingCommand$" && [[ $asdfPluginProvidingCommand == "$asdfCommandName" ]]; then
@@ -119,17 +125,23 @@ _deleteSingleAsdfCommand() {
 			continue
 		fi
 
-		deletePath="$toolPath/bin/$commandToDelete"
+		local deletePath="$toolPath/bin/$commandToDelete"
 		if [[ -f $deletePath ]]; then
 			echo "For command '$commandToDelete' from '$shimLine', deleting command from bin at '$deletePath'"
-			rm "$deletePath" || echoRed "Failed to delete '$deletePath'"
+			if ! rm "$deletePath"; then
+				echoRed "Failed to delete '$deletePath'"
+			else
+				didDelete="true"
+			fi
 		fi
 	done <<<"$shimVersions"
 
 	# Finally, delete the shim.
 	if [[ -n $isDirectPluginCommand ]]; then
-		echoBlue "For command '$commandToDelete', reshimming as it is provided directly by an ASDF plugin."
-		asdf reshim "$commandToDelete"
+		if [[ -n $didDelete ]]; then
+			echoBlue "For command '$commandToDelete', reshimming as it is provided directly by an ASDF plugin."
+			asdf reshim "$commandToDelete"
+		fi
 	else
 		echo "For command '$commandToDelete', deleting root shim command at '$commandPath'."
 		rm "$commandPath"
