@@ -342,6 +342,11 @@ _deleteNormalCommand() {
 	esac
 }
 
+# Echo the PATH with each entry on a line.
+echoPATH() {
+	echo "$PATH" | tr ':' '\n'
+}
+
 # Removes duplicate and nonexistent entries in the user's PATH. Maintains order.
 # For duplicate entries, the first is kept.
 cleanPath() {
