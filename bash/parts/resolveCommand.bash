@@ -41,8 +41,6 @@ deleteAllCommand() {
 # Deletes all the versions of the given command that are in asdf installed tools.
 # For example `deleteAsdfCommand goimports` would delete all versions of goimports
 # for all go versions installed by asdf as well as the main shim binary.
-# Note, this uses asdf commands to find what to delete so if shims are out of date,
-# not all binaries will be removed.
 # This will not remove any asdf plugins or binaries from asdf plugins.
 deleteAsdfCommand() {
 	if [[ ${#@} == 0 ]]; then
@@ -80,7 +78,7 @@ _deleteSingleAsdfCommand() {
 
 	# Determine where the command is and make sure it is a shim.What?
 	local commandPath
-	if ! commandPath=$(command -v "$commandToDelete") || [[ -z $commandPath || $(type -t "$commandToDelete") != "file" || ! $commandPath =~ $asdfShimPath ]]; then
+	if ! commandPath=$(command -v "$commandToDelete") || [[ -z $commandPath || ! -f $commandPath || $(type -t "$commandToDelete") != "file" || ! $commandPath =~ $asdfShimPath ]]; then
 		return 0
 	fi
 	readonly commandPath
@@ -89,32 +87,36 @@ _deleteSingleAsdfCommand() {
 	if ! shimVersions=$(asdf shimversions "$commandToDelete"); then
 		# This really shouldn't happen since we verified there is a shim.
 		echoRed "Cannot determine shim versions for '$commandToDelete'"
-		return 0
+		return 1
 	fi
 
-	# Try to determine if the command to delete is a core plugin command.
-	exitCode="$?"
-	case $(
-		_isAsdfPlugin "$commandToDelete"
-		echo "$?"
-	) in
-	0)
-		echoYellow "Command '$commandToDelete' is a core plugin command. It will not be deleted from the plugin bin."
-		return 0
-		;;
-	1)
-		# Not a core plugin, nothing to do.
-		;;
-	*)
-		# Some other error, return that code.
-		return "$exitCode"
-		;;
-	esac
+	# Get the list of plugins
+	if ! plugins=$(asdf plugin list 2>/dev/null); then
+		echoRed "Command '$commandToDelete' cannot resolve plugin names"
+		return 1
+	fi
 
+	local asdfCommandName
+	asdfCommandName=$(_asdfCommandNameToPluginName "$commandToDelete")
+	readonly asdfCommandName
+
+	local isDirectPluginCommand=""
 	while IFS= read -r shimLine; do
+		# This is eval because shimLine contains a space and using a $() would produce
+		# `asdf where "go 1.26.5"` where the command needs to be `asdf where go 1.26.5`
 		if ! toolPath=$(eval "asdf where $shimLine") || [[ ! -d $toolPath ]]; then
 			echoRed "For command '$commandToDelete' from '$shimLine', cannot determine tool path"
 			return 0
+		fi
+
+		# The asdf plugin that this command comes from (like shfmt is from golang)
+		asdfPluginProvidingCommand="${shimLine%% *}"
+
+		# Determine if this command is from an ASDF plugin. If so, do not remove it.
+		if echo "$plugins" | grep -q "^$asdfPluginProvidingCommand$" && [[ $asdfPluginProvidingCommand == "$asdfCommandName" ]]; then
+			echoYellow "Command $commandToDelete at $toolPath is provided by its own ASDF plugin '$asdfPluginProvidingCommand'. It will not be deleted."
+			isDirectPluginCommand="true"
+			continue
 		fi
 
 		deletePath="$toolPath/bin/$commandToDelete"
@@ -125,8 +127,11 @@ _deleteSingleAsdfCommand() {
 	done <<<"$shimVersions"
 
 	# Finally, delete the shim.
-	if [[ -f $commandPath ]]; then
-		echo "For command '$commandToDelete', deleting root shim command at '$commandPath'"
+	if [[ -n $isDirectPluginCommand ]]; then
+		echoBlue "For command '$commandToDelete', reshimming as it is provided directly by an ASDF plugin."
+		asdf reshim "$commandToDelete"
+	else
+		echo "For command '$commandToDelete', deleting root shim command at '$commandPath'."
 		rm "$commandPath"
 	fi
 }
@@ -162,7 +167,7 @@ _bruteDeleteAsdfCommand() {
 	fi
 
 	# Searching the entire asdf installs directory can be slow, so only look for
-	# the base bin directory, not nested one.
+	# the base bin directory, not nested ones.
 	find "$asdfInstallsPath" -mindepth 4 -maxdepth 4 -type f -path "*bin/$commandToDelete" \
 		-exec echo "For command '$commandToDelete', deleting command from bin at '{}'" \; \
 		-exec rm {} \;
