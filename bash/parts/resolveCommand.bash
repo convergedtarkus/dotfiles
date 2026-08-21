@@ -43,6 +43,7 @@ deleteAllCommand() {
 # for all go versions installed by asdf as well as the main shim binary.
 # Note, this uses asdf commands to find what to delete so if shims are out of date,
 # not all binaries will be removed.
+# This will not remove any asdf plugins or binaries from asdf plugins.
 deleteAsdfCommand() {
 	if [[ ${#@} == 0 ]]; then
 		echoRed "No commands given to deleteAsdfCommand"
@@ -92,15 +93,23 @@ _deleteSingleAsdfCommand() {
 	fi
 
 	# Try to determine if the command to delete is a core plugin command.
-	if ! plugins=$(asdf plugin list); then
-		echoRed "Command '$commandToDelete' cannot resolve plugin names"
-		return 0
-	fi
-
-	if echo "$plugins" | grep -q "^$(_asdfCommandNameToPluginName "$commandToDelete")$"; then
+	exitCode="$?"
+	case $(
+		_isAsdfPlugin "$commandToDelete"
+		echo "$?"
+	) in
+	0)
 		echoYellow "Command '$commandToDelete' is a core plugin command. It will not be deleted from the plugin bin."
 		return 0
-	fi
+		;;
+	1)
+		# Not a core plugin, nothing to do.
+		;;
+	*)
+		# Some other error, return that code.
+		return "$exitCode"
+		;;
+	esac
 
 	while IFS= read -r shimLine; do
 		if ! toolPath=$(eval "asdf where $shimLine") || [[ ! -d $toolPath ]]; then
@@ -120,6 +129,21 @@ _deleteSingleAsdfCommand() {
 		echo "For command '$commandToDelete', deleting root shim command at '$commandPath'"
 		rm "$commandPath"
 	fi
+}
+
+# Returns if the input is an asdf plugin that is installed.
+_isAsdfPlugin() {
+	# Try to determine if the command to delete is a core plugin command.
+	if ! plugins=$(asdf plugin list 2>/dev/null); then
+		echoRed "Command '$commandToDelete' cannot resolve plugin names"
+		return 3
+	fi
+
+	if echo "$plugins" | grep -q "^$(_asdfCommandNameToPluginName "$1")$"; then
+		return 0
+	fi
+
+	return 1
 }
 
 # Similar to deleteAsdfCommand but rather than using asdf tooling, it searches asdf
