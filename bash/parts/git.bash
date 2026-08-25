@@ -112,6 +112,20 @@ alias gf='git fetch --all --prune'
 alias gft='git fetch --all --prune --tags'
 gfm() { git fetch "$(getOriginRemote)" "$(getMainBranch)"; } # fetch remote main
 
+# Performs a fetch for all remotes and overrides all negations for fetching.
+gfn() {
+	trap 'set +x' EXIT
+	while IFS= read -r remote; do
+		# Raw data is remote.$remote.fetch=^refs/heads/<WHAT_EVER>/*
+		# Trimmed to just refs/heads/<WHAT_EVER>/*
+		# Need to convert to +refs/heads/<WHAT_EVER>/*:refs/remotes/$remote/<WHAT_EVER>/*
+		git config list |
+			grep "remote.$remote.fetch=^" |
+			sed "s@.*=\^\(refs/heads/\(.*\)\)@+\1:refs/remotes/$remote/\2@g" |
+			xargs -- git fetch "$remote" --prune "$()"
+	done < <(git remote show)
+}
+
 # Returns the remote information to fetch this branch.
 # If the HEAD cannot be found, exit code 2 is returned.
 # If the upstream cannot be parsed, exit code 3 is returned.
