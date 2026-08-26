@@ -21,7 +21,7 @@ enableBashItScripts: ## Enables the alias, completion and plugin extensions for 
 
 .PHONY: .getAllBash
 .getAllBash: ## Get all bash scripts
-	@make .runGitCommand CMD='-C . ls-files -z ' \
+	@$(MAKE) .runGitCommand CMD='-C . ls-files -z ' \
 	| xargs -0 -n1 dirname \
 	| sort -u \
 	| while IFS= read -r d; do \
@@ -41,7 +41,7 @@ checkAllBash: formatAllBash ## Check all bash scripts with shellcheck
 	@# Pipe to sed to convert the line number format so IDEs can link to the file and line number.
 	@# This will run the shellcheck alias above.
 	@# --color=always is needed to preserve the colors when piping to sed.
-	@make .getAllBash | xargs -0 shellcheck \
+	@$(MAKE) .getAllBash | xargs -0 shellcheck \
 		-e SC1090,SC1091 \
 		-o avoid-negated-conditions,avoid-nullary-conditions,deprecate-which,require-double-brackets,useless-use-of-cat \
 		--color=always \
@@ -50,15 +50,19 @@ checkAllBash: formatAllBash ## Check all bash scripts with shellcheck
 
 .PHONY: formatAllBash
 formatAllBash: ## Format all bash scripts with shfmt
-	@make .getAllBash | xargs -0 shfmt -w -s
+	@$(MAKE) .getAllBash | xargs -0 shfmt -w -s
 
 .PHONY: initAllSubmodules
 initAllSubmodules: ## Init all submodules.
-	@make .runGitCommand CMD='submodule update --init --recursive'
+	@$(MAKE) .runGitCommand CMD='submodule update --init --recursive'
 
 .PHONY: updateAllSubmodules
 updateAllSubmodules: ## For each submodule, switch to master and pull changes.
-	@make .runGitCommand CMD='submodule foreach "(git checkout master &> /dev/null || git checkout main) && git pull"'
+	@$(MAKE) .runGitCommand CMD='submodule foreach "(git checkout master &> /dev/null || git checkout main) && git pull"'
+
+.PHONY: updateRoot
+updateRoot: ## Pull changes into the root install of dotfiles.
+	@(cd "$$HOME" && $(MAKE) .runGitCommand CMD='pull' && $(MAKE) initAllSubmodules && $(MAKE) .runGitCommand CMD='status')
 
 .PHONY: installGoTools
 installGoTools: ## Install from this repo.
@@ -89,7 +93,7 @@ generateFileIgnoreConfig: ## Generates a string of files to ignore for IntelliJ'
 		if [[ -d $$file ]]; then \
 			continue; \
 		fi; \
-		if ! make .runGitCommand CMD="ls-files '$$file' --error-unmatch" &>/dev/null; then \
+		if ! $(MAKE) .runGitCommand CMD="ls-files '$$file' --error-unmatch" &>/dev/null; then \
 			if [[ -z $$output ]]; then \
 				output="$$file"; \
 			else \
@@ -105,7 +109,7 @@ generateFileIgnoreConfig: ## Generates a string of files to ignore for IntelliJ'
 	trap "shopt -u dotglob" EXIT; \
 	shouldDelete="$(FOR_REAL)"; \
 	for file in *; do \
-		if make .runGitCommand CMD="ls-files '$$file' --error-unmatch" &>/dev/null; then \
+		if $(MAKE) .runGitCommand CMD="ls-files '$$file' --error-unmatch" &>/dev/null; then \
 			if [[ $$shouldDelete == "true" ]]; then \
 				rm -rf "$$file"; \
 			else \
