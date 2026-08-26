@@ -52,9 +52,13 @@ checkAllBash: formatAllBash ## Check all bash scripts with shellcheck
 formatAllBash: ## Format all bash scripts with shfmt
 	@make .getAllBash | xargs -0 shfmt -w -s
 
-.PHONY: pullSubmoduleChanges
-pullSubmoduleChanges: ## Pull changes for all git submodules
+.PHONY: initAllSubmodules
+initAllSubmodules: ## Init all submodules.
 	@make .runGitCommand CMD='submodule update --init --recursive'
+
+.PHONY: updateAllSubmodules
+updateAllSubmodules: ## For each submodule, switch to master and pull changes.
+	@make .runGitCommand CMD='submodule foreach "(git checkout master &> /dev/null || git checkout main) && git pull"'
 
 .PHONY: installGoTools
 installGoTools: ## Install from this repo.
