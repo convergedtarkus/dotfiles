@@ -109,6 +109,24 @@ func TestParseFlags(t *testing.T) {
 			},
 		},
 		{
+			testName:   "with -p shorthand after the package path",
+			inputFlags: []string{"github.com/example/pkg", "-p"},
+			expectedConfig: commandConfig{
+				packageToInstall: "github.com/example/pkg",
+				printVersionOnly: true,
+			},
+		},
+		{
+			testName:   "with flags both before and after the package path",
+			inputFlags: []string{"-l", "github.com/example/pkg", "-p", "-v"},
+			expectedConfig: commandConfig{
+				packageToInstall: "github.com/example/pkg",
+				installLatest:    true,
+				printVersionOnly: true,
+				verbose:          true,
+			},
+		},
+		{
 			testName:   "with --no-cache flag",
 			inputFlags: []string{"--no-cache", "github.com/example/pkg"},
 			expectedConfig: commandConfig{
@@ -146,6 +164,12 @@ func TestParseFlags(t *testing.T) {
 		{
 			testName:       "Two trailing arguments",
 			inputFlags:     []string{"-v", "--verbose", "-l", "--install-latest", "github.com/example/pkg", `github.com/extra/arg`},
+			expectedError:  "too many arguments: only one package-path is allowed",
+			expectedOutput: usageString,
+		},
+		{
+			testName:       "extra trailing argument after a flag that follows the package path",
+			inputFlags:     []string{"github.com/example/pkg", "-p", `github.com/extra/arg`},
 			expectedError:  "too many arguments: only one package-path is allowed",
 			expectedOutput: usageString,
 		},

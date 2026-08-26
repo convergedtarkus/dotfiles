@@ -53,8 +53,13 @@ func main() {
 }
 
 // parseFlags parses command-line arguments into a commandConfig struct.
+//
+// Flags are allowed both before and after the package path (e.g. both
+// "smartGoInstall -p pkg" and "smartGoInstall pkg -p" work). This is needed
+// because Go's flag package only parses flags up to the first non-flag
+// argument, so parsing happens in two passes: once for any flags before the
+// package path, and once for any flags after it.
 func parseFlags(args []string, output io.Writer) (commandConfig, error) {
-	// TODO Flags must be before the package path, but it would be nice to allow them after as well.
 	fs := flag.NewFlagSet("smartGoInstall", flag.ContinueOnError)
 	fs.SetOutput(output)
 	fs.Usage = func() {
@@ -90,7 +95,8 @@ func parseFlags(args []string, output io.Writer) (commandConfig, error) {
 	fs.BoolVar(&cfg.noCache, "no-cache", false, "do not read from the install cache (the resolved version is still written to it)")
 	fs.BoolVar(&cfg.noCache, "n", false, "shorthand for --no-cache")
 
-	// Parse the args.
+	// First pass: parse any flags that appear before the package path. This
+	// stops at the first non-flag argument, which should be the package path.
 	if err := fs.Parse(args); err != nil {
 		// The err should be a flag.ErrHelp which will just terminate the program..
 		return commandConfig{}, err
@@ -101,13 +107,20 @@ func parseFlags(args []string, output io.Writer) (commandConfig, error) {
 		fs.Usage()
 		return commandConfig{}, fmt.Errorf("missing required argument: package-path")
 	}
-	if fs.NArg() > 1 {
+	// Set the package path from the first non-flag argument.
+	cfg.packageToInstall = fs.Arg(0)
+
+	// Second pass: parse whatever came after the package path, so flags
+	// provided there (e.g. "smartGoInstall pkg -p") are also picked up.
+	if err := fs.Parse(fs.Args()[1:]); err != nil {
+		return commandConfig{}, err
+	}
+
+	if fs.NArg() > 0 {
 		fs.Usage()
 		return commandConfig{}, fmt.Errorf("too many arguments: only one package-path is allowed")
 	}
 
-	// Set the package path from the first non-flag argument.
-	cfg.packageToInstall = fs.Arg(0)
 	return cfg, nil
 }
 
