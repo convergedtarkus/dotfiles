@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/convergedtarkus/randomUtils/smartGoInstall/cache"
+	"github.com/convergedtarkus/randomUtils/smartGoInstall/semver"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -23,6 +25,7 @@ func TestParseFlags(t *testing.T) {
 		"Flags:\n  " +
 		"-go-version string\n    \tIf set, this will be used for the go version rather than the current go version.\n" +
 		"  -install-latest\n    \tinstall latest version if no compatible version is found\n  -l\tshorthand for --install-latest\n  -" +
+		"n\tshorthand for --no-cache\n  -no-cache\n    \tdo not read from the install cache (the resolved version is still written to it)\n  -" +
 		"p\tshorthand for --print-version-only\n  -print-version-only\n    \tprint the compatible version without installing\n  -" +
 		"v\tshorthand for --verbose\n  -verbose\n    \tenable verbose output\n\n" +
 		"If --install-latest is not provided, the command will fail when it cannot determine a compatible version.\n"
@@ -106,13 +109,38 @@ func TestParseFlags(t *testing.T) {
 			},
 		},
 		{
+			testName:   "with --no-cache flag",
+			inputFlags: []string{"--no-cache", "github.com/example/pkg"},
+			expectedConfig: commandConfig{
+				packageToInstall: "github.com/example/pkg",
+				noCache:          true,
+			},
+		},
+		{
+			testName:   "with -n shorthand",
+			inputFlags: []string{"-n", "github.com/example/pkg"},
+			expectedConfig: commandConfig{
+				packageToInstall: "github.com/example/pkg",
+				noCache:          true,
+			},
+		},
+		{
+			testName:   "with both no-cache flags",
+			inputFlags: []string{"-n", `--no-cache`, "github.com/example/pkg"},
+			expectedConfig: commandConfig{
+				packageToInstall: "github.com/example/pkg",
+				noCache:          true,
+			},
+		},
+		{
 			testName:   "All flags together",
-			inputFlags: []string{"-v", "--install-latest", "-p", "github.com/example/pkg"},
+			inputFlags: []string{"-v", "--install-latest", "-p", "-n", "github.com/example/pkg"},
 			expectedConfig: commandConfig{
 				packageToInstall: "github.com/example/pkg",
 				installLatest:    true,
 				printVersionOnly: true,
 				verbose:          true,
+				noCache:          true,
 			},
 		},
 		{
@@ -170,6 +198,7 @@ func TestParseFlags(t *testing.T) {
 			assert.Equal(t, tc.expectedConfig.installLatest, cfg.installLatest, `Wrong installLatest`)
 			assert.Equal(t, tc.expectedConfig.printVersionOnly, cfg.printVersionOnly, `Wrong printVersionOnly`)
 			assert.Equal(t, tc.expectedConfig.verbose, cfg.verbose, `Wrong verbose`)
+			assert.Equal(t, tc.expectedConfig.noCache, cfg.noCache, `Wrong noCache`)
 		})
 	}
 }
@@ -541,6 +570,9 @@ func TestRun(t *testing.T) {
 	t.Run("finds compatible version and installs it", func(t *testing.T) {
 		// Discard all output to avoid making the test output messy.
 		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		t.Setenv("HOME", t.TempDir())
 
 		// Create a temporary go.mod for the compatible version
 		downloadJSON := writeTmpGoModJSON(t, "module example.com/tool\n\ngo 1.21\n")
@@ -559,6 +591,9 @@ func TestRun(t *testing.T) {
 	t.Run("no compatible version without install-latest", func(t *testing.T) {
 		// Discard all output to avoid making the test output messy.
 		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		t.Setenv("HOME", t.TempDir())
 
 		// Create a go.mod that requires a higher Go version than we have
 		downloadJSON := writeTmpGoModJSON(t, "module example.com/tool\n\ngo 1.23\n")
@@ -577,6 +612,9 @@ func TestRun(t *testing.T) {
 	t.Run("no compatible version with install-latest", func(t *testing.T) {
 		// Discard all output to avoid making the test output messy.
 		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		t.Setenv("HOME", t.TempDir())
 
 		// Create a go.mod that requires a higher Go version than we have
 		downloadJSON := writeTmpGoModJSON(t, "module example.com/tool\n\ngo 1.23\n")
@@ -599,6 +637,9 @@ func TestRun(t *testing.T) {
 	t.Run("no versions found with install-latest", func(t *testing.T) {
 		// Discard all output to avoid making the test output messy.
 		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		t.Setenv("HOME", t.TempDir())
 
 		runner := sharedUtils.NewMockRunner(t)
 		runner.On("Output", "go", []string{"version"}).Return([]byte("go version go1.21.5 darwin/arm64"), nil).Once()
@@ -617,6 +658,9 @@ func TestRun(t *testing.T) {
 	t.Run("go version command fails", func(t *testing.T) {
 		// Discard all output to avoid making the test output messy.
 		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		t.Setenv("HOME", t.TempDir())
 
 		runner := sharedUtils.NewMockRunner(t)
 		runner.On("Output", "go", []string{"version"}).Return([]byte(nil), fmt.Errorf("go not found")).Once()
@@ -629,6 +673,9 @@ func TestRun(t *testing.T) {
 	t.Run("get module versions fails", func(t *testing.T) {
 		// Discard all output to avoid making the test output messy.
 		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		t.Setenv("HOME", t.TempDir())
 
 		runner := sharedUtils.NewMockRunner(t)
 		runner.On("Output", "go", []string{"version"}).Return([]byte("go version go1.21.5 darwin/arm64"), nil).Once()
@@ -643,6 +690,9 @@ func TestRun(t *testing.T) {
 	t.Run("extracts module path from cmd package", func(t *testing.T) {
 		// Discard all output to avoid making the test output messy.
 		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		t.Setenv("HOME", t.TempDir())
 
 		downloadJSON := writeTmpGoModJSON(t, "module example.com/tool\n\ngo 1.21\n")
 
@@ -660,6 +710,9 @@ func TestRun(t *testing.T) {
 	t.Run("print-version-only prints compatible version without installing", func(t *testing.T) {
 		// Discard all output to avoid making the test output messy.
 		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		t.Setenv("HOME", t.TempDir())
 
 		downloadJSON := writeTmpGoModJSON(t, "module example.com/tool\n\ngo 1.21\n")
 
@@ -680,6 +733,9 @@ func TestRun(t *testing.T) {
 	t.Run("print-version-only with install-latest prints latest when no compatible version found", func(t *testing.T) {
 		// Discard all output to avoid making the test output messy.
 		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		t.Setenv("HOME", t.TempDir())
 
 		downloadJSON := writeTmpGoModJSON(t, "module example.com/tool\n\ngo 1.23\n")
 
@@ -697,4 +753,95 @@ func TestRun(t *testing.T) {
 		// Run should NOT be called since we are only printing the version.
 		runner.AssertNotCalled(t, "Run", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 	})
+
+	t.Run("uses cached version and skips version resolution", func(t *testing.T) {
+		// Discard all output to avoid making the test output messy.
+		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		homeDir := t.TempDir()
+		t.Setenv("HOME", homeDir)
+
+		versionCache, err := cache.LoadInstallCache()
+		require.NoError(t, err, `LoadInstallCache should not error`)
+		versionCache.Set("example.com/tool", parseVersion(t, "1.21"), "v1.1.0")
+		require.NoError(t, versionCache.Save(), "cache.save should not error")
+
+		runner := sharedUtils.NewMockRunner(t)
+		runner.On("Output", "go", []string{"version"}).Return([]byte("go version go1.21.5 darwin/arm64"), nil).Once()
+		// No "list -m -versions" or "mod download" calls should be made since the
+		// version is served from the cache.
+		runner.On("Run", mock.Anything, mock.Anything, "go", []string{"install", "example.com/tool@v1.1.0"}).Return(nil).Once()
+
+		err = run(commandConfig{packageToInstall: "example.com/tool"}, runner)
+		require.NoError(t, err, "run should not error")
+	})
+
+	t.Run("writes resolved compatible version to cache", func(t *testing.T) {
+		// Discard all output to avoid making the test output messy.
+		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		homeDir := t.TempDir()
+		t.Setenv("HOME", homeDir)
+
+		downloadJSON := writeTmpGoModJSON(t, "module example.com/tool\n\ngo 1.21\n")
+
+		runner := sharedUtils.NewMockRunner(t)
+		runner.On("Output", "go", []string{"version"}).Return([]byte("go version go1.21.5 darwin/arm64"), nil).Once()
+		runner.On("Output", "go", []string{"list", "-mod=readonly", "-m", "-versions", "example.com/tool"}).Return([]byte("example.com/tool v1.0.0 v1.1.0"), nil).Once()
+		runner.On("Output", "go", []string{"mod", "download", "-json", "example.com/tool@v1.1.0"}).Return(downloadJSON, nil).Once()
+		runner.On("Run", mock.Anything, mock.Anything, "go", []string{"install", "example.com/tool@v1.1.0"}).Return(nil).Once()
+
+		err := run(commandConfig{packageToInstall: "example.com/tool"}, runner)
+		require.NoError(t, err, "run should not error")
+
+		versionCache, err := cache.LoadInstallCache()
+		require.NoError(t, err, "loadInstallCache should not error")
+		cachedVersion, ok := versionCache.Get("example.com/tool", parseVersion(t, "1.21"))
+		require.True(t, ok, "expected a cached entry for example.com/tool@1.21")
+		assert.Equal(t, "v1.1.0", cachedVersion)
+	})
+
+	t.Run("no-cache skips reading a cached entry but still refreshes it", func(t *testing.T) {
+		// Discard all output to avoid making the test output messy.
+		sharedUtils.NewDiscardHandlerLoggerRestoreAfterTest(t)
+		// Isolate the on-disk install cache so tests don't touch the real
+		// user's home directory or interfere with each other.
+		homeDir := t.TempDir()
+		t.Setenv("HOME", homeDir)
+
+		// Seed a fresh (non-expired) cache entry pointing at an older version.
+		versionCache, err := cache.LoadInstallCache()
+		require.NoError(t, err, `LoadInstallCache should not error`)
+		versionCache.Set("example.com/tool", parseVersion(t, "1.21"), "v1.1.0")
+		require.NoError(t, versionCache.Save(), "cache.save should not error")
+
+		downloadJSON := writeTmpGoModJSON(t, "module example.com/tool\n\ngo 1.21\n")
+
+		runner := sharedUtils.NewMockRunner(t)
+		runner.On("Output", "go", []string{"version"}).Return([]byte("go version go1.21.5 darwin/arm64"), nil).Once()
+		// Even though a fresh cache entry exists, --no-cache means it must be
+		// re-resolved rather than trusted.
+		runner.On("Output", "go", []string{"list", "-mod=readonly", "-m", "-versions", "example.com/tool"}).Return([]byte("example.com/tool v1.0.0 v1.1.0"), nil).Once()
+		runner.On("Output", "go", []string{"mod", "download", "-json", "example.com/tool@v1.1.0"}).Return(downloadJSON, nil).Once()
+		runner.On("Run", mock.Anything, mock.Anything, "go", []string{"install", "example.com/tool@v1.1.0"}).Return(nil).Once()
+
+		err = run(commandConfig{packageToInstall: "example.com/tool", noCache: true}, runner)
+		require.NoError(t, err, "run should not error")
+
+		// The re-resolved version should still be written back to the cache.
+		reloaded, err := cache.LoadInstallCache()
+		require.NoError(t, err, "loadInstallCache should not error")
+		refreshedVersion, ok := reloaded.Get("example.com/tool", parseVersion(t, "1.21"))
+		require.True(t, ok, "expected the cache to still hold an entry")
+		assert.Equal(t, "v1.1.0", refreshedVersion, "cache should be overwritten with the newly resolved version despite --no-cache")
+	})
+}
+
+func parseVersion(t *testing.T, versionString string) semver.Version {
+	t.Helper()
+	version, err := semver.ParseVersion(versionString)
+	require.NoError(t, err, `ParseVersion for '%s' failed`, versionString)
+	return version
 }

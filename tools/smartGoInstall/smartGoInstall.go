@@ -14,6 +14,8 @@ import (
 	"strings"
 
 	"github.com/convergedtarkus/randomUtils/sharedUtils"
+	"github.com/convergedtarkus/randomUtils/smartGoInstall/cache"
+	"github.com/convergedtarkus/randomUtils/smartGoInstall/semver"
 )
 
 // commandConfig holds the parsed command-line configuration.
@@ -23,6 +25,7 @@ type commandConfig struct {
 	printVersionOnly bool
 	verbose          bool
 	forcedGoVersion  string
+	noCache          bool
 }
 
 func main() {
@@ -82,6 +85,11 @@ func parseFlags(args []string, output io.Writer) (commandConfig, error) {
 	// --go-version: for the go version used for checking for dependencies.
 	fs.StringVar(&cfg.forcedGoVersion, "go-version", "", "If set, this will be used for the go version rather than the current go version.")
 
+	// -n / --no-cache: skip reading from the on-disk cache, forcing version
+	// resolution to run. The result is still written to the cache.
+	fs.BoolVar(&cfg.noCache, "no-cache", false, "do not read from the install cache (the resolved version is still written to it)")
+	fs.BoolVar(&cfg.noCache, "n", false, "shorthand for --no-cache")
+
 	// Parse the args.
 	if err := fs.Parse(args); err != nil {
 		// The err should be a flag.ErrHelp which will just terminate the program..
@@ -120,6 +128,26 @@ func run(cfg commandConfig, runner sharedUtils.CommandRunner) error {
 		slog.Info("Finding compatible version", "module", modulePath)
 	}
 
+	// Load the on-disk cache of previously resolved compatible versions.
+	versionCache, err := cache.LoadInstallCache()
+	if err != nil {
+		slog.Debug("Could not load install cache; continuing without it", "error", err.Error())
+	}
+
+	if cfg.noCache {
+		slog.Debug("Skipping cache read (--no-cache was provided)")
+	} else if versionCache == nil {
+		slog.Debug("Skipping cache read (cache was nil)")
+	} else if cachedVersion, ok := versionCache.Get(cfg.packageToInstall, systemGoVersion); ok {
+		slog.Debug("Found cached compatible version", "package", cfg.packageToInstall, "version", cachedVersion)
+		if cfg.printVersionOnly {
+			fmt.Println(cachedVersion)
+			return nil
+		}
+		slog.Info("Compatible version found in cache", "version", cachedVersion)
+		return runGoInstall(runner, cfg.packageToInstall, cachedVersion)
+	}
+
 	// Get all available versions of the module.
 	versions, err := getModuleGoVersions(runner, modulePath)
 	if err != nil {
@@ -142,7 +170,12 @@ func run(cfg commandConfig, runner sharedUtils.CommandRunner) error {
 
 		slog.Debug("Version requires Go", "version", version, "packageRequiredGo", packageRequiredGo)
 
-		if compareVersionsLE(packageRequiredGo, systemGoVersion) {
+		if semver.CompareVersionsLE(packageRequiredGo, systemGoVersion) {
+			versionCache.Set(cfg.packageToInstall, systemGoVersion, version)
+			if err := versionCache.Save(); err != nil {
+				slog.Debug("Could not write install cache", "error", err.Error())
+			}
+
 			if cfg.printVersionOnly {
 				fmt.Println(version)
 				return nil
@@ -156,10 +189,10 @@ func run(cfg commandConfig, runner sharedUtils.CommandRunner) error {
 }
 
 // Returns the go version that should be used to check against.
-func getGoVersionToCheck(cfg commandConfig, runner sharedUtils.CommandRunner) (semverVersion, error) {
+func getGoVersionToCheck(cfg commandConfig, runner sharedUtils.CommandRunner) (semver.Version, error) {
 	// Get the current Go version (major.minor) to compare against module requirements.
 	if cfg.forcedGoVersion != "" {
-		return parseVersion(cfg.forcedGoVersion)
+		return semver.ParseVersion(cfg.forcedGoVersion)
 	}
 
 	return getSystemGoVersion(runner)
@@ -174,18 +207,18 @@ func extractModulePath(packagePath string) string {
 }
 
 // getSystemGoVersion runs "go version" and extracts the major.minor version string.
-func getSystemGoVersion(runner sharedUtils.CommandRunner) (semverVersion, error) {
+func getSystemGoVersion(runner sharedUtils.CommandRunner) (semver.Version, error) {
 	out, err := runner.Output("go", "version")
 	if err != nil {
-		return semverVersion{}, fmt.Errorf("running 'go version': %w", err)
+		return semver.Version{}, fmt.Errorf("running 'go version': %w", err)
 	}
 
 	re := regexp.MustCompile(`go(\d+\.\d+)`)
 	matches := re.FindStringSubmatch(string(out))
 	if len(matches) < 2 {
-		return semverVersion{}, fmt.Errorf("could not parse Go version from: %s", string(out))
+		return semver.Version{}, fmt.Errorf("could not parse Go version from: %s", string(out))
 	}
-	return parseVersion(matches[1])
+	return semver.ParseVersion(matches[1])
 }
 
 // getModuleGoVersions runs "go list -m -versions" to get all available versions of a module.
@@ -223,29 +256,29 @@ type modDownloadResult struct {
 //
 // Flags used:
 //   - -json: output download result as JSON (includes the GoMod file path)
-func getRequiredGoVersionForPackage(runner sharedUtils.CommandRunner, modulePath, version string) (semverVersion, error) {
+func getRequiredGoVersionForPackage(runner sharedUtils.CommandRunner, modulePath, version string) (semver.Version, error) {
 	out, err := runner.Output("go", "mod", "download", "-json", modulePath+"@"+version)
 	if err != nil {
-		return semverVersion{}, fmt.Errorf("running 'go mod download -json': %w", err)
+		return semver.Version{}, fmt.Errorf("running 'go mod download -json': %w", err)
 	}
 
 	var result modDownloadResult
 	if err := json.Unmarshal(out, &result); err != nil {
-		return semverVersion{}, fmt.Errorf("parsing JSON from 'go mod download': %w", err)
+		return semver.Version{}, fmt.Errorf("parsing JSON from 'go mod download': %w", err)
 	}
 
 	if result.GoMod == "" {
-		return semverVersion{}, fmt.Errorf("no GoMod path in download result")
+		return semver.Version{}, fmt.Errorf("no GoMod path in download result")
 	}
 
 	return parseGoVersionFromMod(result.GoMod)
 }
 
 // parseGoVersionFromMod reads a go.mod file and extracts the "go X.Y" directive.
-func parseGoVersionFromMod(path string) (semverVersion, error) {
+func parseGoVersionFromMod(path string) (semver.Version, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return semverVersion{}, fmt.Errorf("opening go.mod at %s: %w", path, err)
+		return semver.Version{}, fmt.Errorf("opening go.mod at %s: %w", path, err)
 	}
 	defer sharedUtils.CloseFile(f)
 
@@ -254,13 +287,13 @@ func parseGoVersionFromMod(path string) (semverVersion, error) {
 	for scanner.Scan() {
 		matches := re.FindStringSubmatch(scanner.Text())
 		if len(matches) >= 2 {
-			return parseVersion(matches[1])
+			return semver.ParseVersion(matches[1])
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		return semverVersion{}, fmt.Errorf("reading go.mod at %s: %w", path, err)
+		return semver.Version{}, fmt.Errorf("reading go.mod at %s: %w", path, err)
 	}
-	return semverVersion{}, fmt.Errorf("no 'go' directive found in go.mod at %s", path)
+	return semver.Version{}, fmt.Errorf("no 'go' directive found in go.mod at %s", path)
 }
 
 // installLatestOrFail installs the latest version if --install-latest was provided.

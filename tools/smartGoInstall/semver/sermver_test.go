@@ -1,4 +1,4 @@
-package main
+package semver
 
 import (
 	"fmt"
@@ -83,7 +83,7 @@ func TestParseVersion(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			parsedResult, err := parseVersion(tc.input)
+			parsedResult, err := ParseVersion(tc.input)
 			if tc.expectedErrorString != "" {
 				assert.EqualError(t, err, tc.expectedErrorString, "error message should match expected string")
 				return
@@ -141,12 +141,12 @@ func TestCompareVersionsLE(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			v1Parsed, err := parseVersion(tc.v1)
+			v1Parsed, err := ParseVersion(tc.v1)
 			require.NoError(t, err, "parseVersion should not error for input: %s", tc.v1)
-			v2Parsed, err := parseVersion(tc.v2)
+			v2Parsed, err := ParseVersion(tc.v2)
 			require.NoError(t, err, "parseVersion should not error for input: %s", tc.v2)
 
-			actual := compareVersionsLE(v1Parsed, v2Parsed)
+			actual := CompareVersionsLE(v1Parsed, v2Parsed)
 			assert.Equal(t, tc.expected, actual)
 		})
 	}
