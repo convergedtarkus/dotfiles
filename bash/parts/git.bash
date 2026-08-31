@@ -237,6 +237,7 @@ gpu() { git push -u "$(getOriginRemote)" ${1:+"$1"}; } # push (and track) to ups
 
 # Return the root of the repo.
 alias repoRoot='git rev-parse --show-toplevel'
+alias cdRepoRoot='cd $(repoRoot)'
 
 # git grep and helpers
 alias gitGrep='git grep -I -n --break' # skip binary files, add line numbers and a break between files
