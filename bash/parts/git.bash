@@ -235,6 +235,9 @@ alias gp='git push'
 alias gpf='git push -f'
 gpu() { git push -u "$(getOriginRemote)" ${1:+"$1"}; } # push (and track) to upstream
 
+# Return the root of the repo.
+alias repoRoot='git rev-parse --show-toplevel'
+
 # git grep and helpers
 alias gitGrep='git grep -I -n --break' # skip binary files, add line numbers and a break between files
 
