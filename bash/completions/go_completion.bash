@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Use the gocomplete for general go command completion.
-if command -v gocomplete &>dev/null; then
+if command -v gocomplete &>/dev/null; then
 	complete -C gocomplete go
 fi
 
