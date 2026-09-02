@@ -153,17 +153,15 @@ echoPATH() {
 # Removes duplicate and nonexistent entries in the user's PATH. Maintains order.
 # For duplicate entries, the first is kept.
 cleanPath() {
-	# Add the dotfilesbin to the PATH. It is added as the last option so it is the
-	# fallback option. Adding it in cleanPath ensures it is always last.
-	if [[ -d "$HOME/dotfilesbin/" ]]; then
-		export PATH="$PATH:"$HOME/dotfilesbin/""
-	fi
-
 	declare newPath=()
 
 	while IFS= read -r pathLine; do
 		# Only put in paths that exist.
 		if [[ -e $pathLine ]]; then
+			# Do not add dotfilesbin as the goal is for it to be last.
+			if [[ -d "$HOME/dotfilesbin/" && $pathLine == "$HOME/dotfilesbin/" ]]; then
+				continue
+			fi
 			newPath+=("$pathLine")
 		fi
 	done <<<"$(echo "$PATH" | tr ':' '\n' | uniq)"
@@ -174,5 +172,11 @@ cleanPath() {
 		IFS=':'
 		echo "${newPath[*]}"
 	)
+
 	export PATH="$updatedPath"
+
+	# Ensure the dotfilesbin is the final option. It is the universal fallback.
+	if [[ -d "$HOME/dotfilesbin/" ]]; then
+		export PATH="$PATH:"$HOME/dotfilesbin/""
+	fi
 }

@@ -1,5 +1,23 @@
 #!/usr/bin/env bash
 
+# Full load order (1 being first)
+# 1: .bashrc (loads dotfilesbin, brew and asdf)
+###############################################################################
+# 2: system.completion (load order 325)
+# 3: General completions (load order 350)
+# 4: brew.completion (load order 375)
+###############################################################################
+# 5: custom.aliases.bash (load order 750)
+# 6: bash/combinedBash.bash (from custom.aliases.bash)
+# 7: Anything in custom directory (from combinedBash.bash)
+# 8: git_playground/workiva.bash (in custom)
+# 9: git_playground/workiva_completion.bash  (in custom)
+###############################################################################
+# 10: custom.completion.bash (load order 751)
+# 11: bash/combinedBashCompletions.bash (from custom.completion.bash)
+###############################################################################
+# 12: aliases.completion.bash (load order 800)
+
 # This allows working with the bare clone of this repo under .myconfig. See Readme for more.
 alias myconfig='git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
 
