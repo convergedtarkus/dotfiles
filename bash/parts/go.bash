@@ -275,8 +275,12 @@ restoreVendorDir() {
 }
 
 # Resets all vendor directories, go.mod and go.sum files in the repo.
-# This handles repos with nested vendor directories.
-# Using git diff is much faster than using a find command.
 gResetVendor() {
-	(cat <(git diff --name-only | grep -E '(^vendor/|/vendor/)' | awk -F'^vendor|/vendor/' '{print $1"/vendor/"}' | sort -u | sed 's|^/vendor/$|./vendor|g') <(git diff --name-only | grep -E '(go.mod|go.sum)')) | sort -u | xargs git checkout --
+	# Get all the vendor directories and normalize them. Then get the go.mod and go.sum
+	# files. Sort everything and then checkout and clean them.
+	(cat \
+		<(git diff --name-only | grep -E '(^vendor/|/vendor/)' | awk -F'^vendor|/vendor/' '{print $1"/vendor/"}' | sort -u | sed 's|^/vendor/$|./vendor|g') \
+		<(git diff --name-only | grep -E '(go.mod|go.sum)')) |
+		sort -u |
+		xargs sh -c 'echo "Cleaning $@" && git checkout -- "$@" && git clean -fd -- "$@"'
 }
