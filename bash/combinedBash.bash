@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Full load order (1 being first)
+# 0: .bash_profile (if applicable) (loads .bashrc)
 # 1: .bashrc (loads dotfilesbin, brew and asdf)
 ###############################################################################
 # 2: system.completion (load order 325)
@@ -17,6 +18,8 @@
 # 11: bash/combinedBashCompletions.bash (from custom.completion.bash)
 ###############################################################################
 # 12: aliases.completion.bash (load order 800)
+
+if [[ -n $LOG_DOTFILES_LOAD ]]; then echo "!!!! DOTFILES: Loading combinedBash.bash"; fi
 
 # This allows working with the bare clone of this repo under .myconfig. See Readme for more.
 alias myconfig='git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'

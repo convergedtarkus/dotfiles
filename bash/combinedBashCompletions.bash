@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+if [[ -n $LOG_DOTFILES_LOAD ]]; then echo "!!!! DOTFILES: Loading combinedBashCompletions.bash"; fi
+
 if completionsDir="$(_dotFilesPath "./completions")" && [[ -d $completionsDir ]]; then
 	# Iterate over all bash files in the completions directory and source them.
 	for file in "$completionsDir/"*.bash; do

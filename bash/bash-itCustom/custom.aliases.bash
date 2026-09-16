@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+if [[ -n $LOG_DOTFILES_LOAD ]]; then echo "!!!! DOTFILES: Loading custom.aliases.bash"; fi
+
 if [[ -z $MYDOTFILES ]]; then
 	return
 fi
