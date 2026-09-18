@@ -14,6 +14,7 @@ deleteAllCommand() {
 	fi
 	deleteAsdfCommand "$@"
 
+	local output
 	for commandToDelete in "$@"; do
 		# Run the first command and allow anything it outputs to be output as normal.
 		deleteCommand "$commandToDelete"
@@ -218,8 +219,9 @@ deleteCommand() {
 		return 1
 	fi
 	local exitCode
+	local output
 	for commandToDelete in "$@"; do
-		_deleteNormalCommand "$commandToDelete"
+		output=$(_deleteNormalCommand "$commandToDelete" 2>&1)
 		exitCode="$?"
 		case "$exitCode" in
 		0 | 3 | 5) # 0 = command deleted. 3 = command didn't exist. 5 = a warning.
