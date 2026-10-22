@@ -258,6 +258,20 @@ goResetEnv() {
 	echo "Done resetting go environment!"
 }
 
+goCleanCaches() {
+	goCacheDir=$(go env GOCACHE)
+	if [[ ! -d $goCacheDir ]]; then
+		echo "Go cache does not exist at '$goCacheDir'"
+		return 0
+	fi
+
+	echo "Go cache size"
+	du -h -s "$goCacheDir"
+
+	echo "Deleting go cache"
+	rm -rf "$goCacheDir"
+}
+
 symlinkVendorPackage() {
 	_runScript "./scripts/symlinkPackageIntoVendor.bash" "$@"
 }
