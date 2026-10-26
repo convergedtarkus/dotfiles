@@ -34,6 +34,8 @@ _goInstall() {
 # Allows running all the test in a single go file (given as the first argument to this function)
 # Any additional arguments are passed directly to the go test command (-v --count etc).
 goTestFile() {
+	goCacheSize
+
 	# The whole path to the file './blah/blah/file.go'
 	filePath="$1"
 
@@ -82,6 +84,7 @@ goTestFile() {
 # Helper for go test ./... that adds output for test run status.
 # Aggregates all stderr output and displays it at the end so it is easier to find.
 _goTestAll() {
+	goCacheSize
 	# Capture stderr while still displaying everything in real-time
 	# The fancy routing and error capturing is AI generated code.
 	local errorOutput
@@ -240,6 +243,7 @@ goLint() {
 # Resets a lot of go environment files to fix build issues.
 # gopherjs is often an issue so delete it as well.
 goResetEnv() {
+	goCacheSize
 	if command -v git >/dev/null; then
 		# This ensures there are not local changes (and this is a git repo).
 		if git diff-index --quiet HEAD --; then
@@ -265,11 +269,16 @@ goCleanCaches() {
 		return 0
 	fi
 
-	echo "Go cache size"
-	du -h -s "$goCacheDir"
+	goCacheSize
 
 	echo "Deleting go cache"
 	rm -rf "$goCacheDir"
+}
+
+goCacheSize() {
+	echo "Go cache size"
+	du -sh "$(go env GOCACHE)"
+	echo
 }
 
 symlinkVendorPackage() {

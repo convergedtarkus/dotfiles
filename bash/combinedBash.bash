@@ -141,3 +141,5 @@ if customDir="$(_dotFilesPath "../custom/")" && [[ -d $customDir ]]; then
 		fi
 	done
 fi
+
+unset GOPATH
