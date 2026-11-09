@@ -305,5 +305,6 @@ gResetVendor() {
 		<(git diff --name-only | grep -E '(^vendor/|/vendor/)' | awk -F'^vendor|/vendor/' '{print $1"/vendor/"}' | sort -u | sed 's|^/vendor/$|./vendor|g') \
 		<(git diff --name-only | grep -E '(go.mod|go.sum)')) |
 		sort -u |
-		xargs sh -c 'echo "Cleaning $@" && git checkout -- "$@" && git clean -fd -- "$@"'
+		# The '_' is a dummy arg as sh -c treats the first arg as the script name.
+		xargs sh -c 'echo "Cleaning $@" && git checkout -- "$@" && git clean -fd -- "$@"' _
 }
